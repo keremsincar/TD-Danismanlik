@@ -1,0 +1,1 @@
+"use client";export default function ErrorPage({reset}:{reset:()=>void}){return <main className="not-found"><span>!</span><p className="section-index">BEKLENMEDİK BİR DURUM</p><h1>Bu sayfa şu anda<br/>görüntülenemiyor.</h1><p>Lütfen kısa bir süre sonra yeniden deneyin.</p><button className="button button-dark" onClick={reset}>Tekrar dene</button></main>}
