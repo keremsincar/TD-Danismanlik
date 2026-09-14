@@ -9,6 +9,20 @@ export type Review = { id:number; author:string; context:string; quote:string; i
 export type Faq = { id:number; question:string; answer:string; category:string; active:number; sortOrder:number };
 export type HomeCopy = { heroEyebrow:string; servicesTitle:string; servicesIntro:string; aboutTitle:string; aboutBody:string; finderTitle:string; finderIntro:string; processTitle:string; processIntro:string; reviewsTitle:string; contactTitle:string; contactBody:string };
 export const defaultHomeCopy: HomeCopy = {
+  heroEyebrow:"Yeşilköy, İstanbul · Eğitim ve resmî işlemler",
+  servicesTitle:"Eğitimden resmî işlemlere.",
+  servicesIntro:"Bölüm tercihi, kayıt evrakı ve ikamet başvurusu için hangi adımın ne zaman yapılacağını birlikte belirleyelim.",
+  aboutTitle:"Her dosyaya aynı yerden başlamıyoruz.",
+  aboutBody:"Önce durumunuzu dinler, belgelerinizi ve takvimi önümüze koyarız. Sonra gerçekten gerekli adımları sırasıyla planlarız.",
+  finderTitle:"Hangi bölüm, hangi şehir?",
+  finderIntro:"Şehir, derece ve eğitim diline göre örnek programları karşılaştırın. Güncel koşulları başvuru öncesinde birlikte teyit ederiz.",
+  processTitle:"Süreç gözünüzün önünde ilerlesin.",
+  processIntro:"Başlangıçta bir yol haritası çıkarır, her aşamada nerede olduğunuzu paylaşırız.",
+  reviewsTitle:"Danışan notları",
+  contactTitle:"Sorunuzu konuşalım.",
+  contactBody:"Üniversite, kayıt veya resmî işlemle ilgili sorunuz varsa bize yazın. İlk görüşmede neye ihtiyacınız olduğunu netleştirelim.",
+};
+const legacyHomeCopy: Partial<HomeCopy> = {
   heroEyebrow:"Eğitim ve yaşam danışmanlığı · İstanbul",
   servicesTitle:"İHTİYACINIZ OLAN DESTEK, TEK YERDE.",
   servicesIntro:"Üniversite tercihinden resmî işlemlere kadar her aşamayı açık bir planla birlikte yürütüyoruz.",
@@ -29,9 +43,9 @@ export type Consultation = { id:number; name:string; phone:string; whatsapp:stri
 
 const defaultSettings: SiteSettings = {
   siteName:"TD Danışmanlık", heroTitle:"Doğru adım. Net bir gelecek.",
-  heroDescription:"Üniversite seçiminden ikamet ve vatandaşlık işlemlerine kadar tüm süreci, sizin için sadeleştiriyor ve özenle takip ediyoruz.",
-  ctaText:"Görüşme talebi oluşturun", phone:"+90 507 077 87 15", whatsapp:"905070778715", address:"Yeşilköy, İstanbul Dünya Ticaret Mrk. A2 Blok Kat:5 Daire:206, 34500 Bakırköy/İstanbul", hours:"Mesai bitişi: 17.00", email:"info@tddanismanlik.com",
-  headingFont:"Manrope", bodyFont:"Manrope", primaryColor:"#17181c", accentColor:"#1047e8", updatedAt:new Date().toISOString(),
+  heroDescription:"Türkiye’de üniversite başvurusu, kayıt ve resmî işlemler için dosyanıza uygun bir plan çıkarıyoruz. Belgeyi, tarihi ve sonraki adımı birlikte takip ediyoruz.",
+  ctaText:"Görüşme planlayalım", phone:"+90 507 077 87 15", whatsapp:"905070778715", address:"Yeşilköy, İstanbul Dünya Ticaret Mrk. A2 Blok Kat:5 Daire:206, 34500 Bakırköy/İstanbul", hours:"Mesai bitişi: 17.00", email:"info@tddanismanlik.com",
+  headingFont:"Newsreader", bodyFont:"IBM Plex Sans", primaryColor:"#17181c", accentColor:"#1047e8", updatedAt:new Date().toISOString(),
 };
 
 const defaultServices = [
@@ -114,8 +128,8 @@ async function seedDefaults() {
   ].map((r,i)=>d1.prepare("INSERT INTO reviews (author,context,quote,is_example,active,sort_order,updated_at) VALUES (?,?,?,1,1,?,?)").bind(...r,i+1,now)));
 }
 
-export async function getSettings(): Promise<SiteSettings> { await ensureDatabase(); const row=await db().prepare("SELECT site_name AS siteName,hero_title AS heroTitle,hero_description AS heroDescription,cta_text AS ctaText,phone,whatsapp,address,hours,email,heading_font AS headingFont,body_font AS bodyFont,primary_color AS primaryColor,accent_color AS accentColor,updated_at AS updatedAt FROM site_settings WHERE id=1").first<SiteSettings>(); if(!row)return defaultSettings; const legacyPalette=row.primaryColor==="#14362e"&&row.accentColor==="#dfff70"; return {...row,phone:row.phone||defaultSettings.phone,whatsapp:row.whatsapp||defaultSettings.whatsapp,address:row.address||defaultSettings.address,hours:row.hours||defaultSettings.hours,headingFont:legacyPalette&&row.headingFont==="Newsreader"?"Manrope":row.headingFont,primaryColor:row.primaryColor==="#14362e"?defaultSettings.primaryColor:row.primaryColor,accentColor:row.accentColor==="#dfff70"?defaultSettings.accentColor:row.accentColor}; }
-export async function getHomeCopy(): Promise<HomeCopy> { await ensureDatabase(); const rows=(await db().prepare("SELECT key,value FROM home_content").all<{key:string;value:string}>()).results; return rows.reduce((copy,row)=>{if(row.key in copy)(copy as unknown as Record<string,string>)[row.key]=row.value;return copy;},{...defaultHomeCopy}); }
+export async function getSettings(): Promise<SiteSettings> { await ensureDatabase(); const row=await db().prepare("SELECT site_name AS siteName,hero_title AS heroTitle,hero_description AS heroDescription,cta_text AS ctaText,phone,whatsapp,address,hours,email,heading_font AS headingFont,body_font AS bodyFont,primary_color AS primaryColor,accent_color AS accentColor,updated_at AS updatedAt FROM site_settings WHERE id=1").first<SiteSettings>(); if(!row)return defaultSettings; const legacyPalette=row.primaryColor==="#14362e"&&row.accentColor==="#dfff70"; return {...row,phone:row.phone||defaultSettings.phone,whatsapp:row.whatsapp||defaultSettings.whatsapp,address:row.address||defaultSettings.address,hours:row.hours||defaultSettings.hours,heroDescription:legacyPalette&&row.heroDescription==="Üniversite seçiminden ikamet ve vatandaşlık işlemlerine kadar tüm süreci, sizin için sadeleştiriyor ve özenle takip ediyoruz."?defaultSettings.heroDescription:row.heroDescription,ctaText:legacyPalette&&row.ctaText==="Yol haritanızı oluşturalım"?defaultSettings.ctaText:row.ctaText,headingFont:legacyPalette?defaultSettings.headingFont:row.headingFont,bodyFont:legacyPalette?defaultSettings.bodyFont:row.bodyFont,primaryColor:row.primaryColor==="#14362e"?defaultSettings.primaryColor:row.primaryColor,accentColor:row.accentColor==="#dfff70"?defaultSettings.accentColor:row.accentColor}; }
+export async function getHomeCopy(): Promise<HomeCopy> { await ensureDatabase(); const rows=(await db().prepare("SELECT key,value FROM home_content").all<{key:string;value:string}>()).results; return rows.reduce((copy,row)=>{const key=row.key as keyof HomeCopy;if(key in copy)copy[key]=legacyHomeCopy[key]===row.value?defaultHomeCopy[key]:row.value;return copy;},{...defaultHomeCopy}); }
 export async function getReviews(activeOnly=true): Promise<Review[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,author,context,quote,is_example AS isExample,active,sort_order AS sortOrder,updated_at AS updatedAt FROM reviews WHERE active=1 ORDER BY sort_order,id":"SELECT id,author,context,quote,is_example AS isExample,active,sort_order AS sortOrder,updated_at AS updatedAt FROM reviews ORDER BY sort_order,id";return (await db().prepare(q).all<Review>()).results; }
 export async function getServices(activeOnly=true): Promise<Service[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services WHERE active=1 ORDER BY sort_order":"SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services ORDER BY sort_order"; return (await db().prepare(q).all<Service>()).results; }
 export async function getService(slug:string): Promise<Service|null> { await ensureDatabase(); return await db().prepare("SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services WHERE slug=? AND active=1").bind(slug).first<Service>(); }

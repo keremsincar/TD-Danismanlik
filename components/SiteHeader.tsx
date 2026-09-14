@@ -6,7 +6,7 @@ const languages = [{code:"tr",label:"Türkçe"},{code:"en",label:"English"},{cod
 export function SiteHeader({settings,locale="tr"}:{settings:SiteSettings;locale?:string}) {
   const home=`/${locale}`;
   return <header className="site-header elab-header">
-    <Link className="brand elab-brand" href={home} aria-label={`${settings.siteName} ana sayfa`}><span className="brand-mark">TD</span><span>{settings.siteName}</span></Link>
+    <Link className="brand elab-brand" href={home} aria-label={`${settings.siteName} ana sayfa`}><span className="brand-mark">TD</span><span>{settings.siteName.replace(/^TD\s+/i,"")}</span></Link>
     <nav className="desktop-nav elab-nav" aria-label="Ana menü">
       <Link href={`${home}#hizmetler`}>Hizmetler</Link>
       <Link href={`${home}#universiteler`}>Üniversiteler</Link>

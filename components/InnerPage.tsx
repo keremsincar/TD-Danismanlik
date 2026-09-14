@@ -6,7 +6,7 @@ import { WhatsAppIcon } from "./WhatsAppIcon";
 export function InnerPage({settings,locale="tr",crumbs,children}:{settings:SiteSettings;locale?:string;crumbs:{label:string;href?:string}[];children:React.ReactNode}) {
   const whatsapp=`https://wa.me/${settings.whatsapp.replace(/\D/g,"")}?text=${encodeURIComponent("Merhaba TD Danışmanlık, bilgi almak istiyorum.")}`;
   const schema={"@context":"https://schema.org","@type":"BreadcrumbList",itemListElement:crumbs.map((item,i)=>({"@type":"ListItem",position:i+1,name:item.label,item:item.href?`https://tddanismanlik.com${item.href}`:undefined}))};
-  return <div className="elab-inner-page" dir={locale==="ar"?"rtl":"ltr"} style={{"--primary":settings.primaryColor,"--accent":settings.accentColor,"--site-heading-font":settings.headingFont==="Newsreader"?"var(--font-serif)":"var(--font-sans)","--site-body-font":settings.bodyFont==="Newsreader"?"var(--font-serif)":"var(--font-sans)"} as React.CSSProperties}>
+  return <div className="elab-inner-page" dir={locale==="ar"?"rtl":"ltr"} style={{"--primary":settings.primaryColor,"--accent":settings.accentColor,"--site-heading-font":settings.headingFont==="Newsreader"?"var(--font-serif)":settings.headingFont==="IBM Plex Sans"?"var(--font-plex)":"var(--font-sans)","--site-body-font":settings.bodyFont==="Newsreader"?"var(--font-serif)":settings.bodyFont==="IBM Plex Sans"?"var(--font-plex)":"var(--font-sans)"} as React.CSSProperties}>
     <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(schema)}}/>
     <SiteHeader settings={settings} locale={locale}/>
     <div className="breadcrumb">{crumbs.map((item,i)=><span key={`${item.label}-${i}`}>{i>0&&<i>／</i>}{item.href?<Link href={item.href}>{item.label}</Link>:item.label}</span>)}</div>
