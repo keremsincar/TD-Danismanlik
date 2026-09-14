@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/NativeLink";
 import { InnerPage } from "@/components/InnerPage";
 import { ConsultationForm } from "@/components/ConsultationForm";
 import { ContactPage } from "@/components/ContactPage";

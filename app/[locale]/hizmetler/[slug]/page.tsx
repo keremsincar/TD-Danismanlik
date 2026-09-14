@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/NativeLink";
 import { InnerPage } from "@/components/InnerPage";
 import { getService, getServices, getSettings } from "@/lib/content";
 export const dynamic="force-dynamic";

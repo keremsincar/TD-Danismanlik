@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element -- Local, size-bounded photos avoid a Vinext next/image client-navigation hook error. */
-import Link from "next/link";
+import Link from "@/components/NativeLink";
 import type { HomeCopy, Program, Review, Service, SiteSettings, University } from "@/lib/content";
 import { ProgramFinder } from "./ProgramFinder";
 import { CookieBanner } from "./CookieBanner";

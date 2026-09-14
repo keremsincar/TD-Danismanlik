@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/NativeLink";
 import type { SiteSettings } from "@/lib/content";
 import { MapEmbed } from "./MapEmbed";
 import { WhatsAppIcon } from "./WhatsAppIcon";
