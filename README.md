@@ -46,7 +46,7 @@ npm run build
 
 ## Ortam değişkenleri
 
-`.env.example` dosyasını temel alın. `ADMIN_EMAIL`, yönetim alanına girebilecek tek hesabı belirler. Varsayılan başlangıç hesabı `info@tddanismanlik.com` olarak tanımlıdır.
+`.env.example` dosyasını temel alın. `ADMIN_EMAIL`, yönetim alanına girebilecek ChatGPT hesaplarını virgülle ayrılmış bir liste olarak belirler. Varsayılan başlangıç hesabı `info@tddanismanlik.com` olarak tanımlıdır.
 
 Yönetici girişi `/admin/login` adresindedir. Kimlik doğrulama, dağıtım platformunun güvenli oturum akışını kullanır; kullanıcı şifresi kaynak kodda veya veritabanında tutulmaz. Bu nedenle briefte paylaşılan başlangıç parolası projeye yazılmamıştır.
 
