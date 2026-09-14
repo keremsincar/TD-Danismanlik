@@ -8,6 +8,8 @@ export const siteSettings = sqliteTable("site_settings", {
   ctaText: text("cta_text").notNull(),
   phone: text("phone").notNull(),
   whatsapp: text("whatsapp").notNull(),
+  address: text("address").notNull().default(""),
+  hours: text("hours").notNull().default(""),
   email: text("email").notNull(),
   headingFont: text("heading_font").notNull(),
   bodyFont: text("body_font").notNull(),
@@ -59,3 +61,15 @@ export const auditLogs = sqliteTable("audit_logs", {
 export const rateLimits = sqliteTable("rate_limits", {
   key: text("key").primaryKey(), count: integer("count").notNull(), resetAt: integer("reset_at").notNull(),
 });
+
+export const homeContent = sqliteTable("home_content", {
+  key: text("key").primaryKey(), value: text("value").notNull(), updatedAt: text("updated_at").notNull(),
+});
+
+export const reviews = sqliteTable("reviews", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  author: text("author").notNull(), context: text("context").notNull(), quote: text("quote").notNull(),
+  isExample: integer("is_example", { mode: "boolean" }).notNull().default(true),
+  active: integer("active", { mode: "boolean" }).notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0), updatedAt: text("updated_at").notNull(),
+}, table => [index("idx_reviews_active_order").on(table.active, table.sortOrder)]);

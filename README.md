@@ -5,9 +5,10 @@ Premium kurumsal site, program arama deneyimi ve güvenli içerik yönetim panel
 ## Özellikler
 
 - Türkçe, İngilizce, Rusça ve Arapça rotaları; Arapça için RTL yerleşim
-- Yönetilebilir site adı, hero metni, CTA, telefon, WhatsApp, e-mail, font ve tema renkleri
-- Hizmet, üniversite ve program kayıtları için çalışan yönetim ekranları
-- Program arama ve şehir/derece/dil filtreleri
+- Yönetilebilir site adı, hero metni, ana sayfa yazıları, CTA, telefon, WhatsApp, adres, çalışma saati, e-mail, font ve tema renkleri
+- Hizmet, üniversite, program, yorum ve SSS kayıtları için ekleme/düzenleme/yayından kaldırma ekranları
+- Program arama ve üniversite/şehir/derece/dil filtreleri
+- Google Maps haritası ve WhatsApp için hazır mesaj bağlantıları
 - Veritabanına kaydedilen danışmanlık talepleri, durum/not yönetimi ve CSV dışa aktarma
 - Honeypot, sunucu tarafı doğrulama, aynı-origin kontrolü ve D1 tabanlı rate limiting
 - Opsiyonel Resend bildirim e-maili
@@ -23,10 +24,16 @@ npm install
 npm run dev
 ```
 
-Yerel D1 veritabanı ilk istekte şemayı ve örnek içerikleri otomatik oluşturur. Şema değişikliklerinden sonra:
+Yerel D1 için önce migration dosyalarını uygulayın; ardından ilk istekte örnek içerikler eklenir. Şema değişikliklerinden sonra migration üretin:
 
 ```bash
 npm run db:generate
+```
+
+Mevcut yerel D1 veritabanını güncellerken önce `npm run build` çalıştırın, ardından yeni migration dosyasını Wrangler ile uygulayın. Sıfırdan başlayan veritabanında `drizzle/` dosyalarını sırayla uygulayın. Son migration örneği:
+
+```bash
+npx wrangler d1 execute site-creator-d1 --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0002_demonic_the_initiative.sql
 ```
 
 Kalite kontrolleri:
@@ -67,4 +74,4 @@ Resend alan adını doğrulayın ve gönderici adresini production hesabınızla
 
 ## İçerik notu
 
-Başlangıç üniversite ve program kayıtları katalog deneyimini göstermek için örnek içeriktir. Ücret, kontenjan ve başvuru şartlarını yayına almadan önce güncel resmî kaynaklarla doğrulayın. KVKK ve yasal sayfaların şirket bilgileri tamamlandıktan sonra hukuk danışmanı tarafından gözden geçirilmesi önerilir.
+Başlangıç üniversite ve program kayıtları katalog deneyimini göstermek için örnek içeriktir. Yorumlar da yönetim panelinden gerçek ve onaylı yorumlarla değiştirilene kadar açıkça “Temsili yorum” olarak işaretlenir. Ücret, kontenjan ve başvuru şartlarını yayına almadan önce güncel resmî kaynaklarla doğrulayın. KVKK ve yasal sayfaların şirket bilgileri tamamlandıktan sonra hukuk danışmanı tarafından gözden geçirilmesi önerilir.

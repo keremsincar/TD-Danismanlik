@@ -15,6 +15,13 @@
       "when": 1788526606769,
       "tag": "0001_bored_warbound",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1789377990133,
+      "tag": "0002_demonic_the_initiative",
+      "breakpoints": true
     }
   ]
 }

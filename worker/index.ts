@@ -47,7 +47,7 @@ const worker = {
     secured.headers.set("X-Frame-Options", "SAMEORIGIN");
     secured.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
     secured.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-    secured.headers.set("Content-Security-Policy", "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; connect-src 'self' https://api.resend.com https://www.google-analytics.com; font-src 'self' data:; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://wa.me");
+    secured.headers.set("Content-Security-Policy", "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; connect-src 'self' https://api.resend.com https://www.google-analytics.com; font-src 'self' data:; frame-src https://maps.google.com https://www.google.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https://wa.me");
     return secured;
   },
 };
