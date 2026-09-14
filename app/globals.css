@@ -124,7 +124,6 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
 .elab-inline-link{font-size:14px;font-weight:780;border-bottom:1px solid currentColor;padding-bottom:4px}
 .elab-hero-photo{position:relative;min-height:680px;overflow:hidden;background:#d8e1ee}
 .elab-hero-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:57% center}
-.elab-photo-credit{position:absolute;right:20px;top:18px;padding:7px 10px;border-radius:20px;background:rgba(255,255,255,.88);font-size:10px;font-weight:700;color:#2d3541}
 .elab-hero-tiles{position:absolute;z-index:3;bottom:24px;left:5.4vw;right:5.4vw;display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
 .elab-hero-tiles>div{display:flex;align-items:center;gap:19px;min-height:106px;padding:20px 25px;border-radius:28px;background:rgba(255,255,255,.94);box-shadow:0 18px 50px rgba(16,42,99,.08)}
 .elab-hero-tiles>div:last-child{background:var(--accent);color:white}
@@ -149,7 +148,6 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
 .elab-about-main>div:first-child>p:not(.elab-kicker){max-width:680px;margin:30px 0;font-size:19px;line-height:1.55;color:#4c5664}
 .elab-about-photo{position:relative;min-height:520px;border:27px solid #1e2024;border-radius:45px;overflow:hidden;background:#1e2024}
 .elab-about-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 60%}
-.elab-about-photo>span{position:absolute;right:17px;bottom:17px;max-width:230px;padding:16px 18px;border-radius:16px;background:white;font-size:15px;font-weight:720;line-height:1.25}
 .elab-principles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:45px}
 .elab-principles article{min-height:220px;padding:25px;border-radius:25px;background:#f0f3fa}
 .elab-principles article:nth-child(2){background:#1047e8;color:white}
@@ -184,11 +182,11 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
 .elab-review-mark{height:35px;font-size:74px;line-height:.7;font-weight:800}
 .elab-review-card blockquote{margin:35px 0 auto;font-size:clamp(18px,1.6vw,25px);line-height:1.38;letter-spacing:-.035em;font-weight:620}
 .elab-review-card>div:nth-of-type(2){display:flex;align-items:center;gap:11px;margin-top:30px}
-.elab-review-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#dce6f8;font-size:17px;font-weight:800;color:#101726}
+.elab-review-avatar{width:42px;height:42px;flex:none;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:#dce6f8;font-size:17px;font-weight:800;color:#101726}
+.elab-review-avatar img{display:block;width:100%;height:100%;object-fit:cover}
 .elab-review-card p{margin:0}
 .elab-review-card strong,.elab-review-card small{display:block;font-size:12px}
 .elab-review-card small{margin-top:3px;opacity:.65}
-.elab-example-badge{position:absolute;top:24px;right:24px;padding:7px 10px;border-radius:20px;background:rgba(255,255,255,.7);color:#1b2d4e;font-size:10px;font-weight:780}
 .elab-faq{display:grid;grid-template-columns:.85fr 1.15fr;gap:7vw}
 .elab-faq h2{font-size:clamp(44px,4.6vw,74px)}
 .elab-faq>div:first-child>p:not(.elab-kicker){margin:25px 0 11px;color:#606978;font-size:15px}
@@ -305,7 +303,6 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
 .elab-service-card p,.elab-service-card-3 p{color:#5b6668}
 .elab-card-cta{font-weight:600;color:#26465b}
 .elab-about-photo{border:15px solid #252a2c;border-radius:23px}
-.elab-about-photo>span{border-radius:8px;font-family:var(--font-serif),serif;font-size:19px;font-weight:450}
 .elab-principles article,.elab-principles article:nth-child(2){border:1px solid #e5e7e4;border-radius:18px;background:#f7f8f5;color:#1d2223}
 .elab-principles span{font-family:var(--font-plex),sans-serif;font-weight:600;color:#6e7775}
 .elab-principles h3{font-family:var(--font-serif),serif;font-size:31px;font-weight:500;letter-spacing:-.04em}
@@ -322,7 +319,6 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
 .elab-review-mark{font-family:var(--font-serif),serif;font-weight:500;color:#6b8490}
 .elab-review-card blockquote{font-family:var(--font-serif),serif;font-size:clamp(22px,1.85vw,29px);font-weight:450;line-height:1.27;letter-spacing:-.025em}
 .elab-review-avatar{background:#e8ebea;font-weight:600}
-.elab-example-badge{background:#e9ece8;color:#4c5554;font-weight:600}
 .elab-contact{background:#f5f6f3}
 .elab-contact-copy>p:not(.elab-kicker){color:#4c5658}
 .elab-inner-page .breadcrumb{background:#f5f6f3;border-color:#dedfdc}
