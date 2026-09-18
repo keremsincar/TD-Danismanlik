@@ -1,3 +1,30 @@
-import { notFound } from "next/navigation";import Link from "@/components/NativeLink";import { InnerPage } from "@/components/InnerPage";import { getPrograms,getSettings,getUniversity } from "@/lib/content";export const dynamic="force-dynamic";
-export async function generateMetadata({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const u=await getUniversity(slug);if(!u)return{};const title=`${u.name} | TD Danışmanlık`;return{title,description:u.description,openGraph:{title,description:u.description,images:[]},twitter:{card:"summary",title,description:u.description,images:[]}}}
-export default async function UniversityPage({params}:{params:Promise<{locale:string;slug:string}>}){const {locale,slug}=await params;const [settings,u]=await Promise.all([getSettings(),getUniversity(slug)]);if(!u)notFound();const programs=await getPrograms(u.id);return <InnerPage settings={settings} locale={locale} crumbs={[{label:"Ana Sayfa",href:`/${locale}`},{label:"Üniversiteler",href:`/${locale}#universiteler`},{label:u.name}]}><main className="catalog-detail"><section><p className="section-index">{u.city} · {u.country}</p><h1>{u.name}</h1><p>{u.description}</p><Link className="button button-primary" href={`/${locale}/danismanlik-talebi`}>Bu üniversite için bilgi alın ↗</Link></section><aside><span>{u.name.split(" ").map(x=>x[0]).join("").slice(0,3)}</span><small>ÜNİVERSİTE PROFİLİ</small></aside></main><section className="program-list-section"><div><p className="section-index">PROGRAMLAR</p><h2>İlgili bölümler</h2></div><div>{programs.length?programs.map(p=><Link href={`/${locale}/bolumler/${p.slug}`} key={p.id}><span>{p.degreeType}</span><h3>{p.name}</h3><p>{p.language} · {p.duration}</p><b>↗</b></Link>):<p className="empty-state">Bu üniversite için henüz program eklenmedi.</p>}</div></section></InnerPage>}
+import { notFound } from "next/navigation";
+import Link from "@/components/NativeLink";
+import { InnerPage } from "@/components/InnerPage";
+import { getPrograms, getSettings, getUniversity } from "@/lib/content";
+import { languageLabels, universityDetailText } from "@/lib/i18n";
+
+export const dynamic="force-dynamic";
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}) {
+  const {slug}=await params;
+  const u=await getUniversity(slug);
+  return u?{title:`${u.name} | TD Danışmanlık`,description:`${u.name}: ${u.city}, ${u.institutionType.toLocaleLowerCase("tr-TR")} üniversitesi. Program ve başvuru bilgilerini inceleyin.`}:{};
+}
+
+export default async function UniversityPage({params}:{params:Promise<{locale:string;slug:string}>}) {
+  const {locale,slug}=await params;
+  const [settings,u]=await Promise.all([getSettings(),getUniversity(slug)]);
+  if(!u)notFound();
+  const programs=await getPrograms(u.id);
+  const t=universityDetailText(locale),nav=languageLabels(locale);
+  const type=u.institutionType==="Devlet"?t.public:u.institutionType==="Vakıf"?t.foundation:u.institutionType;
+  return <InnerPage settings={settings} locale={locale} crumbs={[{label:nav.home,href:`/${locale}`},{label:t.university,href:`/${locale}/universiteler`},{label:u.name}]}>
+    <main className="catalog-detail university-detail">
+      <section><p className="section-index">{u.city} · {type}</p><h1>{u.name}</h1><p>{locale==="tr"?u.description:t.generic}</p><div className="university-facts"><div><small>{t.city}</small><strong>{u.city}</strong></div><div><small>{t.type}</small><strong>{type}</strong></div><div><small>{t.founded}</small><strong>{u.founded&&u.founded!=="—"?u.founded:t.unknown}</strong></div></div><Link className="button button-primary" href={`/${locale}/danismanlik-talebi`}>{t.consult} ↗</Link></section>
+      <aside><span>{u.name.split(" ").map(x=>x[0]).join("").slice(0,3)}</span><small>{t.profile}</small></aside>
+    </main>
+    <section className="university-guidance"><article><p className="section-index">01</p><h2>{t.admission}</h2><p>{t.admissionBody}</p></article><article><p className="section-index">02</p><h2>{t.documents}</h2><p>{t.documentsBody}</p></article><article><p className="section-index">03</p><h2>{t.support}</h2><p>{t.supportBody}</p></article></section>
+    <section className="program-list-section"><div><p className="section-index">{nav.programs}</p><h2>{t.programs}</h2><p>{t.programNote}</p><a href="https://yokatlas.yok.gov.tr/" target="_blank" rel="noopener noreferrer">{t.atlas} ↗</a></div><div>{programs.length?programs.map(p=><Link href={`/${locale}/bolumler/${p.slug}`} key={p.id}><span>{p.degreeType}</span><h3>{p.name}</h3><p>{p.language} · {p.duration}</p><b>↗</b></Link>):<p className="empty-state">{t.empty}</p>}</div></section>
+    <section className="university-bottom-cta"><h2>{t.bottomTitle}</h2><p>{t.bottomBody}</p><Link className="elab-pill elab-pill-blue" href={`/${locale}/danismanlik-talebi`}>{t.request} ↗</Link></section>
+  </InnerPage>;
+}

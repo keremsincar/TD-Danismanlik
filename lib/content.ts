@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import { universityCatalog } from "./university-catalog";
 
 export type SiteSettings = {
   siteName: string; heroTitle: string; heroDescription: string; ctaText: string;
@@ -6,15 +7,11 @@ export type SiteSettings = {
   primaryColor: string; accentColor: string; updatedAt: string;
 };
 export type Review = { id:number; author:string; context:string; quote:string; isExample:number; active:number; sortOrder:number; updatedAt:string; avatar?:string };
-const sampleReviewProfiles = [
-  { context:"Üniversite başvurusu", author:"Derya Kaya", avatar:"https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=320&h=320&fit=crop" },
-  { context:"İkamet işlemleri", author:"Emre Yıldız", avatar:"https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=320&h=320&fit=crop" },
-  { context:"Program seçimi", author:"Lina Arslan", avatar:"https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg?auto=compress&cs=tinysrgb&w=320&h=320&fit=crop" },
-];
 export type Faq = { id:number; question:string; answer:string; category:string; active:number; sortOrder:number };
 export type HomeCopy = { heroEyebrow:string; servicesTitle:string; servicesIntro:string; aboutTitle:string; aboutBody:string; finderTitle:string; finderIntro:string; processTitle:string; processIntro:string; reviewsTitle:string; contactTitle:string; contactBody:string };
+export type SiteImages = { hero:string; about:string };
 export const defaultHomeCopy: HomeCopy = {
-  heroEyebrow:"Yeşilköy, İstanbul · Eğitim ve resmî işlemler",
+  heroEyebrow:"TD Danışmanlık",
   servicesTitle:"Eğitimden resmî işlemlere.",
   servicesIntro:"Bölüm tercihi, kayıt evrakı ve ikamet başvurusu için hangi adımın ne zaman yapılacağını birlikte belirleyelim.",
   aboutTitle:"Her dosyaya aynı yerden başlamıyoruz.",
@@ -42,14 +39,14 @@ const legacyHomeCopy: Partial<HomeCopy> = {
   contactBody:"Sorunuzu bize iletin; ihtiyacınıza uygun ilk adımı birlikte belirleyelim.",
 };
 export type Service = { id:number; slug:string; title:string; summary:string; detail:string; icon:string; active:number; sortOrder:number; updatedAt:string };
-export type University = { id:number; slug:string; name:string; city:string; country:string; description:string; featured:number; active:number; updatedAt:string };
+export type University = { id:number; slug:string; name:string; city:string; country:string; description:string; featured:number; active:number; updatedAt:string; institutionType:string; founded:string };
 export type Program = { id:number; universityId:number; universityName:string; universitySlug:string; slug:string; name:string; degreeType:string; language:string; duration:string; tuitionFee:string; description:string; active:number; updatedAt:string };
 export type Consultation = { id:number; name:string; phone:string; whatsapp:string; email:string; service:string; university:string|null; program:string|null; message:string; preferredContact:string; kvkkAcceptedAt:string; status:string; adminNote:string; createdAt:string };
 
 const defaultSettings: SiteSettings = {
   siteName:"TD Danışmanlık", heroTitle:"Doğru adım. Net bir gelecek.",
   heroDescription:"Türkiye’de üniversite başvurusu, kayıt ve resmî işlemler için dosyanıza uygun bir plan çıkarıyoruz. Belgeyi, tarihi ve sonraki adımı birlikte takip ediyoruz.",
-  ctaText:"Görüşme planlayalım", phone:"+90 507 077 87 15", whatsapp:"905070778715", address:"Yeşilköy, İstanbul Dünya Ticaret Mrk. A2 Blok Kat:5 Daire:206, 34500 Bakırköy/İstanbul", hours:"Mesai bitişi: 17.00", email:"info@tddanismanlik.com",
+  ctaText:"Görüşme planlayalım", phone:"+90 507 077 87 15", whatsapp:"905070778715", address:"İstanbul Dünya Ticaret Merkezi, A2 Blok, Kat 5, Daire 206, Yeşilköy, Bakırköy/İstanbul", hours:"", email:"info@tddanismanlik.com",
   headingFont:"Newsreader", bodyFont:"IBM Plex Sans", primaryColor:"#17181c", accentColor:"#1047e8", updatedAt:new Date().toISOString(),
 };
 
@@ -85,6 +82,14 @@ const defaultFaqs = [
   ["İkamet izni için hangi belgeler gerekir?","Belge listesi başvuru türüne ve kişisel durumunuza göre değişir. Ön değerlendirme sonrasında size özel güncel bir kontrol listesi sunarız.","Resmî İşlemler",2],
   ["Çalışma izni süreci ne kadar sürer?","Süre; başvuru türüne, işverene ve kurum değerlendirmesine bağlıdır. Dosya kontrolünden sonra tahmini aşamaları şeffaf biçimde paylaşırız.","Resmî İşlemler",3],
   ["Hizmetleriniz hangi dillerde sunuluyor?","Türkçe, İngilizce, Rusça ve Arapça iletişim altyapımız bulunmaktadır.","Genel",4],
+  ["Başvuru için son tarihleri nasıl öğrenebilirim?","Başvuru tarihleri üniversiteye ve programa göre değişir. İlgilendiğiniz kurumun resmî takvimini birlikte kontrol ederiz.","Üniversite",5],
+  ["Yurt dışından başvuru yapabilir miyim?","Birçok kurum çevrim içi başvuru kabul eder. Gerekli evrak ve adımları seçtiğiniz üniversitenin resmî duyurusuna göre teyit ederiz.","Üniversite",6],
+  ["Diploma denkliği her başvuruda gerekli mi?","Gereklilik başvuru türüne ve kuruma göre değişir. Belgelerinizi inceledikten sonra ilgili resmî kaynağa göre yönlendiririz.","Resmî İşlemler",7],
+  ["Belgelerin tercümesi ve noter onayı gerekiyor mu?","Bu koşul belge türüne ve başvuru yapılan kuruma bağlıdır. Gereksiz işlem yapmamanız için önce kurumun güncel belge listesini inceleriz.","Belgeler",8],
+  ["Danışmanlık görüşmesinde neler konuşuluyor?","Hedefinizi, mevcut belgelerinizi, zaman planınızı ve önceliklerinizi ele alır; sonraki adımları özetleriz.","Genel",9],
+  ["Üniversite ücretleri sitedeki bilgilerle kesinleşir mi?","Hayır. Ücret, burs ve kontenjan bilgileri dönemsel olarak değişir; kesin bilgiyi üniversitenin güncel duyurusundan doğrulamak gerekir.","Üniversite",10],
+  ["İkamet başvurumu sizin yerinize yapıyor musunuz?","Hizmet kapsamını dosyanızın türüne ve yürürlükteki uygulamaya göre ilk görüşmede netleştiririz. Resmî kararı ilgili kurum verir.","Resmî İşlemler",11],
+  ["Görüşme için ofise gelmem şart mı?","İlk değerlendirme telefon veya çevrim içi yapılabilir. Evrak teslimi ya da yüz yüze işlem gerekiyorsa bunu önceden bildiririz.","Genel",12],
 ];
 
 function db(): D1Database { return (env as unknown as { DB:D1Database }).DB; }
@@ -121,25 +126,26 @@ async function seedDefaults() {
   if (!serviceCount?.count) await d1.batch(defaultServices.map((s,i)=>d1.prepare("INSERT INTO services (slug,title,summary,detail,icon,active,sort_order,updated_at) VALUES (?,?,?,?,?,1,?,?)").bind(...s,i+1,now)));
   const universityCount = await d1.prepare("SELECT COUNT(*) AS count FROM universities").first<{count:number}>();
   if (!universityCount?.count) await d1.batch(defaultUniversities.map(u=>d1.prepare("INSERT INTO universities (slug,name,city,country,description,featured,active,updated_at) VALUES (?,?,?,?,?,?,1,?)").bind(...u,now)));
+  if ((universityCount?.count??0)<190) {
+    for(let i=0;i<universityCatalog.length;i+=40) await d1.batch(universityCatalog.slice(i,i+40).map(u=>d1.prepare("INSERT OR IGNORE INTO universities (slug,name,city,country,description,featured,active,updated_at) VALUES (?,?,?,?,?,0,1,?)").bind(u.slug,u.name,u.city,"Türkiye",`${u.city} ilinde bulunan ${u.type.toLocaleLowerCase("tr-TR")} üniversitesi. Program, ücret ve başvuru koşullarını üniversitenin güncel resmî duyurularından teyit edin.`,now)));
+  }
   const programCount = await d1.prepare("SELECT COUNT(*) AS count FROM programs").first<{count:number}>();
   if (!programCount?.count) await d1.batch(defaultPrograms.map(p=>d1.prepare("INSERT INTO programs (university_id,slug,name,degree_type,language,duration,tuition_fee,description,active,updated_at) VALUES (?,?,?,?,?,?,?,?,1,?)").bind(...p,now)));
   const faqCount = await d1.prepare("SELECT COUNT(*) AS count FROM faqs").first<{count:number}>();
   if (!faqCount?.count) await d1.batch(defaultFaqs.map(f=>d1.prepare("INSERT INTO faqs (question,answer,category,active,sort_order) VALUES (?,?,?,1,?)").bind(...f)));
-  const reviewCount = await d1.prepare("SELECT COUNT(*) AS count FROM reviews").first<{count:number}>();
-  if (!reviewCount?.count) await d1.batch([
-    ["Derya Kaya", "Üniversite başvurusu", "Başvuru takvimini ve gerekli belgeleri ilk görüşmede netleştirmeleri, süreç boyunca ne yapacağımı bilmemi sağladı."],
-    ["Emre Yıldız", "İkamet işlemleri", "İkamet dosyamdaki eksikleri önceden görüp tek tek tamamladık. Sorularımın yanıtını her aşamada açıkça aldım."],
-    ["Lina Arslan", "Program seçimi", "Seçenekleri yalnızca sıralamadılar; bütçem ve hedeflerim üzerinden birlikte değerlendirdik."],
-  ].map((r,i)=>d1.prepare("INSERT INTO reviews (author,context,quote,is_example,active,sort_order,updated_at) VALUES (?,?,?,1,1,?,?)").bind(...r,i+1,now)));
+  if (faqCount?.count && faqCount.count<defaultFaqs.length) await d1.batch(defaultFaqs.slice(faqCount.count).map(f=>d1.prepare("INSERT INTO faqs (question,answer,category,active,sort_order) VALUES (?,?,?,1,?)").bind(...f)));
 }
 
-export async function getSettings(): Promise<SiteSettings> { await ensureDatabase(); const row=await db().prepare("SELECT site_name AS siteName,hero_title AS heroTitle,hero_description AS heroDescription,cta_text AS ctaText,phone,whatsapp,address,hours,email,heading_font AS headingFont,body_font AS bodyFont,primary_color AS primaryColor,accent_color AS accentColor,updated_at AS updatedAt FROM site_settings WHERE id=1").first<SiteSettings>(); if(!row)return defaultSettings; const legacyPalette=row.primaryColor==="#14362e"&&row.accentColor==="#dfff70"; return {...row,phone:row.phone||defaultSettings.phone,whatsapp:row.whatsapp||defaultSettings.whatsapp,address:row.address||defaultSettings.address,hours:row.hours||defaultSettings.hours,heroDescription:legacyPalette&&row.heroDescription==="Üniversite seçiminden ikamet ve vatandaşlık işlemlerine kadar tüm süreci, sizin için sadeleştiriyor ve özenle takip ediyoruz."?defaultSettings.heroDescription:row.heroDescription,ctaText:legacyPalette&&row.ctaText==="Yol haritanızı oluşturalım"?defaultSettings.ctaText:row.ctaText,headingFont:legacyPalette?defaultSettings.headingFont:row.headingFont,bodyFont:legacyPalette?defaultSettings.bodyFont:row.bodyFont,primaryColor:row.primaryColor==="#14362e"?defaultSettings.primaryColor:row.primaryColor,accentColor:row.accentColor==="#dfff70"?defaultSettings.accentColor:row.accentColor}; }
-export async function getHomeCopy(): Promise<HomeCopy> { await ensureDatabase(); const rows=(await db().prepare("SELECT key,value FROM home_content").all<{key:string;value:string}>()).results; return rows.reduce((copy,row)=>{const key=row.key as keyof HomeCopy;if(key in copy)copy[key]=legacyHomeCopy[key]===row.value?defaultHomeCopy[key]:row.value;return copy;},{...defaultHomeCopy}); }
-export async function getReviews(activeOnly=true): Promise<Review[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,author,context,quote,is_example AS isExample,active,sort_order AS sortOrder,updated_at AS updatedAt FROM reviews WHERE active=1 ORDER BY sort_order,id":"SELECT id,author,context,quote,is_example AS isExample,active,sort_order AS sortOrder,updated_at AS updatedAt FROM reviews ORDER BY sort_order,id";const rows=(await db().prepare(q).all<Review>()).results;return rows.map(review=>{const profile=review.isExample?sampleReviewProfiles.find(item=>item.context===review.context):undefined;if(!profile || (review.author!=="Örnek danışan" && review.author!==profile.author))return review;return {...review,author:review.author==="Örnek danışan"?profile.author:review.author,avatar:profile.avatar};}); }
+export async function getSettings(): Promise<SiteSettings> { await ensureDatabase(); const row=await db().prepare("SELECT site_name AS siteName,hero_title AS heroTitle,hero_description AS heroDescription,cta_text AS ctaText,phone,whatsapp,address,hours,email,heading_font AS headingFont,body_font AS bodyFont,primary_color AS primaryColor,accent_color AS accentColor,updated_at AS updatedAt FROM site_settings WHERE id=1").first<SiteSettings>(); if(!row)return defaultSettings; const legacyPalette=row.primaryColor==="#14362e"&&row.accentColor==="#dfff70"; return {...row,phone:row.phone||defaultSettings.phone,whatsapp:row.whatsapp||defaultSettings.whatsapp,address:row.address||defaultSettings.address,hours:"",heroDescription:legacyPalette&&row.heroDescription==="Üniversite seçiminden ikamet ve vatandaşlık işlemlerine kadar tüm süreci, sizin için sadeleştiriyor ve özenle takip ediyoruz."?defaultSettings.heroDescription:row.heroDescription,ctaText:legacyPalette&&row.ctaText==="Yol haritanızı oluşturalım"?defaultSettings.ctaText:row.ctaText,headingFont:legacyPalette?defaultSettings.headingFont:row.headingFont,bodyFont:legacyPalette?defaultSettings.bodyFont:row.bodyFont,primaryColor:row.primaryColor==="#14362e"?defaultSettings.primaryColor:row.primaryColor,accentColor:row.accentColor==="#dfff70"?defaultSettings.accentColor:row.accentColor}; }
+export async function getHomeCopy(): Promise<HomeCopy> { await ensureDatabase(); const rows=(await db().prepare("SELECT key,value FROM home_content").all<{key:string;value:string}>()).results; return rows.reduce((copy,row)=>{const key=row.key as keyof HomeCopy;if(key in copy)copy[key]=legacyHomeCopy[key]===row.value||key==="heroEyebrow"&&row.value==="Yeşilköy, İstanbul · Eğitim ve resmî işlemler"?defaultHomeCopy[key]:row.value;return copy;},{...defaultHomeCopy}); }
+export async function getSiteImages():Promise<SiteImages> { await ensureDatabase(); const rows=(await db().prepare("SELECT key,value FROM home_content WHERE key IN ('imageHero','imageAbout')").all<{key:string;value:string}>()).results;const values=Object.fromEntries(rows.map(row=>[row.key,row.value]));return {hero:values.imageHero||"/td-students.jpg",about:values.imageAbout||"/td-campus.jpg"}; }
+export async function getReviews(activeOnly=true): Promise<Review[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,author,context,quote,is_example AS isExample,active,sort_order AS sortOrder,updated_at AS updatedAt FROM reviews WHERE active=1 AND is_example=0 ORDER BY sort_order,id":"SELECT id,author,context,quote,is_example AS isExample,active,sort_order AS sortOrder,updated_at AS updatedAt FROM reviews ORDER BY sort_order,id";return (await db().prepare(q).all<Review>()).results; }
 export async function getServices(activeOnly=true): Promise<Service[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services WHERE active=1 ORDER BY sort_order":"SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services ORDER BY sort_order"; return (await db().prepare(q).all<Service>()).results; }
 export async function getService(slug:string): Promise<Service|null> { await ensureDatabase(); return await db().prepare("SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services WHERE slug=? AND active=1").bind(slug).first<Service>(); }
-export async function getUniversities(activeOnly=true): Promise<University[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities WHERE active=1 ORDER BY featured DESC,name":"SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities ORDER BY featured DESC,name"; return (await db().prepare(q).all<University>()).results; }
-export async function getUniversity(slug:string): Promise<University|null> { await ensureDatabase(); return await db().prepare("SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities WHERE slug=? AND active=1").bind(slug).first<University>(); }
+const catalogBySlug=new Map<string,(typeof universityCatalog)[number]>(universityCatalog.map(u=>[u.slug,u]));
+function withUniversityMetadata(row:Omit<University,"institutionType"|"founded">):University { const item=catalogBySlug.get(row.slug);return {...row,institutionType:item?.type??"Diğer",founded:item?.year??""}; }
+export async function getUniversities(activeOnly=true): Promise<University[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities WHERE active=1 ORDER BY featured DESC,name":"SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities ORDER BY featured DESC,name"; return (await db().prepare(q).all<Omit<University,"institutionType"|"founded">>()).results.map(withUniversityMetadata); }
+export async function getUniversity(slug:string): Promise<University|null> { await ensureDatabase(); const row=await db().prepare("SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities WHERE slug=? AND active=1").bind(slug).first<Omit<University,"institutionType"|"founded">>();return row?withUniversityMetadata(row):null; }
 export async function getPrograms(universityId?:number,activeOnly=true): Promise<Program[]> { await ensureDatabase(); const where=activeOnly?" WHERE p.active=1 AND u.active=1":""; const conjunction=where?" AND":" WHERE"; const q="SELECT p.id,p.university_id AS universityId,u.name AS universityName,u.slug AS universitySlug,p.slug,p.name,p.degree_type AS degreeType,p.language,p.duration,p.tuition_fee AS tuitionFee,p.description,p.active,p.updated_at AS updatedAt FROM programs p JOIN universities u ON u.id=p.university_id"+where+(universityId?`${conjunction} p.university_id=?`:"")+" ORDER BY p.name"; const stmt=db().prepare(q); return (await (universityId?stmt.bind(universityId):stmt).all<Program>()).results; }
 export async function getProgram(slug:string): Promise<Program|null> { await ensureDatabase(); return await db().prepare("SELECT p.id,p.university_id AS universityId,u.name AS universityName,u.slug AS universitySlug,p.slug,p.name,p.degree_type AS degreeType,p.language,p.duration,p.tuition_fee AS tuitionFee,p.description,p.active,p.updated_at AS updatedAt FROM programs p JOIN universities u ON u.id=p.university_id WHERE p.slug=? AND p.active=1").bind(slug).first<Program>(); }
 export async function getFaqs(activeOnly=true): Promise<Faq[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,question,answer,category,active,sort_order AS sortOrder FROM faqs WHERE active=1 ORDER BY sort_order":"SELECT id,question,answer,category,active,sort_order AS sortOrder FROM faqs ORDER BY sort_order";return (await db().prepare(q).all<Faq>()).results; }

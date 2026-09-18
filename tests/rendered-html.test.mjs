@@ -6,11 +6,12 @@ const root = new URL("../", import.meta.url);
 const read = path => readFile(new URL(path, root), "utf8");
 
 test("ships the TD Danışmanlık product instead of the starter", async () => {
-  const [home, layout, manifest] = await Promise.all([
-    read("components/PublicHome.tsx"), read("app/layout.tsx"), read("package.json"),
+  const [home, listings, layout, manifest] = await Promise.all([
+    read("components/PublicHome.tsx"), read("app/[locale]/[slug]/page.tsx"), read("app/layout.tsx"), read("package.json"),
   ]);
   assert.match(home, /TD Danışmanlık/);
-  assert.match(home, /ProgramFinder/);
+  assert.match(home, /\/universiteler/);
+  assert.match(listings, /ProgramFinder|UniversityCatalog/);
   assert.match(home, /CookieBanner/);
   assert.match(layout, /og\.png/);
   assert.doesNotMatch(layout, /Starter Project|codex-preview/);
@@ -34,4 +35,17 @@ test("defines persistent content and lead tables", async () => {
   const [schema, hosting] = await Promise.all([read("db/schema.ts"), read(".openai/hosting.json")]);
   for (const table of ["site_settings", "services", "universities", "programs", "consultation_requests", "audit_logs"]) assert.match(schema, new RegExp(table));
   assert.match(hosting, /"d1": "DB"/);
+  assert.match(hosting, /"r2": "MEDIA"/);
+});
+
+test("routes menus to separate pages and protects media uploads", async () => {
+  const [header, catalog, media, reviews] = await Promise.all([
+    read("components/SiteHeader.tsx"), read("components/UniversityCatalog.tsx"), read("app/api/admin/media/route.ts"), read("lib/content.ts"),
+  ]);
+  for (const path of ["hizmetler", "universiteler", "surec", "sss"]) assert.match(header, new RegExp(`\\$\\{home\\}/${path}`));
+  assert.match(catalog, /PAGE_SIZE=12/);
+  assert.match(catalog, /setPage/);
+  assert.match(media, /getAdmin/);
+  assert.match(media, /8_000_000/);
+  assert.match(reviews, /is_example=0/);
 });
