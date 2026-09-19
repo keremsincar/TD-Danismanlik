@@ -362,9 +362,20 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
 .elab-main-menu .elab-nav a span{font-weight:400;color:#6f7778}
 @keyframes td-menu-in{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}
 @keyframes td-rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes td-image-in{from{opacity:.45;transform:scale(1.035)}to{opacity:1;transform:scale(1)}}
-.elab-hero-copy{animation:td-rise .65s cubic-bezier(.2,.7,.2,1) both}
-.elab-hero-photo img{animation:td-image-in .85s ease-out both}
+@keyframes td-intro-nav{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes td-intro-text{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes td-intro-photo{from{clip-path:inset(0 0 100% 0);opacity:.72}to{clip-path:inset(0 0 0 0);opacity:1}}
+@keyframes td-intro-image{from{transform:scale(1.055)}to{transform:scale(1)}}
+@keyframes td-intro-tile{from{opacity:0;transform:translateY(17px) scale(.985)}to{opacity:1;transform:none}}
+.elab-page>.elab-header{animation:td-intro-nav .48s cubic-bezier(.2,.75,.2,1) .02s both}
+.elab-page .elab-hero-copy>.elab-kicker{animation:td-intro-text .48s cubic-bezier(.2,.75,.2,1) .11s both}
+.elab-page .elab-hero-copy>h1{animation:td-intro-text .68s cubic-bezier(.16,.8,.24,1) .17s both}
+.elab-page .elab-hero-lead{animation:td-intro-text .55s cubic-bezier(.2,.75,.2,1) .31s both}
+.elab-page .elab-hero-actions{animation:td-intro-text .5s cubic-bezier(.2,.75,.2,1) .4s both}
+.elab-page .elab-hero-photo{animation:td-intro-photo .82s cubic-bezier(.24,.7,.2,1) .08s both}
+.elab-page .elab-hero-photo img{animation:td-intro-image .96s cubic-bezier(.2,.75,.2,1) .08s both}
+.elab-page .elab-hero-tiles>div{animation:td-intro-tile .52s cubic-bezier(.2,.75,.2,1) both}
+.elab-page .elab-hero-tiles>div:nth-child(1){animation-delay:.5s}.elab-page .elab-hero-tiles>div:nth-child(2){animation-delay:.58s}.elab-page .elab-hero-tiles>div:nth-child(3){animation-delay:.66s}
 .elab-service-card,.elab-university-grid a,.elab-process-grid article,.elab-review-card{transition:transform .24s ease,box-shadow .24s ease,background .24s ease}
 .elab-service-card:hover,.elab-university-grid a:hover,.elab-process-grid article:hover,.elab-review-card:hover{transform:translateY(-4px);box-shadow:0 12px 25px rgba(23,41,43,.08)}
 @supports(animation-timeline:view()){
@@ -375,7 +386,7 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
   .elab-main-menu .elab-nav{position:fixed;top:76px;left:18px;right:18px;width:auto;max-height:calc(100dvh - 110px);overflow-y:auto}
 }
 @media(prefers-reduced-motion:reduce){
-  .elab-main-menu .elab-nav,.elab-hero-copy,.elab-hero-photo img,.elab-section-head,.elab-about-main,.elab-contact-copy{animation:none!important}
+  .elab-main-menu .elab-nav,.elab-page>.elab-header,.elab-page .elab-hero-copy>*,.elab-page .elab-hero-photo,.elab-page .elab-hero-photo img,.elab-page .elab-hero-tiles>div,.elab-section-head,.elab-about-main,.elab-contact-copy{animation:none!important}
   .elab-menu-icon i,.elab-service-card,.elab-university-grid a,.elab-process-grid article,.elab-review-card{transition:none!important}
 }
 /* Catalog and editorial refinements */
