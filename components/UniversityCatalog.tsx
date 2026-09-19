@@ -11,13 +11,13 @@ const catalogText={
  ar:{search:"ابحث عن جامعة",searchPlaceholder:"الاسم أو المدينة",city:"المدينة",allCities:"كل المدن",type:"نوع المؤسسة",allTypes:"حكومية ووقفية",state:"حكومية",foundation:"وقفية",sort:"ترتيب",nameAsc:"الاسم تصاعدياً",nameDesc:"الاسم تنازلياً",citySort:"حسب المدينة",newest:"سنة التأسيس",results:"جامعة معروضة",page:"صفحة",founded:"سنة التأسيس",profile:"ملف الجامعة",view:"عرض الملف",empty:"لا توجد جامعات مطابقة. غيّر البحث.",previous:"السابق",next:"التالي"}
 } as const;
 
-export function UniversityCatalog({universities,locale}:{universities:University[];locale:string}) {
+export function UniversityCatalog({universities,locale,initialPage=1}:{universities:University[];locale:string;initialPage?:number}) {
   const t=catalogText[(locale in catalogText?locale:"tr") as keyof typeof catalogText];
   const [query,setQuery]=useState("");
   const [city,setCity]=useState("");
   const [type,setType]=useState("");
   const [sort,setSort]=useState("name");
-  const [page,setPage]=useState(1);
+  const [page,setPage]=useState(Math.max(1,Math.floor(initialPage)));
   const cities=useMemo(()=>[...new Set(universities.map(u=>u.city))].sort((a,b)=>a.localeCompare(b,"tr")),[universities]);
   const filtered=useMemo(()=>{
     const term=query.toLocaleLowerCase("tr-TR").trim();
@@ -35,9 +35,9 @@ export function UniversityCatalog({universities,locale}:{universities:University
       <label>{t.type}<select value={type} onChange={change(setType)}><option value="">{t.allTypes}</option><option value="Devlet">{t.state}</option><option value="Vakıf">{t.foundation}</option></select></label>
       <label>{t.sort}<select value={sort} onChange={change(setSort)}><option value="name">{t.nameAsc}</option><option value="name-desc">{t.nameDesc}</option><option value="city">{t.citySort}</option><option value="newest">{t.newest}</option></select></label>
     </div>
-    <p className="catalog-count">{filtered.length} {t.results} · {t.page} {currentPage}/{pageCount}</p>
-    <div className="catalog-cards">{visible.map(u=><Link href={`/${locale}/universiteler/${u.slug}`} className="catalog-university-card" key={u.id}><div><span>{u.city}</span><span>{u.institutionType==="Devlet"?t.state:u.institutionType==="Vakıf"?t.foundation:u.institutionType}</span></div><h2>{u.name}</h2><p>{u.founded&&u.founded!=="—"?`${u.founded} ${t.founded}`:t.profile}</p><b>{t.view} ↗</b></Link>)}</div>
+    <div className="catalog-page-frame" id="universite-listesi" key={`page-${currentPage}`}><p className="catalog-count">{filtered.length} {t.results} · {t.page} {currentPage}/{pageCount}</p>
+    <div className="catalog-cards">{visible.map(u=><Link href={`/${locale}/universiteler/${u.slug}`} className="catalog-university-card" key={u.id}><div><span>{u.city}</span><span>{u.institutionType==="Devlet"?t.state:u.institutionType==="Vakıf"?t.foundation:u.institutionType}</span></div><h2>{u.name}</h2><p>{u.founded&&u.founded!=="—"?`${u.founded} ${t.founded}`:t.profile}</p><b>{t.view} ↗</b></Link>)}</div></div>
     {!visible.length&&<p className="empty-state">{t.empty}</p>}
-    <nav className="catalog-pagination" aria-label={t.page}><button type="button" disabled={currentPage===1} onClick={()=>setPage(p=>Math.max(1,p-1))}>← {t.previous}</button>{Array.from({length:pageCount},(_,i)=>i+1).filter(i=>i===1||i===pageCount||Math.abs(i-currentPage)<=2).map((i,index,array)=><span key={i}>{index>0&&i-array[index-1]>1&&<span className="pagination-ellipsis">…</span>}<button type="button" aria-current={i===currentPage?"page":undefined} onClick={()=>setPage(i)}>{i}</button></span>)}<button type="button" disabled={currentPage===pageCount} onClick={()=>setPage(p=>Math.min(pageCount,p+1))}>{t.next} →</button></nav>
+    <nav className="catalog-pagination" aria-label={t.page}>{currentPage===1?<span className="pagination-disabled">← {t.previous}</span>:<a href={`/${locale}/universiteler?page=${currentPage-1}#universite-listesi`}>← {t.previous}</a>}{Array.from({length:pageCount},(_,i)=>i+1).filter(i=>i===1||i===pageCount||Math.abs(i-currentPage)<=2).map((i,index,array)=><span key={i}>{index>0&&i-array[index-1]>1&&<span className="pagination-ellipsis">…</span>}<a href={`/${locale}/universiteler?page=${i}#universite-listesi`} aria-current={i===currentPage?"page":undefined}>{i}</a></span>)}{currentPage===pageCount?<span className="pagination-disabled">{t.next} →</span>:<a href={`/${locale}/universiteler?page=${currentPage+1}#universite-listesi`}>{t.next} →</a>}</nav>
   </div>;
 }

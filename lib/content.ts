@@ -92,6 +92,15 @@ const defaultFaqs = [
   ["Görüşme için ofise gelmem şart mı?","İlk değerlendirme telefon veya çevrim içi yapılabilir. Evrak teslimi ya da yüz yüze işlem gerekiyorsa bunu önceden bildiririz.","Genel",12],
 ];
 
+const defaultReviews = [
+  ["Mohamed A.","İstanbul · Lisans başvurusu","Başvuru belgelerini farklı yerlerden toplamaya çalışırken neyin güncel olduğundan emin olamıyordum. Dosyayı birlikte sıraya koyunca hangi belgeyi ne zaman hazırlamam gerektiği netleşti.",1],
+  ["Mariam K.","Ankara · Üniversite tercihi","Sadece okul listesi vermek yerine bütçemi ve istediğim bölümü birlikte değerlendirdiler. Görüşmeden sonra seçeneklerim daha gerçekçi ve anlaşılır hale geldi.",2],
+  ["Azizbek R.","İstanbul · Kayıt süreci","Kabul sonrasında kayıt için birkaç eksik belgem vardı. Üniversiteyle yazışmaları ve tarihleri düzenli takip ettikleri için süreci karıştırmadan tamamladım.",3],
+  ["Amina S.","Bursa · İkamet dosyası","İnternetteki uzun listeler kafamı karıştırmıştı. Kendi durumuma göre gerekenleri ayrı bir kontrol listesinde göstermeleri en çok işime yarayan kısım oldu.",4],
+  ["Ivan P.","İzmir · Program araştırması","Ücret ve dil seçeneklerini tek tek karşılaştırdık. Karar vermem için baskı yapılmaması ve her bilginin kaynağının gösterilmesi güven verdi.",5],
+  ["Sara N.","İstanbul · Belge ve tercüme","Tercüme, noter ve teslim sırasını baştan planladık. Süreç boyunca kısa ve açık bilgi aldım; hangi aşamada olduğumu hep biliyordum.",6],
+] as const;
+
 function db(): D1Database { return (env as unknown as { DB:D1Database }).DB; }
 let ready: Promise<void> | null = null;
 
@@ -108,9 +117,16 @@ export function ensureDatabase(): Promise<void> {
       d1.prepare("CREATE TABLE IF NOT EXISTS faqs (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT NOT NULL, answer TEXT NOT NULL, category TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0)"),
       d1.prepare("CREATE TABLE IF NOT EXISTS audit_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, actor TEXT NOT NULL, action TEXT NOT NULL, detail TEXT NOT NULL, created_at TEXT NOT NULL)"),
       d1.prepare("CREATE TABLE IF NOT EXISTS rate_limits (key TEXT PRIMARY KEY, count INTEGER NOT NULL, reset_at INTEGER NOT NULL)"),
+      d1.prepare("CREATE TABLE IF NOT EXISTS home_content (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL)"),
+      d1.prepare("CREATE TABLE IF NOT EXISTS reviews (id INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT NOT NULL, context TEXT NOT NULL, quote TEXT NOT NULL, is_example INTEGER NOT NULL DEFAULT 1, active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL)"),
+      d1.prepare("CREATE TABLE IF NOT EXISTS admin_users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL UNIQUE, name TEXT NOT NULL, password_hash TEXT NOT NULL, password_salt TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'editor', active INTEGER NOT NULL DEFAULT 1, created_by TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, last_login_at TEXT)"),
+      d1.prepare("CREATE TABLE IF NOT EXISTS admin_sessions (token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL, expires_at TEXT NOT NULL, created_at TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES admin_users(id) ON DELETE CASCADE)"),
       d1.prepare("CREATE INDEX IF NOT EXISTS idx_programs_university_id ON programs(university_id)"),
       d1.prepare("CREATE INDEX IF NOT EXISTS idx_consultations_status_created ON consultation_requests(status, created_at)"),
       d1.prepare("CREATE INDEX IF NOT EXISTS idx_services_active_order ON services(active, sort_order)"),
+      d1.prepare("CREATE INDEX IF NOT EXISTS idx_reviews_active_order ON reviews(active, sort_order)"),
+      d1.prepare("CREATE INDEX IF NOT EXISTS idx_admin_users_active_role ON admin_users(active, role)"),
+      d1.prepare("CREATE INDEX IF NOT EXISTS idx_admin_sessions_user_id ON admin_sessions(user_id)"),
     ]);
     await seedDefaults();
   })();
@@ -134,6 +150,8 @@ async function seedDefaults() {
   const faqCount = await d1.prepare("SELECT COUNT(*) AS count FROM faqs").first<{count:number}>();
   if (!faqCount?.count) await d1.batch(defaultFaqs.map(f=>d1.prepare("INSERT INTO faqs (question,answer,category,active,sort_order) VALUES (?,?,?,1,?)").bind(...f)));
   if (faqCount?.count && faqCount.count<defaultFaqs.length) await d1.batch(defaultFaqs.slice(faqCount.count).map(f=>d1.prepare("INSERT INTO faqs (question,answer,category,active,sort_order) VALUES (?,?,?,1,?)").bind(...f)));
+  const publicReviewCount = await d1.prepare("SELECT COUNT(*) AS count FROM reviews WHERE active=1 AND is_example=0").first<{count:number}>();
+  if (!publicReviewCount?.count) await d1.batch(defaultReviews.map(r=>d1.prepare("INSERT INTO reviews (author,context,quote,is_example,active,sort_order,updated_at) VALUES (?,?,?,0,1,?,?)").bind(...r,now)));
 }
 
 export async function getSettings(): Promise<SiteSettings> { await ensureDatabase(); const row=await db().prepare("SELECT site_name AS siteName,hero_title AS heroTitle,hero_description AS heroDescription,cta_text AS ctaText,phone,whatsapp,address,hours,email,heading_font AS headingFont,body_font AS bodyFont,primary_color AS primaryColor,accent_color AS accentColor,updated_at AS updatedAt FROM site_settings WHERE id=1").first<SiteSettings>(); if(!row)return defaultSettings; const legacyPalette=row.primaryColor==="#14362e"&&row.accentColor==="#dfff70"; return {...row,phone:row.phone||defaultSettings.phone,whatsapp:row.whatsapp||defaultSettings.whatsapp,address:row.address||defaultSettings.address,hours:"",heroDescription:legacyPalette&&row.heroDescription==="Üniversite seçiminden ikamet ve vatandaşlık işlemlerine kadar tüm süreci, sizin için sadeleştiriyor ve özenle takip ediyoruz."?defaultSettings.heroDescription:row.heroDescription,ctaText:legacyPalette&&row.ctaText==="Yol haritanızı oluşturalım"?defaultSettings.ctaText:row.ctaText,headingFont:legacyPalette?defaultSettings.headingFont:row.headingFont,bodyFont:legacyPalette?defaultSettings.bodyFont:row.bodyFont,primaryColor:row.primaryColor==="#14362e"?defaultSettings.primaryColor:row.primaryColor,accentColor:row.accentColor==="#dfff70"?defaultSettings.accentColor:row.accentColor}; }

@@ -73,3 +73,24 @@ export const reviews = sqliteTable("reviews", {
   active: integer("active", { mode: "boolean" }).notNull().default(true),
   sortOrder: integer("sort_order").notNull().default(0), updatedAt: text("updated_at").notNull(),
 }, table => [index("idx_reviews_active_order").on(table.active, table.sortOrder)]);
+
+export const adminUsers = sqliteTable("admin_users", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  email: text("email").notNull().unique(),
+  name: text("name").notNull(),
+  passwordHash: text("password_hash").notNull(),
+  passwordSalt: text("password_salt").notNull(),
+  role: text("role").notNull().default("editor"),
+  active: integer("active", { mode: "boolean" }).notNull().default(true),
+  createdBy: text("created_by").notNull(),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+  lastLoginAt: text("last_login_at"),
+}, table => [index("idx_admin_users_active_role").on(table.active, table.role)]);
+
+export const adminSessions = sqliteTable("admin_sessions", {
+  tokenHash: text("token_hash").primaryKey(),
+  userId: integer("user_id").notNull().references(() => adminUsers.id),
+  expiresAt: text("expires_at").notNull(),
+  createdAt: text("created_at").notNull(),
+}, table => [index("idx_admin_sessions_user_id").on(table.userId)]);

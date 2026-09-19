@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
-import { getAdmin } from "@/lib/admin";
+import { getAdmin, getAdminUsers } from "@/lib/admin";
 import { getDashboardData, getFaqs, getHomeCopy, getPrograms, getReviews, getServices, getSettings, getSiteImages, getUniversities } from "@/lib/content";
-import { getChatGPTUser } from "@/app/chatgpt-auth";
 import { AdminDashboard } from "@/components/AdminDashboard";
-import Link from "@/components/NativeLink";
 export const dynamic="force-dynamic"; export const metadata={title:"Yönetim Paneli | TD Danışmanlık",robots:{index:false,follow:false}};
-export default async function AdminPage(){const user=await getChatGPTUser();if(!user)redirect("/admin/login");const admin=await getAdmin();if(!admin)return <main className="access-denied"><span>TD</span><h1>Bu hesap için erişim tanımlı değil.</h1><p>Yönetici e-mail adresinizin site ayarlarında tanımlı olduğundan emin olun.</p><Link href="/signout-with-chatgpt?return_to=/admin/login">Farklı hesapla giriş yapın</Link></main>;const [settings,homeCopy,images,reviews,faqs,services,universities,programs,dashboard]=await Promise.all([getSettings(),getHomeCopy(),getSiteImages(),getReviews(false),getFaqs(false),getServices(false),getUniversities(false),getPrograms(undefined,false),getDashboardData()]);return <AdminDashboard adminEmail={admin.email} {...{settings,homeCopy,images,reviews,faqs,services,universities,programs,dashboard}}/>}
+export default async function AdminPage(){const admin=await getAdmin();if(!admin)redirect("/admin/login");const [settings,homeCopy,images,reviews,faqs,services,universities,programs,dashboard,users]=await Promise.all([getSettings(),getHomeCopy(),getSiteImages(),getReviews(false),getFaqs(false),getServices(false),getUniversities(false),getPrograms(undefined,false),getDashboardData(),admin.role==="owner"?getAdminUsers():Promise.resolve([])]);return <AdminDashboard admin={admin} {...{settings,homeCopy,images,reviews,faqs,services,universities,programs,dashboard,users}}/>}
