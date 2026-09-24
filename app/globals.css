@@ -470,3 +470,36 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
 @media(max-width:1050px){.users-grid{grid-template-columns:1fr}.user-row{grid-template-columns:1.2fr 120px 1fr 70px 70px}}
 @media(max-width:720px){.users-intro{align-items:flex-start;flex-direction:column}.user-row{grid-template-columns:1fr 1fr;padding-bottom:24px}.user-identity{grid-column:1/-1}.user-row>.check{align-self:end}.last-login{left:17px;bottom:7px}}
 @media(prefers-reduced-motion:reduce){.catalog-page-frame{animation:none}}
+
+/* Compact public flow and complete university catalog */
+.compact-home .elab-hero{min-height:620px}
+.compact-home .elab-hero-copy{padding-top:70px;padding-bottom:70px}
+.compact-home .elab-hero-photo{min-height:620px}
+.home-discover{display:grid;grid-template-columns:.8fr 1.2fr;gap:5vw;align-items:end;margin:0 18px 22px;padding:48px 5.4vw;border:1px solid #e0e6ee;border-radius:28px;background:#111820;color:#fff}
+.home-discover h2{margin:0;font-family:var(--site-heading-font),serif;font-size:clamp(38px,4vw,62px);line-height:1;letter-spacing:-.05em}
+.home-discover>div>p:last-child{max-width:520px;margin:18px 0 0;color:#bfc8d2;line-height:1.6}
+.home-discover form{display:grid;grid-template-columns:1.15fr 1fr auto;gap:8px}
+.home-discover input,.home-discover select,.home-discover button{min-width:0;min-height:52px;border:1px solid rgba(255,255,255,.18);border-radius:13px;padding:0 14px;font:inherit;font-size:13px}
+.home-discover input,.home-discover select{background:#202a34;color:#fff}.home-discover input::placeholder{color:#aeb8c2}.home-discover button{border:0;background:var(--accent);color:white;font-weight:750;cursor:pointer}
+.compact-home .elab-section{padding-top:82px;padding-bottom:82px}.compact-home .elab-section-head{margin-bottom:40px}
+.compact-home .elab-service-card{min-height:245px}.compact-home .elab-service-card-top>span:first-child{max-width:80%;font-size:16px;font-weight:750;line-height:1.2}.compact-home .elab-service-card>div:last-child{margin-top:auto}.compact-home .elab-service-card h3{display:none}
+.home-catalog-actions{display:flex;gap:22px;flex-wrap:wrap}.compact-home .elab-review-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.compact-home .elab-review-card{min-height:280px}
+.compact-home .elab-faq-list summary{grid-template-columns:1fr 30px}.compact-home .elab-faq-list summary>span{display:none}
+.compact-contact{display:flex;justify-content:space-between;align-items:center;gap:40px;margin:0 18px 22px;padding:65px 5.4vw;border:1px solid #dfe4ea;border-radius:28px;background:#eef3f8}.compact-contact h2{max-width:720px;margin:0;font-family:var(--site-heading-font),serif;font-size:clamp(42px,5vw,74px);line-height:1;letter-spacing:-.055em}.compact-contact p:not(.elab-kicker){max-width:680px;color:#4f5c69;line-height:1.65}.compact-contact>div:last-child{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.catalog-filters{grid-template-columns:minmax(210px,1.5fr) repeat(3,minmax(150px,1fr)) auto auto;align-items:end}.catalog-filters .filter-submit,.catalog-filters .filter-clear,.filter-submit,.filter-clear{min-height:46px;padding:0 16px;border:0;border-radius:11px;display:grid;place-items:center;font-size:12px;font-weight:750;cursor:pointer}.filter-submit{background:#1047e8;color:#fff}.filter-clear{border:1px solid #dbe2eb;background:#fff;color:#344256}
+.program-filter-form{grid-template-columns:minmax(230px,1.4fr) repeat(5,minmax(130px,1fr));border-bottom:0;gap:9px;padding:18px}.program-filter-form .filter-submit,.program-filter-form .filter-clear{min-height:50px}.program-english-name{margin:2px 0 8px!important;font-size:11px!important;color:#7a8490!important}.program-links{gap:16px}.program-links a:last-child{margin-left:auto}.program-source-link{display:block;width:max-content;max-width:100%;margin:22px 0;font-size:12px;font-weight:750;text-decoration:underline;text-underline-offset:4px}
+.program-list-section>div:last-child>a small{display:block;margin-top:9px;color:#556273;font-size:10px;line-height:1.4}.program-list-section>div:last-child>a{min-height:190px}
+.request-points span{padding:15px 18px;border:1px solid #dfe5ec;border-radius:12px;background:#fff;font-size:13px;font-weight:700}
+
+@media(max-width:1180px){.program-filter-form{grid-template-columns:repeat(3,minmax(0,1fr))}.catalog-filters{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:860px){.compact-home .elab-hero,.compact-home .elab-hero-photo{min-height:auto}.home-discover{grid-template-columns:1fr}.compact-contact{display:grid}.compact-contact>div:last-child{justify-content:flex-start}.catalog-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.program-filter-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ .compact-home .elab-header{margin-bottom:0}.compact-home .elab-hero{margin-bottom:8px}.compact-home .elab-hero-copy{padding:44px 22px 34px}.compact-home .elab-hero-photo{min-height:270px}
+ .home-discover{margin:0 8px 8px;padding:34px 22px;border-radius:22px}.home-discover h2{font-size:42px}.home-discover form{grid-template-columns:1fr}.home-discover input,.home-discover select,.home-discover button{min-height:50px;width:100%}
+ .compact-home .elab-section{margin-bottom:8px;padding:50px 22px}.compact-home .elab-section h2{font-size:42px}.compact-home .elab-service-card{min-height:190px}.compact-home .elab-review-grid{grid-template-columns:1fr}.compact-home .elab-review-card{min-height:230px}
+ .compact-contact{margin:0 8px 8px;padding:42px 22px;border-radius:22px}.compact-contact h2{font-size:42px}.compact-contact>div:last-child .elab-pill{width:100%}
+ .catalog-filters,.program-filter-form{grid-template-columns:1fr;padding:13px}.catalog-filters .filter-submit,.catalog-filters .filter-clear,.program-filter-form .filter-submit,.program-filter-form .filter-clear{width:100%}
+ .program-results{grid-template-columns:1fr}.program-card{min-height:245px}.finder-meta{display:block}.finder-meta small{display:block;margin-top:8px}.program-links{align-items:flex-start;flex-direction:column}.program-links a:last-child{margin-left:0}
+ .catalog-pagination{justify-content:space-between}.catalog-pagination>a,.catalog-pagination>.pagination-disabled{min-width:0}.catalog-pagination>span:not(.pagination-disabled){border:0;background:transparent;padding:0;font-size:11px}
+ .elab-footer-grid{grid-template-columns:1fr}.elab-footer-grid>div:first-child,.elab-footer-grid>div:last-child{grid-column:auto}
+}

@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { env } from "cloudflare:workers";
 import { ensureDatabase, rawDatabase } from "@/lib/content";
 
 export const ADMIN_COOKIE = "td_admin_session";
@@ -35,14 +36,22 @@ export async function verifyPassword(password:string,salt:string,expected:string
   return difference===0;
 }
 
-export async function hasAdminUsers() {
+let bootstrapReady:Promise<void>|null=null;
+async function ensureBootstrapOwner(){
   await ensureDatabase();
+  if(bootstrapReady)return bootstrapReady;
+  bootstrapReady=(async()=>{const d1=rawDatabase(),runtime=env as unknown as {ADMIN_BOOTSTRAP_PASSWORD?:string;ADMIN_BOOTSTRAP_REVISION?:string};const password=runtime.ADMIN_BOOTSTRAP_PASSWORD||"",revision=runtime.ADMIN_BOOTSTRAP_REVISION||"";if(password.length<12||!revision)return;const marker=`BOOTSTRAP_OWNER_${revision}`;if(await d1.prepare("SELECT id FROM audit_logs WHERE action=? LIMIT 1").bind(marker).first())return;const {hash,salt}=await makePassword(password),now=new Date().toISOString(),existing=await d1.prepare("SELECT id FROM admin_users WHERE email=?").bind(PRIMARY_ADMIN_EMAIL).first<{id:number}>();if(existing){await d1.batch([d1.prepare("UPDATE admin_users SET name=?,password_hash=?,password_salt=?,role='owner',active=1,updated_at=? WHERE id=?").bind("TD Danışmanlık",hash,salt,now,existing.id),d1.prepare("DELETE FROM admin_sessions WHERE user_id=?").bind(existing.id),d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",marker,"Ana yönetici hesabı güvenli biçimde etkinleştirildi",now)]);}else{await d1.batch([d1.prepare("INSERT INTO admin_users (email,name,password_hash,password_salt,role,active,created_by,created_at,updated_at) VALUES (?,?,?,?, 'owner',1,?,?,?)").bind(PRIMARY_ADMIN_EMAIL,"TD Danışmanlık",hash,salt,"secure-bootstrap",now,now),d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",marker,"Ana yönetici hesabı güvenli biçimde oluşturuldu",now)]);}})();
+  return bootstrapReady;
+}
+
+export async function hasAdminUsers() {
+  await ensureBootstrapOwner();
   const row=await rawDatabase().prepare("SELECT COUNT(*) AS count FROM admin_users").first<{count:number}>();
   return Boolean(row?.count);
 }
 
 export async function getAdmin():Promise<AdminAccount|null> {
-  await ensureDatabase();
+  await ensureBootstrapOwner();
   const token=(await cookies()).get(ADMIN_COOKIE)?.value;
   if(!token)return null;
   const tokenHash=await sha256(token);
@@ -50,7 +59,7 @@ export async function getAdmin():Promise<AdminAccount|null> {
 }
 
 export async function getAdminUsers():Promise<AdminAccount[]> {
-  await ensureDatabase();
+  await ensureBootstrapOwner();
   return (await rawDatabase().prepare("SELECT id,email,name,role,active,created_at AS createdAt,updated_at AS updatedAt,last_login_at AS lastLoginAt FROM admin_users ORDER BY CASE role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END,name").all<AdminAccount>()).results;
 }
 
@@ -66,7 +75,7 @@ export async function createAdminSession(userId:number) {
 }
 
 export async function authenticateAdmin(email:string,password:string,requestKey:string) {
-  await ensureDatabase();const d1=rawDatabase(),now=Date.now(),key=`admin-login:${requestKey}:${email}`;
+  await ensureBootstrapOwner();const d1=rawDatabase(),now=Date.now(),key=`admin-login:${requestKey}:${email}`;
   const limit=await d1.prepare("SELECT count,reset_at AS resetAt FROM rate_limits WHERE key=?").bind(key).first<{count:number;resetAt:number}>();
   if(limit&&limit.resetAt>now&&limit.count>=8)return {error:"Çok fazla deneme yapıldı. Lütfen 15 dakika sonra tekrar deneyin."} as const;
   const user=await d1.prepare("SELECT id,email,name,role,active,password_hash AS passwordHash,password_salt AS passwordSalt,created_at AS createdAt,updated_at AS updatedAt,last_login_at AS lastLoginAt FROM admin_users WHERE email=?").bind(email).first<AdminAccount&{passwordHash:string;passwordSalt:string}>();

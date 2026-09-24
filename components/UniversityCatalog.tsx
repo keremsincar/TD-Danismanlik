@@ -1,43 +1,36 @@
-"use client";
-import { useMemo, useState } from "react";
 import Link from "@/components/NativeLink";
 import type { University } from "@/lib/content";
 
 const PAGE_SIZE=12;
 const catalogText={
- tr:{search:"Üniversite ara",searchPlaceholder:"Ad veya şehir yazın",city:"Şehir",allCities:"Tüm şehirler",type:"Kurum türü",allTypes:"Devlet ve vakıf",state:"Devlet",foundation:"Vakıf",sort:"Sırala",nameAsc:"Ada göre A–Z",nameDesc:"Ada göre Z–A",citySort:"Şehre göre",newest:"Kuruluş yılına göre",results:"üniversite gösteriliyor",page:"Sayfa",founded:"kuruluş yılı",profile:"Üniversite profili",view:"Profili incele",empty:"Bu filtrelerle eşleşen üniversite bulunamadı. Aramayı değiştirebilirsiniz.",previous:"Önceki",next:"Sonraki"},
- en:{search:"Search universities",searchPlaceholder:"Name or city",city:"City",allCities:"All cities",type:"Institution type",allTypes:"Public and foundation",state:"Public",foundation:"Foundation",sort:"Sort by",nameAsc:"Name A–Z",nameDesc:"Name Z–A",citySort:"City",newest:"Year founded",results:"universities found",page:"Page",founded:"founded",profile:"University profile",view:"View profile",empty:"No universities match these filters. Try a different search.",previous:"Previous",next:"Next"},
- ru:{search:"Поиск университетов",searchPlaceholder:"Название или город",city:"Город",allCities:"Все города",type:"Тип вуза",allTypes:"Государственные и частные",state:"Государственный",foundation:"Частный",sort:"Сортировка",nameAsc:"Название А–Я",nameDesc:"Название Я–А",citySort:"По городу",newest:"По году основания",results:"университетов найдено",page:"Страница",founded:"год основания",profile:"Профиль университета",view:"Подробнее",empty:"Ничего не найдено. Измените параметры поиска.",previous:"Назад",next:"Далее"},
- ar:{search:"ابحث عن جامعة",searchPlaceholder:"الاسم أو المدينة",city:"المدينة",allCities:"كل المدن",type:"نوع المؤسسة",allTypes:"حكومية ووقفية",state:"حكومية",foundation:"وقفية",sort:"ترتيب",nameAsc:"الاسم تصاعدياً",nameDesc:"الاسم تنازلياً",citySort:"حسب المدينة",newest:"سنة التأسيس",results:"جامعة معروضة",page:"صفحة",founded:"سنة التأسيس",profile:"ملف الجامعة",view:"عرض الملف",empty:"لا توجد جامعات مطابقة. غيّر البحث.",previous:"السابق",next:"التالي"}
+ tr:{search:"Üniversite ara",searchPlaceholder:"Ad veya şehir yazın",city:"Şehir",allCities:"Tüm şehirler",type:"Kurum türü",allTypes:"Devlet ve vakıf",state:"Devlet",foundation:"Vakıf",sort:"Sırala",nameAsc:"Ada göre A–Z",nameDesc:"Ada göre Z–A",citySort:"Şehre göre",newest:"Kuruluş yılına göre",apply:"Filtrele",clear:"Temizle",results:"üniversite gösteriliyor",page:"Sayfa",founded:"kuruluş yılı",view:"Bölümleri ve ücretleri incele",programs:"bölüm",empty:"Bu filtrelerle eşleşen üniversite bulunamadı.",previous:"Önceki",next:"Sonraki"},
+ en:{search:"Search universities",searchPlaceholder:"Name or city",city:"City",allCities:"All cities",type:"Institution type",allTypes:"Public and foundation",state:"Public",foundation:"Foundation",sort:"Sort by",nameAsc:"Name A–Z",nameDesc:"Name Z–A",citySort:"City",newest:"Year founded",apply:"Apply filters",clear:"Clear",results:"universities found",page:"Page",founded:"founded",view:"View programs and tuition",programs:"programs",empty:"No universities match these filters.",previous:"Previous",next:"Next"},
+ ru:{search:"Поиск университетов",searchPlaceholder:"Название или город",city:"Город",allCities:"Все города",type:"Тип вуза",allTypes:"Государственные и частные",state:"Государственный",foundation:"Частный",sort:"Сортировка",nameAsc:"Название А–Я",nameDesc:"Название Я–А",citySort:"По городу",newest:"По году основания",apply:"Применить",clear:"Сбросить",results:"университетов найдено",page:"Страница",founded:"год основания",view:"Программы и стоимость",programs:"программ",empty:"Ничего не найдено.",previous:"Назад",next:"Далее"},
+ ar:{search:"ابحث عن جامعة",searchPlaceholder:"الاسم أو المدينة",city:"المدينة",allCities:"كل المدن",type:"نوع المؤسسة",allTypes:"حكومية ووقفية",state:"حكومية",foundation:"وقفية",sort:"ترتيب",nameAsc:"الاسم تصاعدياً",nameDesc:"الاسم تنازلياً",citySort:"حسب المدينة",newest:"سنة التأسيس",apply:"تطبيق الفلاتر",clear:"مسح",results:"جامعة",page:"صفحة",founded:"سنة التأسيس",view:"عرض البرامج والرسوم",programs:"برنامج",empty:"لا توجد جامعات مطابقة.",previous:"السابق",next:"التالي"}
 } as const;
 
-export function UniversityCatalog({universities,locale,initialPage=1}:{universities:University[];locale:string;initialPage?:number}) {
+type Filters={query:string;city:string;type:string;sort:string};
+function pageUrl(locale:string,page:number,filters:Filters){const params=new URLSearchParams();if(filters.query)params.set("q",filters.query);if(filters.city)params.set("city",filters.city);if(filters.type)params.set("type",filters.type);if(filters.sort&&filters.sort!=="name")params.set("sort",filters.sort);const suffix=params.toString();return `/${locale}/universiteler?page=${page}${suffix?`&${suffix}`:""}#universite-listesi`;}
+
+export function UniversityCatalog({universities,locale,initialPage=1,filters,programCounts}:{universities:University[];locale:string;initialPage?:number;filters:Filters;programCounts:Record<string,number>}) {
   const t=catalogText[(locale in catalogText?locale:"tr") as keyof typeof catalogText];
-  const [query,setQuery]=useState("");
-  const [city,setCity]=useState("");
-  const [type,setType]=useState("");
-  const [sort,setSort]=useState("name");
-  const [page,setPage]=useState(Math.max(1,Math.floor(initialPage)));
-  const cities=useMemo(()=>[...new Set(universities.map(u=>u.city))].sort((a,b)=>a.localeCompare(b,"tr")),[universities]);
-  const filtered=useMemo(()=>{
-    const term=query.toLocaleLowerCase("tr-TR").trim();
-    const result=universities.filter(u=>(!term||`${u.name} ${u.city}`.toLocaleLowerCase("tr-TR").includes(term))&&(!city||u.city===city)&&(!type||u.institutionType===type));
-    return result.sort((a,b)=>sort==="name-desc"?b.name.localeCompare(a.name,"tr"):sort==="city"?a.city.localeCompare(b.city,"tr")||a.name.localeCompare(b.name,"tr"):sort==="newest"?Number(b.founded)-Number(a.founded)||a.name.localeCompare(b.name,"tr"):a.name.localeCompare(b.name,"tr"));
-  },[universities,query,city,type,sort]);
+  const term=filters.query.toLocaleLowerCase("tr-TR").trim();
+  const cities=[...new Set(universities.map(u=>u.city))].sort((a,b)=>a.localeCompare(b,"tr"));
+  const filtered=universities.filter(u=>(!term||`${u.name} ${u.city}`.toLocaleLowerCase("tr-TR").includes(term))&&(!filters.city||u.city===filters.city)&&(!filters.type||u.institutionType===filters.type)).sort((a,b)=>filters.sort==="name-desc"?b.name.localeCompare(a.name,"tr"):filters.sort==="city"?a.city.localeCompare(b.city,"tr")||a.name.localeCompare(b.name,"tr"):filters.sort==="newest"?Number(b.founded)-Number(a.founded)||a.name.localeCompare(b.name,"tr"):a.name.localeCompare(b.name,"tr"));
   const pageCount=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
-  const currentPage=Math.min(page,pageCount);
+  const currentPage=Math.min(Math.max(1,initialPage),pageCount);
   const visible=filtered.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);
-  const change=(fn:(value:string)=>void)=>(event:React.ChangeEvent<HTMLInputElement|HTMLSelectElement>)=>{fn(event.target.value);setPage(1)};
   return <div className="university-catalog">
-    <div className="catalog-filters">
-      <label>{t.search}<input type="search" value={query} onChange={change(setQuery)} placeholder={t.searchPlaceholder}/></label>
-      <label>{t.city}<select value={city} onChange={change(setCity)}><option value="">{t.allCities}</option>{cities.map(x=><option key={x}>{x}</option>)}</select></label>
-      <label>{t.type}<select value={type} onChange={change(setType)}><option value="">{t.allTypes}</option><option value="Devlet">{t.state}</option><option value="Vakıf">{t.foundation}</option></select></label>
-      <label>{t.sort}<select value={sort} onChange={change(setSort)}><option value="name">{t.nameAsc}</option><option value="name-desc">{t.nameDesc}</option><option value="city">{t.citySort}</option><option value="newest">{t.newest}</option></select></label>
-    </div>
-    <div className="catalog-page-frame" id="universite-listesi" key={`page-${currentPage}`}><p className="catalog-count">{filtered.length} {t.results} · {t.page} {currentPage}/{pageCount}</p>
-    <div className="catalog-cards">{visible.map(u=><Link href={`/${locale}/universiteler/${u.slug}`} className="catalog-university-card" key={u.id}><div><span>{u.city}</span><span>{u.institutionType==="Devlet"?t.state:u.institutionType==="Vakıf"?t.foundation:u.institutionType}</span></div><h2>{u.name}</h2><p>{u.founded&&u.founded!=="—"?`${u.founded} ${t.founded}`:t.profile}</p><b>{t.view} ↗</b></Link>)}</div></div>
+    <form className="catalog-filters" method="get" action={`/${locale}/universiteler`}>
+      <label>{t.search}<input name="q" type="search" defaultValue={filters.query} placeholder={t.searchPlaceholder}/></label>
+      <label>{t.city}<select name="city" defaultValue={filters.city}><option value="">{t.allCities}</option>{cities.map(x=><option key={x}>{x}</option>)}</select></label>
+      <label>{t.type}<select name="type" defaultValue={filters.type}><option value="">{t.allTypes}</option><option value="Devlet">{t.state}</option><option value="Vakıf">{t.foundation}</option></select></label>
+      <label>{t.sort}<select name="sort" defaultValue={filters.sort}><option value="name">{t.nameAsc}</option><option value="name-desc">{t.nameDesc}</option><option value="city">{t.citySort}</option><option value="newest">{t.newest}</option></select></label>
+      <button className="filter-submit" type="submit">{t.apply}</button><Link className="filter-clear" href={`/${locale}/universiteler`}>{t.clear}</Link>
+    </form>
+    <div className="catalog-page-frame" id="universite-listesi"><p className="catalog-count">{filtered.length} {t.results} · {t.page} {currentPage}/{pageCount}</p>
+    <div className="catalog-cards">{visible.map(u=><Link href={`/${locale}/universiteler/${u.slug}`} className="catalog-university-card" key={u.id}><div><span>{u.city}</span><span>{u.institutionType==="Devlet"?t.state:u.institutionType==="Vakıf"?t.foundation:u.institutionType}</span></div><h2>{u.name}</h2><p>{programCounts[u.slug]||0} {t.programs} · {u.founded&&u.founded!=="—"?`${u.founded} ${t.founded}`:""}</p><b>{t.view} ↗</b></Link>)}</div></div>
     {!visible.length&&<p className="empty-state">{t.empty}</p>}
-    <nav className="catalog-pagination" aria-label={t.page}>{currentPage===1?<span className="pagination-disabled">← {t.previous}</span>:<a href={`/${locale}/universiteler?page=${currentPage-1}#universite-listesi`}>← {t.previous}</a>}{Array.from({length:pageCount},(_,i)=>i+1).filter(i=>i===1||i===pageCount||Math.abs(i-currentPage)<=2).map((i,index,array)=><span key={i}>{index>0&&i-array[index-1]>1&&<span className="pagination-ellipsis">…</span>}<a href={`/${locale}/universiteler?page=${i}#universite-listesi`} aria-current={i===currentPage?"page":undefined}>{i}</a></span>)}{currentPage===pageCount?<span className="pagination-disabled">{t.next} →</span>:<a href={`/${locale}/universiteler?page=${currentPage+1}#universite-listesi`}>{t.next} →</a>}</nav>
+    {pageCount>1&&<nav className="catalog-pagination" aria-label={t.page}>{currentPage===1?<span className="pagination-disabled">← {t.previous}</span>:<Link href={pageUrl(locale,currentPage-1,filters)}>← {t.previous}</Link>}<span>{t.page} {currentPage} / {pageCount}</span>{currentPage===pageCount?<span className="pagination-disabled">{t.next} →</span>:<Link href={pageUrl(locale,currentPage+1,filters)}>{t.next} →</Link>}</nav>}
   </div>;
 }
