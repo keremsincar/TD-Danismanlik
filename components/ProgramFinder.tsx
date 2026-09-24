@@ -17,20 +17,20 @@ export function ProgramFinder({programs,universities,cities,degrees,languages,fi
  const t=texts[(locale in texts?locale:"tr") as keyof typeof texts];
  return <div className="finder-shell">
    <form className="finder-filters program-filter-form" method="get" action={`/${locale}/bolumler`}>
-     <label className="search-field"><span aria-hidden="true">⌕</span><input name="q" type="search" defaultValue={filters.query} placeholder={t.searchPlaceholder} aria-label={t.search}/></label>
-     <select name="city" defaultValue={filters.city} aria-label={t.city}><option value="">{t.allCities}</option>{cities.map(x=><option key={x}>{x}</option>)}</select>
-     <select name="university" defaultValue={filters.university} aria-label={t.university}><option value="">{t.allUniversities}</option>{universities.map(x=><option key={x.id} value={x.slug}>{x.name}</option>)}</select>
-     <select name="degree" defaultValue={filters.degree} aria-label={t.degree}><option value="">{t.allDegrees}</option>{degrees.map(x=><option key={x}>{x}</option>)}</select>
-     <select name="language" defaultValue={filters.language} aria-label={t.language}><option value="">{t.allLanguages}</option>{languages.map(x=><option key={x}>{x}</option>)}</select>
-     <select name="field" defaultValue={filters.field} aria-label={t.field}><option value="">{t.allFields}</option>{fields.map(x=><option key={x}>{x}</option>)}</select>
-     <select name="sort" defaultValue={filters.sort} aria-label={t.sort}><option value="university">{t.universitySort}</option><option value="program-asc">{t.programAsc}</option><option value="program-desc">{t.programDesc}</option><option value="field">{t.fieldSort}</option></select>
+     <label className="program-filter-search"><span>{t.search}</span><input name="q" type="search" defaultValue={filters.query} placeholder={t.searchPlaceholder}/></label>
+     <label><span>{t.city}</span><select name="city" defaultValue={filters.city}><option value="">{t.allCities}</option>{cities.map(x=><option key={x}>{x}</option>)}</select></label>
+     <label><span>{t.university}</span><select name="university" defaultValue={filters.university}><option value="">{t.allUniversities}</option>{universities.map(x=><option key={x.id} value={x.slug}>{x.name}</option>)}</select></label>
+     <label><span>{t.degree}</span><select name="degree" defaultValue={filters.degree}><option value="">{t.allDegrees}</option>{degrees.map(x=><option key={x}>{x}</option>)}</select></label>
+     <label><span>{t.language}</span><select name="language" defaultValue={filters.language}><option value="">{t.allLanguages}</option>{languages.map(x=><option key={x}>{x}</option>)}</select></label>
+     <label><span>{t.field}</span><select name="field" defaultValue={filters.field}><option value="">{t.allFields}</option>{fields.map(x=><option key={x}>{x}</option>)}</select></label>
+     <label><span>{t.sort}</span><select name="sort" defaultValue={filters.sort}><option value="university">{t.universitySort}</option><option value="program-asc">{t.programAsc}</option><option value="program-desc">{t.programDesc}</option><option value="field">{t.fieldSort}</option></select></label>
      <button className="filter-submit" type="submit">{t.apply}</button><Link className="filter-clear" href={`/${locale}/bolumler`}>{t.clear}</Link>
    </form>
    <div className="finder-meta" id="program-listesi"><span><b>{total}</b> {t.found}</span><small>{t.note}</small></div>
    <div className="program-results">{programs.map(p=><article className="program-card" key={p.slug}>
      <div className="program-top"><span className="degree-badge">{p.degreeType}</span><span>{p.language}</span></div>
-     <h3>{p.name}</h3>{p.englishName&&p.englishName!==p.name&&<p className="program-english-name">{p.englishName}</p>}<p><Link href={`/${locale}/universiteler/${p.universitySlug}`}>{p.universityName} ↗</Link></p>
-     <div className="program-info"><span><small>{t.duration}</small>{p.duration}</span><span><small>{t.fee}</small>{p.tuitionFee}</span></div>
+     <h3>{p.name}</h3>{p.englishName&&p.englishName!==p.name&&<p className="program-english-name">{p.englishName}</p>}<p className="program-university"><Link href={`/${locale}/universiteler/${p.universitySlug}`}>{p.universityName} ↗</Link></p>
+     <div className="program-info"><span><small>{t.duration}</small>{p.duration}</span>{p.field&&<span><small>{t.field}</small>{p.field}</span>}</div>
      <div className="program-links"><Link href={`/${locale}/bolumler/${p.slug}`}>{t.detail}</Link>{p.source&&<a href={p.source} target="_blank" rel="noopener noreferrer">{t.source} ↗</a>}</div>
    </article>)}</div>
    {!programs.length&&<p className="empty-state">{t.empty}</p>}
