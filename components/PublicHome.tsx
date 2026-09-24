@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- Local, size-bounded photography is served directly by the Site. */
 import Link from "@/components/NativeLink";
-import type { HomeCopy, Review, Service, SiteImages, SiteSettings, University } from "@/lib/content";
+import type { HomeCopy, Service, SiteImages, SiteSettings, University } from "@/lib/content";
 import { CookieBanner } from "./CookieBanner";
 import { ConsentAnalytics } from "./ConsentAnalytics";
 import { SiteHeader } from "./SiteHeader";
@@ -8,7 +8,6 @@ import { WhatsAppIcon } from "./WhatsAppIcon";
 import { RevealMotion } from "./RevealMotion";
 import { languageLabels } from "@/lib/i18n";
 import { FaqAccordion } from "./FaqAccordion";
-import { HomeMetrics } from "./HomeMetrics";
 import { AdvisorBot } from "./AdvisorBot";
 
 type FAQ={id:number;question:string;answer:string;category:string;active:number;sortOrder:number};
@@ -19,7 +18,7 @@ const local={
  ar:{discover:"اكتشف تخصصك",discoverLead:"قارن البرامج والجامعات ولغات الدراسة ومعلومات الرسوم في مكان واحد.",query:"اكتب اسم البرنامج",all:"كل الجامعات",go:"عرض البرامج",featured:"جامعات مميزة",legal:["إشعار حماية البيانات","سياسة الخصوصية","سياسة ملفات الارتباط","شروط الاستخدام"],about:"من نحن",photo:"الصورة"}
 } as const;
 
-export function PublicHome({settings,homeCopy,images,reviews,services,universities,faqs,programTotal,locale="tr"}:{settings:SiteSettings;homeCopy:HomeCopy;images:SiteImages;reviews:Review[];services:Service[];universities:University[];faqs:FAQ[];programTotal:number;locale?:string}) {
+export function PublicHome({settings,homeCopy,images,services,universities,faqs,locale="tr"}:{settings:SiteSettings;homeCopy:HomeCopy;images:SiteImages;services:Service[];universities:University[];faqs:FAQ[];locale?:string}) {
   const home=`/${locale}`,t=languageLabels(locale),l=local[(locale in local?locale:"tr") as keyof typeof local];
   const whatsapp=`https://wa.me/${settings.whatsapp.replace(/\D/g,"")}?text=${encodeURIComponent("Merhaba TD Danışmanlık, hizmetleriniz hakkında bilgi almak istiyorum.")}`;
   const heroBreak=settings.heroTitle.indexOf(". ");
@@ -27,16 +26,13 @@ export function PublicHome({settings,homeCopy,images,reviews,services,universiti
   return <div className="site-page elab-page compact-home" dir={locale==="ar"?"rtl":"ltr"} style={{"--primary":settings.primaryColor,"--accent":settings.accentColor,"--site-heading-font":settings.headingFont==="Newsreader"?"var(--font-serif)":settings.headingFont==="IBM Plex Sans"?"var(--font-plex)":"var(--font-sans)","--site-body-font":settings.bodyFont==="Newsreader"?"var(--font-serif)":settings.bodyFont==="IBM Plex Sans"?"var(--font-plex)":"var(--font-sans)"} as React.CSSProperties}>
     <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(faqSchema)}}/><SiteHeader settings={settings} locale={locale}/><RevealMotion/>
     <main>
-      <section className="elab-hero" aria-labelledby="hero-title"><div className="elab-hero-copy"><p className="elab-kicker">{homeCopy.heroEyebrow}</p><h1 id="hero-title">{heroBreak>=0?<><span className="elab-hero-first">{settings.heroTitle.slice(0,heroBreak+1)}</span><span className="elab-hero-second">{settings.heroTitle.slice(heroBreak+2)}</span></>:settings.heroTitle}</h1><p className="elab-hero-lead">{settings.heroDescription}</p><div className="elab-hero-actions"><Link className="elab-pill elab-pill-blue" href={`/${locale}/danismanlik-talebi`}>{settings.ctaText} <span>↗</span></Link><a className="elab-inline-link" href={whatsapp} target="_blank" rel="noopener noreferrer">{t.whatsapp} ↗</a></div></div><div className="elab-hero-photo"><img src={images.hero} alt="Üniversite danışmanlığı" loading="eager" fetchPriority="high" decoding="async"/></div></section>
-      <HomeMetrics universities={universities.length} programs={programTotal} cities={new Set(universities.map(item=>item.city)).size} locale={locale}/>
+      <section className="elab-hero" aria-labelledby="hero-title"><div className="elab-hero-copy"><p className="elab-kicker">{homeCopy.heroEyebrow}</p><h1 id="hero-title">{heroBreak>=0?<><span className="elab-hero-first">{settings.heroTitle.slice(0,heroBreak+1)}</span><span className="elab-hero-second">{settings.heroTitle.slice(heroBreak+2)}</span></>:settings.heroTitle}</h1><p className="elab-hero-lead">{settings.heroDescription}</p><div className="elab-hero-actions"><Link className="elab-pill elab-pill-blue" href={`/${locale}/danismanlik-talebi`}>{settings.ctaText} <span>↗</span></Link><a className="elab-inline-link hero-whatsapp-link" href={whatsapp} target="_blank" rel="noopener noreferrer">{t.whatsapp} ↗</a></div></div><div className="elab-hero-photo"><img src={images.hero} alt="Üniversite danışmanlığı" loading="eager" fetchPriority="high" decoding="async"/></div></section>
 
       <section className="elab-section elab-services" id="hizmetler"><div className="elab-section-head"><p className="elab-kicker">{t.serviceKicker}</p><h2>{homeCopy.servicesTitle}</h2><p>{homeCopy.servicesIntro}</p></div><div className="elab-service-grid">{services.slice(0,4).map(service=><Link className="elab-service-card" href={`/${locale}/hizmetler/${service.slug}`} key={service.id}><div className="elab-service-card-top"><span>{service.title}</span><span>↗</span></div><div><p>{service.summary}</p><span className="elab-card-cta">{t.viewService} ↗</span></div></Link>)}</div><Link className="elab-section-more" href={`/${locale}/hizmetler`}>{t.allServices} ↗</Link></section>
 
       <section className="elab-section elab-finder" id="universiteler"><div className="elab-section-head"><p className="elab-kicker">{l.featured}</p><h2>{homeCopy.finderTitle}</h2><p>{homeCopy.finderIntro}</p></div><div className="elab-university-grid">{universities.slice(0,8).map(university=><Link href={`/${locale}/universiteler/${university.slug}`} key={university.id}><span>{university.city}</span><strong>{university.name}</strong><b>{t.viewUniversity} ↗</b></Link>)}</div><div className="home-catalog-actions"><Link className="elab-section-more" href={`/${locale}/universiteler`}>{universities.length} {t.allUniversities} ↗</Link><Link className="elab-section-more" href={`/${locale}/bolumler`}>{t.allPrograms} ↗</Link></div></section>
 
-      {reviews.length>0&&<section className="elab-section elab-reviews" id="yorumlar"><div className="elab-section-head"><p className="elab-kicker">{t.reviewKicker}</p><h2>{homeCopy.reviewsTitle}</h2></div><div className="elab-review-grid">{reviews.slice(0,2).map(review=><article className="elab-review-card" key={review.id}><blockquote>“{review.quote}”</blockquote><div><span className="elab-review-avatar" aria-hidden="true">{review.author.slice(0,1)}</span><p><strong>{review.author}</strong><small>{review.context}</small></p></div></article>)}</div><Link className="elab-section-more" href={`/${locale}/yorumlar`}>{t.allReviews} ↗</Link></section>}
-
-      <section className="elab-section elab-faq" id="sss"><div><p className="elab-kicker">{t.faqKicker}</p><h2>{t.qPrompt}</h2><p>{t.qLead}</p><Link className="elab-section-more" href={`/${locale}/sss`}>{t.allFaq} ↗</Link></div><FaqAccordion className="home-faq-accordion" items={faqs.slice(0,6)}/></section>
+      <section className="elab-section elab-faq home-faq-compact" id="sss"><div><p className="elab-kicker">{t.faqKicker}</p><h2>{t.qPrompt}</h2><p>{t.qLead}</p><Link className="elab-section-more" href={`/${locale}/sss`}>{t.allFaq} ↗</Link></div><FaqAccordion className="home-faq-accordion" items={faqs.slice(0,4)}/></section>
 
       <section className="compact-contact"><div><p className="elab-kicker">{t.contactKicker}</p><h2>{homeCopy.contactTitle}</h2><p>{homeCopy.contactBody}</p></div><div><a className="elab-pill elab-pill-blue" href={whatsapp} target="_blank" rel="noopener noreferrer"><WhatsAppIcon size={19}/> {t.whatsapp}</a><Link className="elab-pill elab-pill-neutral" href={`/${locale}/iletisim`}>{t.contact} ↗</Link></div></section>
     </main>
