@@ -5,7 +5,8 @@ import { ensureDatabase, rawDatabase } from "@/lib/content";
 export const ADMIN_COOKIE = "td_admin_session";
 export const PRIMARY_ADMIN_EMAIL = "info@tddanismanlik.com";
 const SESSION_DAYS = 7;
-const PASSWORD_ITERATIONS = 210_000;
+const PASSWORD_ITERATIONS = 100_000;
+const LEGACY_PASSWORD_ITERATIONS = 210_000;
 
 export type AdminRole = "owner" | "admin" | "editor";
 export type AdminAccount = {
@@ -22,17 +23,24 @@ async function sha256(value:string) {
   return base64(new Uint8Array(await crypto.subtle.digest("SHA-256",encoder.encode(value))));
 }
 
+async function derivePassword(password:string,salt:Uint8Array,iterations:number) {
+  const key=await crypto.subtle.importKey("raw",encoder.encode(password),"PBKDF2",false,["deriveBits"]);
+  const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:Uint8Array.from(salt).buffer,iterations,hash:"SHA-256"},key,256);
+  return base64(new Uint8Array(bits));
+}
+
 export async function makePassword(password:string,saltValue?:string) {
   const salt=saltValue?unbase64(saltValue):crypto.getRandomValues(new Uint8Array(16));
-  const key=await crypto.subtle.importKey("raw",encoder.encode(password),"PBKDF2",false,["deriveBits"]);
-  const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt,iterations:PASSWORD_ITERATIONS,hash:"SHA-256"},key,256);
-  return {hash:base64(new Uint8Array(bits)),salt:base64(salt)};
+  const hash=await derivePassword(password,salt,PASSWORD_ITERATIONS);
+  return {hash:`pbkdf2$${PASSWORD_ITERATIONS}$${hash}`,salt:base64(salt)};
 }
 
 export async function verifyPassword(password:string,salt:string,expected:string) {
-  const actual=(await makePassword(password,salt)).hash;
-  if(actual.length!==expected.length)return false;
-  let difference=0;for(let i=0;i<actual.length;i++)difference|=actual.charCodeAt(i)^expected.charCodeAt(i);
+  const parts=expected.split("$"),versioned=parts.length===3&&parts[0]==="pbkdf2",iterations=versioned?Number(parts[1]):LEGACY_PASSWORD_ITERATIONS,target=versioned?parts[2]:expected;
+  if(!Number.isInteger(iterations)||iterations<50_000||iterations>1_000_000)return false;
+  const actual=await derivePassword(password,unbase64(salt),iterations);
+  if(actual.length!==target.length)return false;
+  let difference=0;for(let i=0;i<actual.length;i++)difference|=actual.charCodeAt(i)^target.charCodeAt(i);
   return difference===0;
 }
 
@@ -40,7 +48,7 @@ let bootstrapReady:Promise<void>|null=null;
 async function ensureBootstrapOwner(){
   await ensureDatabase();
   if(bootstrapReady)return bootstrapReady;
-  bootstrapReady=(async()=>{const d1=rawDatabase(),runtime=env as unknown as {ADMIN_BOOTSTRAP_PASSWORD?:string;ADMIN_BOOTSTRAP_REVISION?:string};const password=runtime.ADMIN_BOOTSTRAP_PASSWORD||"",revision=runtime.ADMIN_BOOTSTRAP_REVISION||"";if(password.length<12||!revision)return;const marker=`BOOTSTRAP_OWNER_${revision}`;if(await d1.prepare("SELECT id FROM audit_logs WHERE action=? LIMIT 1").bind(marker).first())return;const {hash,salt}=await makePassword(password),now=new Date().toISOString(),existing=await d1.prepare("SELECT id FROM admin_users WHERE email=?").bind(PRIMARY_ADMIN_EMAIL).first<{id:number}>();if(existing){await d1.batch([d1.prepare("UPDATE admin_users SET name=?,password_hash=?,password_salt=?,role='owner',active=1,updated_at=? WHERE id=?").bind("TD Danışmanlık",hash,salt,now,existing.id),d1.prepare("DELETE FROM admin_sessions WHERE user_id=?").bind(existing.id),d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",marker,"Ana yönetici hesabı güvenli biçimde etkinleştirildi",now)]);}else{await d1.batch([d1.prepare("INSERT INTO admin_users (email,name,password_hash,password_salt,role,active,created_by,created_at,updated_at) VALUES (?,?,?,?, 'owner',1,?,?,?)").bind(PRIMARY_ADMIN_EMAIL,"TD Danışmanlık",hash,salt,"secure-bootstrap",now,now),d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",marker,"Ana yönetici hesabı güvenli biçimde oluşturuldu",now)]);}})();
+  bootstrapReady=(async()=>{const d1=rawDatabase(),runtime=env as unknown as {ADMIN_BOOTSTRAP_PASSWORD?:string;ADMIN_BOOTSTRAP_REVISION?:string};const password=runtime.ADMIN_BOOTSTRAP_PASSWORD||"",revision=runtime.ADMIN_BOOTSTRAP_REVISION||"";if(password.length<12||!revision)return;const marker=`BOOTSTRAP_OWNER_${revision}`;if(await d1.prepare("SELECT id FROM audit_logs WHERE action=? LIMIT 1").bind(marker).first())return;const {hash,salt}=await makePassword(password),now=new Date().toISOString(),existing=await d1.prepare("SELECT id FROM admin_users WHERE email=?").bind(PRIMARY_ADMIN_EMAIL).first<{id:number}>();if(existing){await d1.batch([d1.prepare("UPDATE admin_users SET name=?,password_hash=?,password_salt=?,role='owner',active=1,updated_at=? WHERE id=?").bind("TD Danışmanlık",hash,salt,now,existing.id),d1.prepare("DELETE FROM admin_sessions WHERE user_id=?").bind(existing.id),d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",marker,"Ana yönetici hesabı güvenli biçimde etkinleştirildi",now)]);}else{await d1.batch([d1.prepare("INSERT INTO admin_users (email,name,password_hash,password_salt,role,active,created_by,created_at,updated_at) VALUES (?,?,?,?, 'owner',1,?,?,?)").bind(PRIMARY_ADMIN_EMAIL,"TD Danışmanlık",hash,salt,"secure-bootstrap",now,now),d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",marker,"Ana yönetici hesabı güvenli biçimde oluşturuldu",now)]);}})().catch(error=>{console.error("Admin hesabı başlatılamadı",error instanceof Error?error.message:String(error));});
   return bootstrapReady;
 }
 
