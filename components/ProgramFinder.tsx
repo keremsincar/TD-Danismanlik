@@ -30,9 +30,9 @@ export function ProgramFinder({programs,universities,cities,degrees,languages,fi
    <div className="program-results">{programs.map(p=><Link className="program-card program-card-simple" href={`/${locale}/bolumler/${p.slug}`} key={p.slug} aria-label={`${p.name} — ${t.detail}`}>
      <div className="program-top"><span className="degree-badge">{p.degreeType}</span>{p.language&&<span>{p.language}</span>}</div>
      <h3>{p.name}</h3><p className="program-university">{p.universityName}</p>
-     <span className="program-card-cta">{t.detail}<b aria-hidden="true">↗</b></span>
+     <span className="program-card-cta">{t.detail}</span>
    </Link>)}</div>
    {!programs.length&&<p className="empty-state">{t.empty}</p>}
-   {pageCount>1&&<nav className="catalog-pagination" aria-label={t.page}>{page>1?<Link href={pageUrl(locale,page-1,filters)}>← {t.previous}</Link>:<span className="pagination-disabled">← {t.previous}</span>}<span>{t.page} {page} / {pageCount}</span>{page<pageCount?<Link href={pageUrl(locale,page+1,filters)}>{t.next} →</Link>:<span className="pagination-disabled">{t.next} →</span>}</nav>}
+   {pageCount>1&&<nav className="catalog-pagination" aria-label={t.page}>{page>1?<Link href={pageUrl(locale,page-1,filters)}>{t.previous}</Link>:<span className="pagination-disabled">{t.previous}</span>}<span>{t.page} {page} / {pageCount}</span>{page<pageCount?<Link href={pageUrl(locale,page+1,filters)}>{t.next}</Link>:<span className="pagination-disabled">{t.next}</span>}</nav>}
  </div>;
 }
