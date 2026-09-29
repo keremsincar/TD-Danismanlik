@@ -344,6 +344,24 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
   .contact-page-details h2{font-size:49px}
 }
 
+/* Compact program directory: the whole card opens its detail page. */
+.elab-finder .program-card.program-card-simple{min-height:210px;padding:22px;display:flex;flex-direction:column;color:#1c252e;text-decoration:none}
+.elab-finder .program-card-simple h3{margin:26px 0 8px;font-size:clamp(21px,1.5vw,26px)}
+.elab-finder .program-card-simple .program-university{margin:0;color:#627080;font-size:12px!important;line-height:1.5}
+.program-card-cta{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:auto;padding-top:22px;border-top:1px solid #edf0f3;color:#1047e8;font-size:11px;font-weight:750}
+.program-card-cta b{font-size:17px;font-weight:500;transition:transform .2s ease}
+.program-card-simple:hover .program-card-cta b{transform:translate(3px,-3px)}
+
+/* Give the process badge and heading a deliberate editorial rhythm. */
+.process-page-grid>article>span{margin-bottom:26px}
+.process-page-grid>article h2{margin:0 0 14px;line-height:1.08}
+
+@media(max-width:700px){
+ .elab-finder .program-card.program-card-simple{min-height:175px;padding:20px}
+ .elab-finder .program-card-simple h3{margin-top:22px}
+ .process-page-grid>article>span{margin-bottom:22px}
+}
+
 /* Native, accessible menu: hover for pointer devices, summary toggle for touch/keyboard. */
 .elab-main-menu{position:relative;z-index:30;margin-left:auto}
 .elab-main-menu summary{display:flex;align-items:center;gap:11px;min-height:44px;padding:9px 15px;list-style:none;border:1px solid #e2e5e1;border-radius:13px;background:#fff;cursor:pointer;font-size:13px;font-weight:650;user-select:none}

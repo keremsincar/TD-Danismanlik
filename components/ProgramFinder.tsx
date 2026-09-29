@@ -27,12 +27,11 @@ export function ProgramFinder({programs,universities,cities,degrees,languages,fi
      <button className="filter-submit" type="submit">{t.apply}</button><Link className="filter-clear" href={`/${locale}/bolumler`}>{t.clear}</Link>
    </form>
    <div className="finder-meta" id="program-listesi"><span><b>{total}</b> {t.found}</span><small>{t.note}</small></div>
-   <div className="program-results">{programs.map(p=><article className="program-card" key={p.slug}>
-     <div className="program-top"><span className="degree-badge">{p.degreeType}</span><span>{p.language}</span></div>
-     <h3>{p.name}</h3>{p.englishName&&p.englishName!==p.name&&<p className="program-english-name">{p.englishName}</p>}<p className="program-university"><Link href={`/${locale}/universiteler/${p.universitySlug}`}>{p.universityName} ↗</Link></p>
-     <div className="program-info"><span><small>{t.duration}</small>{p.duration}</span>{p.field&&<span><small>{t.field}</small>{p.field}</span>}</div>
-     <div className="program-links"><Link href={`/${locale}/bolumler/${p.slug}`}>{t.detail}</Link>{p.source&&<a href={p.source} target="_blank" rel="noopener noreferrer">{t.source} ↗</a>}</div>
-   </article>)}</div>
+   <div className="program-results">{programs.map(p=><Link className="program-card program-card-simple" href={`/${locale}/bolumler/${p.slug}`} key={p.slug} aria-label={`${p.name} — ${t.detail}`}>
+     <div className="program-top"><span className="degree-badge">{p.degreeType}</span>{p.language&&<span>{p.language}</span>}</div>
+     <h3>{p.name}</h3><p className="program-university">{p.universityName}</p>
+     <span className="program-card-cta">{t.detail}<b aria-hidden="true">↗</b></span>
+   </Link>)}</div>
    {!programs.length&&<p className="empty-state">{t.empty}</p>}
    {pageCount>1&&<nav className="catalog-pagination" aria-label={t.page}>{page>1?<Link href={pageUrl(locale,page-1,filters)}>← {t.previous}</Link>:<span className="pagination-disabled">← {t.previous}</span>}<span>{t.page} {page} / {pageCount}</span>{page<pageCount?<Link href={pageUrl(locale,page+1,filters)}>{t.next} →</Link>:<span className="pagination-disabled">{t.next} →</span>}</nav>}
  </div>;
