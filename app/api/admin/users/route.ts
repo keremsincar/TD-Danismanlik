@@ -15,7 +15,7 @@ export async function POST(request:Request) {
     if(password.length<12||password!==confirm)return NextResponse.json({error:"Yeni şifre en az 12 karakter olmalı ve tekrar alanıyla eşleşmelidir."},{status:400});
     const account=await d1.prepare("SELECT password_hash AS hash,password_salt AS salt FROM admin_users WHERE id=?").bind(admin.id).first<{hash:string;salt:string}>();
     if(!account||!await verifyPassword(currentPassword,account.salt,account.hash))return NextResponse.json({error:"Mevcut şifre hatalı."},{status:400});
-    const next=await makePassword(password);await d1.batch([d1.prepare("UPDATE admin_users SET password_hash=?,password_salt=?,updated_at=? WHERE id=?").bind(next.hash,next.salt,now,admin.id),d1.prepare("DELETE FROM admin_sessions WHERE user_id=?").bind(admin.id),d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind(admin.email,"CHANGE_PASSWORD","Yönetici şifresi değiştirildi",now)]);return NextResponse.json({ok:true,reauthenticate:true});
+    const next=await makePassword(password);await d1.batch([d1.prepare("UPDATE admin_users SET password_hash=?,password_salt=?,updated_at=? WHERE id=?").bind(next.hash,next.salt,now,admin.id),d1.prepare("DELETE FROM admin_sessions WHERE user_id=?").bind(admin.id),d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind(admin.email,"CHANGE_PASSWORD","Yönetici şifresi değiştirildi",now)]);return NextResponse.json({ok:true,reauthenticate:true,savedAt:now,persistence:"d1"});
   }
   if(action==="create"){
     const name=clean(body.name,100),email=clean(body.email,160).toLowerCase(),password=typeof body.password==="string"?body.password.slice(0,200):"",role=clean(body.role,20) as AdminRole;
@@ -26,7 +26,7 @@ export async function POST(request:Request) {
       d1.prepare("INSERT INTO admin_users (email,name,password_hash,password_salt,role,active,created_by,created_at,updated_at) VALUES (?,?,?,?,?,1,?,?,?)").bind(email,name,hash,salt,role,admin.email,now,now),
       d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind(admin.email,"CREATE_ADMIN_USER",`${email} · ${role}`,now),
     ]);
-    return NextResponse.json({ok:true});
+    return NextResponse.json({ok:true,savedAt:now,persistence:"d1"});
   }
   if(action==="update"){
     const id=Number(body.id),role=clean(body.role,20) as AdminRole,active=body.active===true?1:0,password=typeof body.password==="string"?body.password.slice(0,200):"";
@@ -38,7 +38,7 @@ export async function POST(request:Request) {
     if(password){const {hash,salt}=await makePassword(password);await d1.prepare("UPDATE admin_users SET role=?,active=?,password_hash=?,password_salt=?,updated_at=? WHERE id=?").bind(role,active,hash,salt,now,id).run();await d1.prepare("DELETE FROM admin_sessions WHERE user_id=?").bind(id).run();}
     else await d1.prepare("UPDATE admin_users SET role=?,active=?,updated_at=? WHERE id=?").bind(role,active,now,id).run();
     await d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind(admin.email,"UPDATE_ADMIN_USER",`${target.email} · ${role} · ${active?"aktif":"pasif"}`,now).run();
-    return NextResponse.json({ok:true});
+    return NextResponse.json({ok:true,savedAt:now,persistence:"d1"});
   }
   return NextResponse.json({error:"Geçersiz işlem."},{status:400});
 }

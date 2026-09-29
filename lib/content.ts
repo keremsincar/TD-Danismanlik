@@ -25,20 +25,6 @@ export const defaultHomeCopy: HomeCopy = {
   contactTitle:"Sorunuzu konuşalım.",
   contactBody:"Üniversite, kayıt veya resmî işlemle ilgili sorunuz varsa bize yazın. İlk görüşmede neye ihtiyacınız olduğunu netleştirelim.",
 };
-const legacyHomeCopy: Partial<HomeCopy> = {
-  heroEyebrow:"Eğitim ve yaşam danışmanlığı · İstanbul",
-  servicesTitle:"İHTİYACINIZ OLAN DESTEK, TEK YERDE.",
-  servicesIntro:"Üniversite tercihinden resmî işlemlere kadar her aşamayı açık bir planla birlikte yürütüyoruz.",
-  aboutTitle:"KARMAŞIK SÜREÇLERİ SADELEŞTİRİYORUZ.",
-  aboutBody:"Önce sizi dinliyoruz. Ardından seçenekleri, belgeleri ve tarihleri tek tek açıklayarak uygulanabilir bir yol haritası hazırlıyoruz.",
-  finderTitle:"SİZE UYGUN PROGRAMI KEŞFEDİN.",
-  finderIntro:"Örnek katalogda şehir, derece ve eğitim diline göre arama yapın. Program ve başvuru koşullarını görüşmede güncel olarak teyit ediyoruz.",
-  processTitle:"DÖRT ADIMDA NET BİR YOL.",
-  processIntro:"Hangi aşamada olduğunuzu ve sırada ne yapılacağını her zaman bilirsiniz.",
-  reviewsTitle:"DANIŞAN DENEYİMLERİ.",
-  contactTitle:"BİRLİKTE BAŞLAYALIM.",
-  contactBody:"Sorunuzu bize iletin; ihtiyacınıza uygun ilk adımı birlikte belirleyelim.",
-};
 export type Service = { id:number; slug:string; title:string; summary:string; detail:string; icon:string; active:number; sortOrder:number; updatedAt:string };
 export type University = { id:number; slug:string; name:string; city:string; country:string; description:string; featured:number; active:number; updatedAt:string; institutionType:string; founded:string };
 export type Program = { id:number; universityId:number; universityName:string; universitySlug:string; slug:string; name:string; degreeType:string; language:string; duration:string; tuitionFee:string; description:string; active:number; updatedAt:string; field?:string; englishName?:string; source?:string };
@@ -130,30 +116,7 @@ let ready: Promise<void> | null = null;
 
 export function ensureDatabase(): Promise<void> {
   if (ready) return ready;
-  ready = (async () => {
-    const d1 = db();
-    await d1.batch([
-      d1.prepare("CREATE TABLE IF NOT EXISTS site_settings (id INTEGER PRIMARY KEY, site_name TEXT NOT NULL, hero_title TEXT NOT NULL, hero_description TEXT NOT NULL, cta_text TEXT NOT NULL, phone TEXT NOT NULL, whatsapp TEXT NOT NULL, address TEXT NOT NULL DEFAULT '', hours TEXT NOT NULL DEFAULT '', email TEXT NOT NULL, heading_font TEXT NOT NULL, body_font TEXT NOT NULL, primary_color TEXT NOT NULL, accent_color TEXT NOT NULL, updated_at TEXT NOT NULL)"),
-      d1.prepare("CREATE TABLE IF NOT EXISTS services (id INTEGER PRIMARY KEY AUTOINCREMENT, slug TEXT NOT NULL UNIQUE, title TEXT NOT NULL, summary TEXT NOT NULL, detail TEXT NOT NULL, icon TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL)"),
-      d1.prepare("CREATE TABLE IF NOT EXISTS universities (id INTEGER PRIMARY KEY AUTOINCREMENT, slug TEXT NOT NULL UNIQUE, name TEXT NOT NULL, city TEXT NOT NULL, country TEXT NOT NULL, description TEXT NOT NULL, featured INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, updated_at TEXT NOT NULL)"),
-      d1.prepare("CREATE TABLE IF NOT EXISTS programs (id INTEGER PRIMARY KEY AUTOINCREMENT, university_id INTEGER NOT NULL, slug TEXT NOT NULL UNIQUE, name TEXT NOT NULL, degree_type TEXT NOT NULL, language TEXT NOT NULL, duration TEXT NOT NULL, tuition_fee TEXT NOT NULL, description TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, updated_at TEXT NOT NULL, FOREIGN KEY (university_id) REFERENCES universities(id))"),
-      d1.prepare("CREATE TABLE IF NOT EXISTS consultation_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, phone TEXT NOT NULL, whatsapp TEXT NOT NULL, email TEXT NOT NULL, service TEXT NOT NULL, university TEXT, program TEXT, message TEXT NOT NULL, preferred_contact TEXT NOT NULL, kvkk_accepted_at TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'NEW', admin_note TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL)"),
-      d1.prepare("CREATE TABLE IF NOT EXISTS faqs (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT NOT NULL, answer TEXT NOT NULL, category TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0)"),
-      d1.prepare("CREATE TABLE IF NOT EXISTS audit_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, actor TEXT NOT NULL, action TEXT NOT NULL, detail TEXT NOT NULL, created_at TEXT NOT NULL)"),
-      d1.prepare("CREATE TABLE IF NOT EXISTS rate_limits (key TEXT PRIMARY KEY, count INTEGER NOT NULL, reset_at INTEGER NOT NULL)"),
-      d1.prepare("CREATE TABLE IF NOT EXISTS home_content (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL)"),
-      d1.prepare("CREATE TABLE IF NOT EXISTS reviews (id INTEGER PRIMARY KEY AUTOINCREMENT, author TEXT NOT NULL, context TEXT NOT NULL, quote TEXT NOT NULL, is_example INTEGER NOT NULL DEFAULT 1, active INTEGER NOT NULL DEFAULT 1, sort_order INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL)"),
-      d1.prepare("CREATE TABLE IF NOT EXISTS admin_users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL UNIQUE, name TEXT NOT NULL, password_hash TEXT NOT NULL, password_salt TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'editor', active INTEGER NOT NULL DEFAULT 1, created_by TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, last_login_at TEXT)"),
-      d1.prepare("CREATE TABLE IF NOT EXISTS admin_sessions (token_hash TEXT PRIMARY KEY, user_id INTEGER NOT NULL, expires_at TEXT NOT NULL, created_at TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES admin_users(id) ON DELETE CASCADE)"),
-      d1.prepare("CREATE INDEX IF NOT EXISTS idx_programs_university_id ON programs(university_id)"),
-      d1.prepare("CREATE INDEX IF NOT EXISTS idx_consultations_status_created ON consultation_requests(status, created_at)"),
-      d1.prepare("CREATE INDEX IF NOT EXISTS idx_services_active_order ON services(active, sort_order)"),
-      d1.prepare("CREATE INDEX IF NOT EXISTS idx_reviews_active_order ON reviews(active, sort_order)"),
-      d1.prepare("CREATE INDEX IF NOT EXISTS idx_admin_users_active_role ON admin_users(active, role)"),
-      d1.prepare("CREATE INDEX IF NOT EXISTS idx_admin_sessions_user_id ON admin_sessions(user_id)"),
-    ]);
-    await seedDefaults();
-  })();
+  ready = seedDefaults();
   return ready;
 }
 
@@ -162,6 +125,21 @@ async function seedDefaults() {
   const settingsCount = await d1.prepare("SELECT COUNT(*) AS count FROM site_settings").first<{count:number}>();
   if (!settingsCount?.count) await d1.prepare("INSERT INTO site_settings (id,site_name,hero_title,hero_description,cta_text,phone,whatsapp,address,hours,email,heading_font,body_font,primary_color,accent_color,updated_at) VALUES (1,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
     .bind(defaultSettings.siteName,defaultSettings.heroTitle,defaultSettings.heroDescription,defaultSettings.ctaText,defaultSettings.phone,defaultSettings.whatsapp,defaultSettings.address,defaultSettings.hours,defaultSettings.email,defaultSettings.headingFont,defaultSettings.bodyFont,defaultSettings.primaryColor,defaultSettings.accentColor,now).run();
+  const legacyMarker="NORMALIZE_LEGACY_SETTINGS_V1";
+  const legacyHandled=await d1.prepare("SELECT id FROM audit_logs WHERE action=? LIMIT 1").bind(legacyMarker).first<{id:number}>();
+  if(!legacyHandled){
+    const legacy=await d1.prepare("SELECT primary_color AS primaryColor,accent_color AS accentColor,phone,whatsapp,address FROM site_settings WHERE id=1").first<{primaryColor:string;accentColor:string;phone:string;whatsapp:string;address:string}>();
+    if(legacy?.primaryColor==="#14362e"&&legacy.accentColor==="#dfff70"&&!legacy.phone&&!legacy.whatsapp){
+      await d1.prepare("UPDATE site_settings SET hero_title=?,hero_description=?,cta_text=?,phone=?,whatsapp=?,address=?,hours=?,heading_font=?,body_font=?,primary_color=?,accent_color=?,updated_at=? WHERE id=1").bind(defaultSettings.heroTitle,defaultSettings.heroDescription,defaultSettings.ctaText,defaultSettings.phone,defaultSettings.whatsapp,defaultSettings.address,defaultSettings.hours,defaultSettings.headingFont,defaultSettings.bodyFont,defaultSettings.primaryColor,defaultSettings.accentColor,now).run();
+    }
+    await d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",legacyMarker,"Eski başlangıç ayarları bir kez normalleştirildi",now).run();
+  }
+  const copyRepairMarker="REPAIR_TRUNCATED_COPY_V1";
+  const copyRepairHandled=await d1.prepare("SELECT id FROM audit_logs WHERE action=? LIMIT 1").bind(copyRepairMarker).first<{id:number}>();
+  if(!copyRepairHandled){
+    await d1.prepare("UPDATE home_content SET value=?,updated_at=? WHERE key='servicesIntro' AND value=?").bind(defaultHomeCopy.servicesIntro,now,"Bölüm tercihi, kayıt evrakı ve ikamet başvurusu için hangi adımın ne zaman yapılacağını").run();
+    await d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",copyRepairMarker,"Yarım kalan hizmet açıklaması tamamlandı",now).run();
+  }
   const serviceCount = await d1.prepare("SELECT COUNT(*) AS count FROM services").first<{count:number}>();
   if (!serviceCount?.count) await d1.batch(defaultServices.map((s,i)=>d1.prepare("INSERT INTO services (slug,title,summary,detail,icon,active,sort_order,updated_at) VALUES (?,?,?,?,?,1,?,?)").bind(...s,i+1,now)));
   const universityCount = await d1.prepare("SELECT COUNT(*) AS count FROM universities").first<{count:number}>();
@@ -178,8 +156,8 @@ async function seedDefaults() {
   if (!publicReviewCount?.count) await d1.batch(defaultReviews.map(r=>d1.prepare("INSERT INTO reviews (author,context,quote,is_example,active,sort_order,updated_at) VALUES (?,?,?,0,1,?,?)").bind(...r,now)));
 }
 
-export async function getSettings(): Promise<SiteSettings> { await ensureDatabase(); const row=await db().prepare("SELECT site_name AS siteName,hero_title AS heroTitle,hero_description AS heroDescription,cta_text AS ctaText,phone,whatsapp,address,hours,email,heading_font AS headingFont,body_font AS bodyFont,primary_color AS primaryColor,accent_color AS accentColor,updated_at AS updatedAt FROM site_settings WHERE id=1").first<SiteSettings>(); if(!row)return defaultSettings; const legacyPalette=row.primaryColor==="#14362e"&&row.accentColor==="#dfff70"; return {...row,phone:row.phone||defaultSettings.phone,whatsapp:row.whatsapp||defaultSettings.whatsapp,address:row.address||defaultSettings.address,hours:"",heroDescription:legacyPalette&&row.heroDescription==="Üniversite seçiminden ikamet ve vatandaşlık işlemlerine kadar tüm süreci, sizin için sadeleştiriyor ve özenle takip ediyoruz."?defaultSettings.heroDescription:row.heroDescription,ctaText:legacyPalette&&row.ctaText==="Yol haritanızı oluşturalım"?defaultSettings.ctaText:row.ctaText,headingFont:legacyPalette?defaultSettings.headingFont:row.headingFont,bodyFont:legacyPalette?defaultSettings.bodyFont:row.bodyFont,primaryColor:row.primaryColor==="#14362e"?defaultSettings.primaryColor:row.primaryColor,accentColor:row.accentColor==="#dfff70"?defaultSettings.accentColor:row.accentColor}; }
-export async function getHomeCopy(): Promise<HomeCopy> { await ensureDatabase(); const rows=(await db().prepare("SELECT key,value FROM home_content").all<{key:string;value:string}>()).results; return rows.reduce((copy,row)=>{const key=row.key as keyof HomeCopy;if(key in copy)copy[key]=legacyHomeCopy[key]===row.value||key==="heroEyebrow"&&row.value==="Yeşilköy, İstanbul · Eğitim ve resmî işlemler"?defaultHomeCopy[key]:row.value;return copy;},{...defaultHomeCopy}); }
+export async function getSettings(): Promise<SiteSettings> { await ensureDatabase(); const row=await db().prepare("SELECT site_name AS siteName,hero_title AS heroTitle,hero_description AS heroDescription,cta_text AS ctaText,phone,whatsapp,address,hours,email,heading_font AS headingFont,body_font AS bodyFont,primary_color AS primaryColor,accent_color AS accentColor,updated_at AS updatedAt FROM site_settings WHERE id=1").first<SiteSettings>(); return row??defaultSettings; }
+export async function getHomeCopy(): Promise<HomeCopy> { await ensureDatabase(); const rows=(await db().prepare("SELECT key,value FROM home_content").all<{key:string;value:string}>()).results; return rows.reduce((copy,row)=>{const key=row.key as keyof HomeCopy;if(key in copy)copy[key]=row.value;return copy;},{...defaultHomeCopy}); }
 export async function getSiteImages():Promise<SiteImages> { await ensureDatabase(); const rows=(await db().prepare("SELECT key,value FROM home_content WHERE key IN ('imageHero','imageAbout')").all<{key:string;value:string}>()).results;const values=Object.fromEntries(rows.map(row=>[row.key,row.value]));return {hero:values.imageHero||"/td-students.jpg",about:values.imageAbout||"/td-campus.jpg"}; }
 export async function getReviews(activeOnly=true): Promise<Review[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,author,context,quote,is_example AS isExample,active,sort_order AS sortOrder,updated_at AS updatedAt FROM reviews WHERE active=1 AND is_example=0 ORDER BY sort_order,id":"SELECT id,author,context,quote,is_example AS isExample,active,sort_order AS sortOrder,updated_at AS updatedAt FROM reviews ORDER BY sort_order,id";return (await db().prepare(q).all<Review>()).results; }
 export async function getServices(activeOnly=true): Promise<Service[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services WHERE active=1 ORDER BY sort_order":"SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services ORDER BY sort_order"; return (await db().prepare(q).all<Service>()).results; }

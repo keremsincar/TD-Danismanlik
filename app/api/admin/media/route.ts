@@ -24,5 +24,5 @@ export async function POST(request:Request) {
     rawDatabase().prepare("INSERT INTO home_content (key,value,updated_at) VALUES (?,?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(slot==="hero"?"imageHero":"imageAbout",url,now),
     rawDatabase().prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind(admin.email,"UPDATE_IMAGE",slot,now),
   ]);
-  return NextResponse.json({ok:true,url});
+  return NextResponse.json({ok:true,url,savedAt:now,persistence:"r2+d1"});
 }
