@@ -780,3 +780,22 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
  .advisor-panel{right:0;bottom:58px;width:calc(100vw - 24px);max-height:calc(100vh - 145px);border-radius:16px}
  .advisor-panel>header{padding:16px}.advisor-messages{max-height:36vh;padding:14px}.advisor-suggestions{padding:0 14px 12px}.advisor-panel>form{padding:12px}.advisor-panel>footer{padding:2px 14px 14px}
 }
+
+/* Service pages use the editable campus image and the complete wordmark in the former empty panel. */
+.elab-inner-page .detail-hero>.detail-brand-panel{
+ position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;
+ min-width:0;padding:38px;overflow:hidden;background:#1b2028;text-align:left;color:#fff;
+}
+.detail-brand-panel>img{position:absolute;z-index:-2;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 58%;filter:saturate(.8) contrast(1.02)}
+.detail-brand-panel::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(19,27,26,.38) 0%,rgba(19,27,26,.58) 48%,rgba(19,27,26,.94) 100%)}
+.detail-panel-wordmark{display:flex;align-items:baseline;gap:16px;padding-bottom:22px;border-bottom:1px solid rgba(255,255,255,.35)}
+.detail-panel-wordmark strong{font-size:clamp(66px,7vw,112px);font-weight:850;line-height:.78;letter-spacing:-.075em}
+.detail-panel-wordmark b{font-size:clamp(20px,2vw,31px);font-weight:800;line-height:1;letter-spacing:-.055em}
+.elab-inner-page .detail-brand-panel>p{position:relative;z-index:1;max-width:360px;margin:0;font-size:16px;font-weight:750;line-height:1.35}
+.elab-inner-page .detail-brand-panel>p small{margin-top:9px;color:rgba(255,255,255,.72);font-size:12px;font-weight:600;line-height:1.45}
+@media(max-width:850px){
+ .elab-inner-page .detail-hero>.detail-brand-panel{min-height:440px;padding:30px}.detail-panel-wordmark{gap:12px}.detail-panel-wordmark strong{font-size:78px}.detail-panel-wordmark b{font-size:24px}
+}
+@media(max-width:600px){
+ .elab-inner-page .detail-hero>.detail-brand-panel{min-height:360px;padding:24px}.detail-brand-panel>img{object-position:center 56%}.detail-panel-wordmark{padding-bottom:16px}.detail-panel-wordmark strong{font-size:62px}.detail-panel-wordmark b{font-size:20px}.elab-inner-page .detail-brand-panel>p{font-size:14px}
+}
