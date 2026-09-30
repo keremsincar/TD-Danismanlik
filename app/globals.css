@@ -489,6 +489,35 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
 @media(max-width:720px){.users-intro{align-items:flex-start;flex-direction:column}.user-row{grid-template-columns:1fr 1fr;padding-bottom:24px}.user-identity{grid-column:1/-1}.user-row>.check{align-self:end}.last-login{left:17px;bottom:7px}}
 @media(prefers-reduced-motion:reduce){.catalog-page-frame{animation:none}}
 
+/* Final spacing and action polish */
+.elab-pill-whatsapp{background:#1fa95b;color:#fff;box-shadow:0 10px 24px rgba(31,169,91,.18)}
+.elab-pill-whatsapp:hover,.elab-pill-whatsapp:focus-visible{background:#178948;color:#fff}
+.mobile-cta a:nth-child(2){background:#1fa95b!important;color:#fff!important}
+.service-listing-grid>a{min-height:260px;padding:36px 32px}
+.service-listing-grid>a h2{margin:0 0 20px;line-height:1.1}
+.service-listing-grid>a p{margin:0;line-height:1.72}
+.service-listing-grid>a b{padding-top:34px}
+.elab-inner-page .request-page>section{padding-top:88px;padding-bottom:88px}
+.elab-inner-page .request-page h1{font-size:clamp(60px,6vw,88px);line-height:1.08;letter-spacing:-.045em}
+.elab-inner-page .request-page>section>p:not(.section-index){margin:38px 0;line-height:1.85}
+.elab-inner-page .request-points{margin-top:42px}
+.elab-inner-page .request-points span{display:block;padding:18px 0;border:0;border-bottom:1px solid rgba(255,255,255,.16);border-radius:0;background:transparent;color:#d4ddd9;font-size:11px;line-height:1.65}
+.elab-inner-page .consultation-form{padding-top:76px;padding-bottom:76px}
+.elab-inner-page .consultation-form .form-grid{gap:28px 22px}
+.elab-inner-page .consultation-form label{gap:10px;line-height:1.4}
+.elab-inner-page .consultation-form input,.elab-inner-page .consultation-form select{min-height:52px;border-radius:12px}
+.elab-inner-page .consultation-form textarea{border-radius:12px;line-height:1.6}
+@media(max-width:600px){
+ .service-listing-grid>a{min-height:0;padding:28px 22px}
+ .service-listing-grid>a h2{margin-bottom:16px}
+ .service-listing-grid>a b{padding-top:26px}
+ .elab-inner-page .request-page>section{padding:64px 25px}
+ .elab-inner-page .request-page h1{font-size:clamp(50px,14vw,68px)!important;line-height:1.08!important;letter-spacing:-.045em!important}
+ .elab-inner-page .request-page>section>p:not(.section-index){margin:30px 0;font-size:14px}
+ .elab-inner-page .request-points{margin-top:34px}
+ .elab-inner-page .consultation-form{padding:58px 22px}
+}
+
 /* Compact public flow and complete university catalog */
 .compact-home .elab-hero{min-height:620px}
 .compact-home .elab-hero-copy{padding-top:70px;padding-bottom:70px}
@@ -537,7 +566,6 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
 .faq-number{font-size:11px;color:#82909d}.faq-question{font-size:17px;font-weight:650;line-height:1.35;transition:color .2s}.faq-question small{display:block;margin-top:5px;color:#7b8791;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em}.faq-plus{font-size:22px;font-weight:400;transition:transform .3s ease}.animated-faq article.is-open .faq-plus{transform:rotate(45deg)}
 .faq-answer-wrap{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .38s cubic-bezier(.2,.75,.2,1),opacity .25s ease}.faq-answer-wrap>div{overflow:hidden}.faq-answer-wrap p{max-width:850px;margin:0;padding:0 48px 26px 60px;color:#526073;font-size:14px;line-height:1.75}.animated-faq article.is-open .faq-answer-wrap{grid-template-rows:1fr;opacity:1}
 .faq-listing-page .faq-page-list{max-width:1120px;border-top:0}.faq-listing-page .animated-faq button{min-height:88px;padding-left:18px;padding-right:18px}.faq-listing-page .faq-question{font-size:19px}.home-faq-accordion{border-top-color:#cfd8e0}
-.hero-whatsapp-link{color:#168a47}.hero-whatsapp-link:hover{color:#0f6f38}
 .compact-home .elab-faq.home-faq-compact{grid-template-columns:.62fr 1.38fr;gap:5vw;padding-top:48px;padding-bottom:48px}
 .compact-home .home-faq-compact h2{font-size:clamp(36px,4vw,58px)}
 .compact-home .home-faq-compact .elab-kicker{margin-bottom:14px}
