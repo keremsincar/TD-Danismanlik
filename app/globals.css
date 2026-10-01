@@ -679,7 +679,7 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
 /* Final navigation: the same complete menu stays at the top on every screen. */
 .elab-header{display:flex;align-items:center;gap:clamp(18px,2.2vw,34px);min-height:88px;height:auto;padding:14px 3.2vw;border-radius:28px 28px 0 0;background:rgba(248,249,247,.97);box-shadow:0 12px 34px rgba(23,31,36,.045)}
 .elab-header .elab-brand{flex:none;white-space:nowrap}
-.elab-header .elab-top-nav{position:static;display:flex;flex:1;flex-wrap:nowrap;justify-content:center;align-items:center;gap:2px;min-width:0;margin:0;padding:0;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none}
+.elab-header .elab-top-nav{position:static;display:flex;flex:1;flex-wrap:nowrap;justify-content:flex-start;align-items:center;gap:2px;min-width:0;margin:0;padding:0;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none}
 .elab-header .elab-top-nav::-webkit-scrollbar{display:none}
 .elab-header .elab-top-nav a{flex:none;display:flex;align-items:center;justify-content:center;min-height:42px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:#2d3437;font-size:13px;font-weight:650;white-space:nowrap}
 .elab-header .elab-top-nav a:hover,.elab-header .elab-top-nav a:focus-visible{background:#eaeeec;transform:none}
