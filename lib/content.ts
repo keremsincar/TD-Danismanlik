@@ -13,20 +13,20 @@ export type HomeCopy = { heroEyebrow:string; servicesTitle:string; servicesIntro
 export type SiteImages = { hero:string; about:string };
 export const defaultHomeCopy: HomeCopy = {
   heroEyebrow:"TD Danışmanlık",
-  servicesTitle:"Eğitimden resmî işlemlere.",
-  servicesIntro:"Bölüm tercihi, kayıt evrakı ve ikamet başvurusu için hangi adımın ne zaman yapılacağını birlikte belirleyelim.",
+  servicesTitle:"Eğitim ve resmî işlemlerde kapsamlı danışmanlık.",
+  servicesIntro:"Üniversite tercihi, kayıt, ikamet ve ilgili resmî süreçler için kapsamı, belge planını ve kritik tarihleri sistematik biçimde yönetiyoruz.",
   aboutTitle:"Her dosyaya aynı yerden başlamıyoruz.",
   aboutBody:"Önce durumunuzu dinler, belgelerinizi ve takvimi önümüze koyarız. Sonra gerçekten gerekli adımları sırasıyla planlarız.",
-  finderTitle:"Hangi bölüm, hangi şehir?",
-  finderIntro:"Şehir, derece ve eğitim diline göre örnek programları karşılaştırın. Güncel koşulları başvuru öncesinde birlikte teyit ederiz.",
-  processTitle:"Süreç gözünüzün önünde ilerlesin.",
-  processIntro:"Başlangıçta bir yol haritası çıkarır, her aşamada nerede olduğunuzu paylaşırız.",
+  finderTitle:"Üniversite ve program kataloğu.",
+  finderIntro:"Üniversiteleri ve programları şehir, derece, dil ve alana göre inceleyin; güncel koşulları resmî kaynak üzerinden doğrulayın.",
+  processTitle:"Tanımlı aşamalar, düzenli takip.",
+  processIntro:"İş kapsamını başlangıçta belirler, her aşamanın sorumluluklarını ve durumunu düzenli olarak raporlarız.",
   reviewsTitle:"Danışan notları",
-  contactTitle:"Sorunuzu konuşalım.",
-  contactBody:"Üniversite, kayıt veya resmî işlemle ilgili sorunuz varsa bize yazın. İlk görüşmede neye ihtiyacınız olduğunu netleştirelim.",
+  contactTitle:"Danışmanlık ve iletişim.",
+  contactBody:"Üniversite, kayıt veya resmî işlemlere ilişkin talebinizi iletin. Ekibimiz kapsamı değerlendirerek uygun iletişim kanalından dönüş sağlayacaktır.",
 };
-export type Service = { id:number; slug:string; title:string; summary:string; detail:string; icon:string; active:number; sortOrder:number; updatedAt:string };
-export type University = { id:number; slug:string; name:string; city:string; country:string; description:string; featured:number; active:number; updatedAt:string; institutionType:string; founded:string };
+export type Service = { id:number; slug:string; title:string; summary:string; detail:string; icon:string; image:string; active:number; sortOrder:number; updatedAt:string };
+export type University = { id:number; slug:string; name:string; city:string; country:string; description:string; featured:number; active:number; updatedAt:string; institutionType:string; founded:string; image:string; logoUrl:string };
 export type Program = { id:number; universityId:number; universityName:string; universitySlug:string; slug:string; name:string; degreeType:string; language:string; duration:string; tuitionFee:string; description:string; active:number; updatedAt:string; field?:string; englishName?:string; source?:string };
 type ReferenceProgram = { id:number; universitySlug:string; universityName:string; slug:string; name:string; englishName:string; degreeType:string; field:string; language:string; duration:string; tuitionFee:string; source:string };
 const referencePrograms=referenceProgramsRaw as ReferenceProgram[];
@@ -36,8 +36,19 @@ export type Consultation = { id:number; name:string; phone:string; whatsapp:stri
 const defaultSettings: SiteSettings = {
   siteName:"TD Danışmanlık", heroTitle:"Doğru adım. Net bir gelecek.",
   heroDescription:"Türkiye’de üniversite başvurusu, kayıt ve resmî işlemler için dosyanıza uygun bir plan çıkarıyoruz. Belgeyi, tarihi ve sonraki adımı birlikte takip ediyoruz.",
-  ctaText:"Görüşme planlayalım", phone:"+90 507 077 87 15", whatsapp:"905070778715", address:"İstanbul Dünya Ticaret Merkezi, A2 Blok, Kat 5, Daire 206, Yeşilköy, Bakırköy/İstanbul", hours:"", email:"info@tddanismanlik.com",
-  headingFont:"Newsreader", bodyFont:"IBM Plex Sans", primaryColor:"#17181c", accentColor:"#1047e8", updatedAt:new Date().toISOString(),
+  ctaText:"Danışmanlık talebi oluşturun", phone:"+90 507 077 87 15", whatsapp:"905070778715", address:"İstanbul Dünya Ticaret Merkezi, A2 Blok, Kat 5, Daire 206, Yeşilköy, Bakırköy/İstanbul", hours:"", email:"info@tddanismanlik.com",
+  headingFont:"Newsreader", bodyFont:"IBM Plex Sans", primaryColor:"#20252b", accentColor:"#6686a3", updatedAt:new Date().toISOString(),
+};
+
+const defaultServiceImages:Record<string,string>={
+  "universite-bolum-secimi":"https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1600&q=82",
+  "kayit-sureci":"https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1600&q=82",
+  "ikamet-izni":"https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1600&q=82",
+  "adres-kayit":"https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1600&q=82",
+  "calisma-izni":"https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=82",
+  "vatandaslik":"https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1600&q=82",
+  "tercume":"https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=82",
+  "denklik":"https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=82",
 };
 
 const defaultServices = [
@@ -140,6 +151,28 @@ async function seedDefaults() {
     await d1.prepare("UPDATE home_content SET value=?,updated_at=? WHERE key='servicesIntro' AND value=?").bind(defaultHomeCopy.servicesIntro,now,"Bölüm tercihi, kayıt evrakı ve ikamet başvurusu için hangi adımın ne zaman yapılacağını").run();
     await d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",copyRepairMarker,"Yarım kalan hizmet açıklaması tamamlandı",now).run();
   }
+  const styleRefreshMarker="STYLE_REFRESH_V2";
+  const styleRefreshHandled=await d1.prepare("SELECT id FROM audit_logs WHERE action=? LIMIT 1").bind(styleRefreshMarker).first<{id:number}>();
+  if(!styleRefreshHandled){
+    await d1.prepare("UPDATE site_settings SET cta_text=CASE WHEN cta_text='Görüşme planlayalım' THEN ? ELSE cta_text END,primary_color=CASE WHEN primary_color IN ('#17181c','#14362e') THEN ? ELSE primary_color END,accent_color=CASE WHEN accent_color IN ('#1047e8','#dfff70','#6f8d7c') THEN ? ELSE accent_color END,updated_at=? WHERE id=1").bind(defaultSettings.ctaText,defaultSettings.primaryColor,defaultSettings.accentColor,now).run();
+    await d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",styleRefreshMarker,"Kurumsal renk ve CTA varsayılanları güncellendi",now).run();
+  }
+  const professionalCopyMarker="PROFESSIONAL_COPY_V2";
+  const professionalCopyHandled=await d1.prepare("SELECT id FROM audit_logs WHERE action=? LIMIT 1").bind(professionalCopyMarker).first<{id:number}>();
+  if(!professionalCopyHandled){
+    const replacements:[keyof HomeCopy,string,string][]=[
+      ["servicesTitle",defaultHomeCopy.servicesTitle,"Eğitimden resmî işlemlere."],
+      ["servicesIntro",defaultHomeCopy.servicesIntro,"Bölüm tercihi, kayıt evrakı ve ikamet başvurusu için hangi adımın ne zaman yapılacağını birlikte belirleyelim."],
+      ["finderTitle",defaultHomeCopy.finderTitle,"Hangi bölüm, hangi şehir?"],
+      ["finderIntro",defaultHomeCopy.finderIntro,"Şehir, derece ve eğitim diline göre örnek programları karşılaştırın. Güncel koşulları başvuru öncesinde birlikte teyit ederiz."],
+      ["processTitle",defaultHomeCopy.processTitle,"Süreç gözünüzün önünde ilerlesin."],
+      ["processIntro",defaultHomeCopy.processIntro,"Başlangıçta bir yol haritası çıkarır, her aşamada nerede olduğunuzu paylaşırız."],
+      ["contactTitle",defaultHomeCopy.contactTitle,"Sorunuzu konuşalım."],
+      ["contactBody",defaultHomeCopy.contactBody,"Üniversite, kayıt veya resmî işlemle ilgili sorunuz varsa bize yazın. İlk görüşmede neye ihtiyacınız olduğunu netleştirelim."],
+    ];
+    await d1.batch(replacements.map(([key,value,oldValue])=>d1.prepare("UPDATE home_content SET value=?,updated_at=? WHERE key=? AND value=?").bind(value,now,key,oldValue)));
+    await d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",professionalCopyMarker,"Ana sayfa dili kurumsal anlatıma güncellendi",now).run();
+  }
   const serviceCount = await d1.prepare("SELECT COUNT(*) AS count FROM services").first<{count:number}>();
   if (!serviceCount?.count) await d1.batch(defaultServices.map((s,i)=>d1.prepare("INSERT INTO services (slug,title,summary,detail,icon,active,sort_order,updated_at) VALUES (?,?,?,?,?,1,?,?)").bind(...s,i+1,now)));
   const universityCount = await d1.prepare("SELECT COUNT(*) AS count FROM universities").first<{count:number}>();
@@ -160,12 +193,14 @@ export async function getSettings(): Promise<SiteSettings> { await ensureDatabas
 export async function getHomeCopy(): Promise<HomeCopy> { await ensureDatabase(); const rows=(await db().prepare("SELECT key,value FROM home_content").all<{key:string;value:string}>()).results; return rows.reduce((copy,row)=>{const key=row.key as keyof HomeCopy;if(key in copy)copy[key]=row.value;return copy;},{...defaultHomeCopy}); }
 export async function getSiteImages():Promise<SiteImages> { await ensureDatabase(); const rows=(await db().prepare("SELECT key,value FROM home_content WHERE key IN ('imageHero','imageAbout')").all<{key:string;value:string}>()).results;const values=Object.fromEntries(rows.map(row=>[row.key,row.value]));return {hero:values.imageHero||"/td-students.jpg",about:values.imageAbout||"/td-campus.jpg"}; }
 export async function getReviews(activeOnly=true): Promise<Review[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,author,context,quote,is_example AS isExample,active,sort_order AS sortOrder,updated_at AS updatedAt FROM reviews WHERE active=1 AND is_example=0 ORDER BY sort_order,id":"SELECT id,author,context,quote,is_example AS isExample,active,sort_order AS sortOrder,updated_at AS updatedAt FROM reviews ORDER BY sort_order,id";return (await db().prepare(q).all<Review>()).results; }
-export async function getServices(activeOnly=true): Promise<Service[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services WHERE active=1 ORDER BY sort_order":"SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services ORDER BY sort_order"; return (await db().prepare(q).all<Service>()).results; }
-export async function getService(slug:string): Promise<Service|null> { await ensureDatabase(); return await db().prepare("SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services WHERE slug=? AND active=1").bind(slug).first<Service>(); }
+async function getManagedMedia(prefix:string){const rows=(await db().prepare("SELECT key,value FROM home_content WHERE key LIKE ?").bind(`${prefix}%`).all<{key:string;value:string}>()).results;return new Map(rows.map(row=>[row.key.slice(prefix.length),row.value]));}
+export async function getServices(activeOnly=true): Promise<Service[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services WHERE active=1 ORDER BY sort_order":"SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services ORDER BY sort_order"; const [rows,images]=await Promise.all([db().prepare(q).all<Omit<Service,"image">>(),getManagedMedia("serviceImage:")]);return rows.results.map(service=>({...service,image:images.get(service.slug)||defaultServiceImages[service.slug]||"/td-campus.jpg"})); }
+export async function getService(slug:string): Promise<Service|null> { await ensureDatabase(); const [service,image]=await Promise.all([db().prepare("SELECT id,slug,title,summary,detail,icon,active,sort_order AS sortOrder,updated_at AS updatedAt FROM services WHERE slug=? AND active=1").bind(slug).first<Omit<Service,"image">>(),db().prepare("SELECT value FROM home_content WHERE key=?").bind(`serviceImage:${slug}`).first<{value:string}>()]);return service?{...service,image:image?.value||defaultServiceImages[slug]||"/td-campus.jpg"}:null; }
 const catalogBySlug=new Map<string,(typeof universityCatalog)[number]>(universityCatalog.map(u=>[u.slug,u]));
-function withUniversityMetadata(row:Omit<University,"institutionType"|"founded">):University { const item=catalogBySlug.get(row.slug);return {...row,institutionType:item?.type??"Diğer",founded:item?.year??""}; }
-export async function getUniversities(activeOnly=true): Promise<University[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities WHERE active=1 ORDER BY featured DESC,name":"SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities ORDER BY featured DESC,name"; return (await db().prepare(q).all<Omit<University,"institutionType"|"founded">>()).results.map(withUniversityMetadata); }
-export async function getUniversity(slug:string): Promise<University|null> { await ensureDatabase(); const row=await db().prepare("SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities WHERE slug=? AND active=1").bind(slug).first<Omit<University,"institutionType"|"founded">>();return row?withUniversityMetadata(row):null; }
+type UniversityRow=Omit<University,"institutionType"|"founded"|"image"|"logoUrl">;
+function withUniversityMetadata(row:UniversityRow,images:Map<string,string>,logos:Map<string,string>):University { const item=catalogBySlug.get(row.slug);return {...row,institutionType:item?.type??"Diğer",founded:item?.year??"",image:images.get(row.slug)||"/td-campus.jpg",logoUrl:logos.get(row.slug)||""}; }
+export async function getUniversities(activeOnly=true): Promise<University[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities WHERE active=1 ORDER BY featured DESC,name":"SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities ORDER BY featured DESC,name"; const [rows,images,logos]=await Promise.all([db().prepare(q).all<UniversityRow>(),getManagedMedia("universityImage:"),getManagedMedia("universityLogo:")]);return rows.results.map(row=>withUniversityMetadata(row,images,logos)); }
+export async function getUniversity(slug:string): Promise<University|null> { await ensureDatabase(); const [row,image,logo]=await Promise.all([db().prepare("SELECT id,slug,name,city,country,description,featured,active,updated_at AS updatedAt FROM universities WHERE slug=? AND active=1").bind(slug).first<UniversityRow>(),db().prepare("SELECT value FROM home_content WHERE key=?").bind(`universityImage:${slug}`).first<{value:string}>(),db().prepare("SELECT value FROM home_content WHERE key=?").bind(`universityLogo:${slug}`).first<{value:string}>()]);return row?withUniversityMetadata(row,new Map([[slug,image?.value||"/td-campus.jpg"]]),new Map([[slug,logo?.value||""]])):null; }
 function cleanProgramLanguage(value:string){const language=value.trim();return !language||language.length>32||/doğrulanmadı|whatsapp|iletişime geç/i.test(language)?"":language;}
 function cleanProgram(program:Program):Program{return {...program,language:cleanProgramLanguage(program.language)};}
 export async function getPrograms(universityId?:number,activeOnly=true): Promise<Program[]> { await ensureDatabase(); const where=activeOnly?" WHERE p.active=1 AND u.active=1":""; const conjunction=where?" AND":" WHERE"; const q="SELECT p.id,p.university_id AS universityId,u.name AS universityName,u.slug AS universitySlug,p.slug,p.name,p.degree_type AS degreeType,p.language,p.duration,p.tuition_fee AS tuitionFee,p.description,p.active,p.updated_at AS updatedAt FROM programs p JOIN universities u ON u.id=p.university_id"+where+(universityId?`${conjunction} p.university_id=?`:"")+" ORDER BY p.name"; const stmt=db().prepare(q); return (await (universityId?stmt.bind(universityId):stmt).all<Program>()).results.map(cleanProgram); }
@@ -174,8 +209,27 @@ export async function getCatalogUniversities():Promise<University[]>{const unive
 export function getCatalogProgramCounts(){return {...referenceProgramCounts};}
 export function getCatalogProgramTotal(){return referencePrograms.length;}
 export type ProgramSearch={query?:string;city?:string;university?:string;degree?:string;language?:string;field?:string;sort?:string;page?:number;pageSize?:number};
-export async function searchCatalogPrograms(options:ProgramSearch={}){const universities=await getCatalogUniversities();const universityBySlug=new Map(universities.map(item=>[item.slug,item]));const databasePrograms=await getPrograms();const overrides=new Map(databasePrograms.map(item=>[item.slug,item]));const referenceSlugs=new Set(referencePrograms.map(item=>item.slug));const all=referencePrograms.map(item=>overrides.get(item.slug)??(universityBySlug.has(item.universitySlug)?referenceToProgram(item,universityBySlug.get(item.universitySlug)!):null)).filter((item):item is Program=>Boolean(item));for(const item of databasePrograms){if(referenceSlugs.has(item.slug))continue;all.push(item)}const normalize=(value:string)=>value.toLocaleLowerCase("tr-TR").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ı/g,"i");const query=normalize(options.query?.trim()||"");const degreeRank=(value:string)=>({"Ön Lisans":0,"Lisans":1,"Yüksek Lisans":2,"Doktora":3}[value]??9);const byDegree=(a:Program,b:Program)=>degreeRank(a.degreeType)-degreeRank(b.degreeType)||a.universityName.localeCompare(b.universityName,"tr")||a.name.localeCompare(b.name,"tr");const compare=(a:Program,b:Program)=>options.sort==="program-asc"?a.name.localeCompare(b.name,"tr")||a.universityName.localeCompare(b.universityName,"tr"):options.sort==="program-desc"?b.name.localeCompare(a.name,"tr")||a.universityName.localeCompare(b.universityName,"tr"):options.sort==="field"?(a.field||"").localeCompare(b.field||"","tr")||degreeRank(a.degreeType)-degreeRank(b.degreeType)||a.name.localeCompare(b.name,"tr"):options.sort==="university"?a.universityName.localeCompare(b.universityName,"tr")||degreeRank(a.degreeType)-degreeRank(b.degreeType)||a.name.localeCompare(b.name,"tr"):byDegree(a,b);const filtered=all.filter(item=>{const university=universityBySlug.get(item.universitySlug);return (!query||normalize(`${item.name} ${item.englishName||""} ${item.universityName} ${item.field||""}`).includes(query))&&(!options.city||university?.city===options.city)&&(!options.university||item.universitySlug===options.university)&&(!options.degree||item.degreeType===options.degree)&&(!options.language||item.language===options.language)&&(!options.field||item.field===options.field)}).sort(compare);const pageSize=Math.min(48,Math.max(12,options.pageSize||18));const pageCount=Math.max(1,Math.ceil(filtered.length/pageSize));const page=Math.min(pageCount,Math.max(1,options.page||1));const values=(key:"degreeType"|"language"|"field")=>[...new Set(all.map(item=>item[key]).filter(Boolean) as string[])].sort((a,b)=>key==="degreeType"?degreeRank(a)-degreeRank(b):a.localeCompare(b,"tr"));return {programs:filtered.slice((page-1)*pageSize,page*pageSize),total:filtered.length,page,pageCount,universities,cities:[...new Set(universities.map(item=>item.city))].sort((a,b)=>a.localeCompare(b,"tr")),degrees:values("degreeType"),languages:values("language"),fields:values("field")};}
-export async function getCatalogProgramsForUniversity(university:University,limit=36):Promise<{programs:Program[];total:number}>{const result=await searchCatalogPrograms({university:university.slug,pageSize:Math.min(48,limit),page:1});return {programs:result.programs,total:result.total};}
+export async function searchCatalogPrograms(options:ProgramSearch={}){
+  const universities=await getCatalogUniversities();
+  const universityBySlug=new Map(universities.map(item=>[item.slug,item]));
+  const databasePrograms=await getPrograms();
+  const overrides=new Map(databasePrograms.map(item=>[item.slug,item]));
+  const referenceSlugs=new Set(referencePrograms.map(item=>item.slug));
+  const all=referencePrograms.map(item=>overrides.get(item.slug)??(universityBySlug.has(item.universitySlug)?referenceToProgram(item,universityBySlug.get(item.universitySlug)!):null)).filter((item):item is Program=>Boolean(item));
+  for(const item of databasePrograms){if(!referenceSlugs.has(item.slug))all.push(item)}
+  const normalize=(value:string)=>value.toLocaleLowerCase("tr-TR").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ı/g,"i");
+  const query=normalize(options.query?.trim()||"");
+  const degreeRank=(value:string)=>({"Ön Lisans":0,"Lisans":1,"Yüksek Lisans":2,"Doktora":3}[value]??9);
+  const byDegree=(a:Program,b:Program)=>degreeRank(a.degreeType)-degreeRank(b.degreeType)||a.universityName.localeCompare(b.universityName,"tr")||a.name.localeCompare(b.name,"tr");
+  const compare=(a:Program,b:Program)=>options.sort==="program-asc"?a.name.localeCompare(b.name,"tr")||a.universityName.localeCompare(b.universityName,"tr"):options.sort==="program-desc"?b.name.localeCompare(a.name,"tr")||a.universityName.localeCompare(b.universityName,"tr"):options.sort==="field"?(a.field||"").localeCompare(b.field||"","tr")||degreeRank(a.degreeType)-degreeRank(b.degreeType)||a.name.localeCompare(b.name,"tr"):options.sort==="university"?a.universityName.localeCompare(b.universityName,"tr")||degreeRank(a.degreeType)-degreeRank(b.degreeType)||a.name.localeCompare(b.name,"tr"):byDegree(a,b);
+  const filtered=all.filter(item=>{const university=universityBySlug.get(item.universitySlug);return (!query||normalize(`${item.name} ${item.englishName||""} ${item.universityName} ${item.field||""}`).includes(query))&&(!options.city||university?.city===options.city)&&(!options.university||item.universitySlug===options.university)&&(!options.degree||item.degreeType===options.degree)&&(!options.language||item.language===options.language)&&(!options.field||item.field===options.field)}).sort(compare);
+  const pageSize=Math.min(120,Math.max(12,options.pageSize||18));
+  const pageCount=Math.max(1,Math.ceil(filtered.length/pageSize));
+  const page=Math.min(pageCount,Math.max(1,options.page||1));
+  const values=(key:"degreeType"|"language"|"field")=>[...new Set(all.map(item=>item[key]).filter(Boolean) as string[])].sort((a,b)=>key==="degreeType"?degreeRank(a)-degreeRank(b):a.localeCompare(b,"tr"));
+  return {programs:filtered.slice((page-1)*pageSize,page*pageSize),total:filtered.length,page,pageCount,universities,cities:[...new Set(universities.map(item=>item.city))].sort((a,b)=>a.localeCompare(b,"tr")),degrees:values("degreeType"),languages:values("language"),fields:values("field")};
+}
+export async function getCatalogProgramsForUniversity(university:University,limit=96):Promise<{programs:Program[];total:number}>{const result=await searchCatalogPrograms({university:university.slug,pageSize:Math.min(120,limit),page:1});return {programs:result.programs,total:result.total};}
 export async function getProgram(slug:string): Promise<Program|null> { await ensureDatabase(); const saved=await db().prepare("SELECT p.id,p.university_id AS universityId,u.name AS universityName,u.slug AS universitySlug,p.slug,p.name,p.degree_type AS degreeType,p.language,p.duration,p.tuition_fee AS tuitionFee,p.description,p.active,p.updated_at AS updatedAt FROM programs p JOIN universities u ON u.id=p.university_id WHERE p.slug=? AND p.active=1").bind(slug).first<Program>();if(saved)return cleanProgram(saved);const reference=referencePrograms.find(item=>item.slug===slug);if(!reference)return null;const university=await getUniversity(reference.universitySlug);return university?referenceToProgram(reference,university):null; }
 export async function getFaqs(activeOnly=true): Promise<Faq[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,question,answer,category,active,sort_order AS sortOrder FROM faqs WHERE active=1 ORDER BY sort_order":"SELECT id,question,answer,category,active,sort_order AS sortOrder FROM faqs ORDER BY sort_order";return (await db().prepare(q).all<Faq>()).results; }
 export async function getDashboardData() { await ensureDatabase(); const d1=db(); const [leads,universities,programs,faqs,recent,audit]=await Promise.all([d1.prepare("SELECT COUNT(*) AS count FROM consultation_requests").first<{count:number}>(),d1.prepare("SELECT COUNT(*) AS count FROM universities WHERE active=1").first<{count:number}>(),d1.prepare("SELECT COUNT(*) AS count FROM programs WHERE active=1").first<{count:number}>(),d1.prepare("SELECT COUNT(*) AS count FROM faqs WHERE active=1").first<{count:number}>(),d1.prepare("SELECT * FROM consultation_requests ORDER BY created_at DESC LIMIT 12").all<Consultation>(),d1.prepare("SELECT actor,action,detail,created_at AS createdAt FROM audit_logs ORDER BY created_at DESC LIMIT 8").all<{actor:string;action:string;detail:string;createdAt:string}>()]); return { counts:{leads:leads?.count??0,universities:universities?.count??0,programs:referencePrograms.length+(programs?.count??0),faqs:faqs?.count??0}, recent:recent.results, audit:audit.results } }

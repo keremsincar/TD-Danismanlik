@@ -3,7 +3,7 @@ import { env } from "cloudflare:workers";
 export async function GET(_request:Request,{params}:{params:Promise<{key:string[]}>}) {
   const {key:parts}=await params;
   const key=parts.join("/");
-  if(!/^(hero|about)\/[a-f0-9-]+\.(jpg|png|webp)$/.test(key))return new Response("Not found",{status:404});
+  if(!/^(hero|about|service\/[a-z0-9-]+|university-image\/[a-z0-9-]+|university-logo\/[a-z0-9-]+)\/[a-f0-9-]+\.(jpg|png|webp)$/.test(key))return new Response("Not found",{status:404});
   const bucket=(env as unknown as {MEDIA?:R2Bucket}).MEDIA;
   if(!bucket)return new Response("Storage unavailable",{status:503});
   const object=await bucket.get(key);

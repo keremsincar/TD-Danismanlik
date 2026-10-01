@@ -29,7 +29,7 @@ export function ProgramFinder({programs,universities,cities,degrees,languages,fi
      <button className="filter-submit" type="submit">{t.apply}</button><Link className="filter-clear" href={`/${locale}/bolumler`}>{t.clear}</Link>
    </form>
    <div className="finder-meta" id="program-listesi"><span><b>{total}</b> {t.found}</span><small>{t.note}</small></div>
-   <div className="program-results">{programs.map(p=><Link className="program-card program-card-simple" href={`/${locale}/bolumler/${p.slug}`} key={p.slug} aria-label={`${p.name} — ${t.detail}`}>
+   <div className="program-results">{programs.map(p=><Link className="program-card program-card-simple" data-degree={p.degreeType} href={`/${locale}/bolumler/${p.slug}`} key={p.slug} aria-label={`${p.name} — ${t.detail}`}>
      <div className="program-top"><span className="degree-badge">{p.degreeType}</span>{p.language&&<span>{p.language}</span>}</div>
      <h3>{p.name}</h3><p className="program-university">{p.universityName}</p>
      <span className="program-card-cta">{t.detail}</span>

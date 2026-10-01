@@ -799,3 +799,85 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
 @media(max-width:600px){
  .elab-inner-page .detail-hero>.detail-brand-panel{min-height:360px;padding:24px}.detail-brand-panel>img{object-position:center 56%}.detail-panel-wordmark{padding-bottom:16px}.detail-panel-wordmark strong{font-size:62px}.detail-panel-wordmark b{font-size:20px}.elab-inner-page .detail-brand-panel>p{font-size:14px}
 }
+
+/* October launch polish: one editable palette, structured cards and media-rich catalogues. */
+.elab-page,.elab-inner-page{
+ --action:var(--accent);
+ --action-hover:color-mix(in srgb,var(--accent) 82%,#24313b);
+ --action-soft:color-mix(in srgb,var(--accent) 11%,#fff);
+ --action-border:color-mix(in srgb,var(--accent) 28%,#d9e0e5);
+ --action-ink:color-mix(in srgb,var(--accent) 52%,#17232c);
+}
+.elab-page .elab-pill,.elab-inner-page .elab-pill,
+.elab-page .button,.elab-inner-page .button,
+.filter-submit,.filter-clear,.degree-tabs a,.preference-form button,
+.contact-email form>button,.program-list-toggle,.cookie-actions button{
+ border-radius:11px!important;
+}
+.elab-page .elab-pill,.elab-inner-page .elab-pill{min-height:50px;padding-inline:22px}
+.degree-tabs a{border-radius:9px!important}
+.elab-page .elab-pill-whatsapp,.elab-inner-page .elab-pill-whatsapp{border-color:#25b964!important;background:#25b964!important;color:#fff!important}
+.elab-card-cta,.listing-grid b,.catalog-university-card b,.program-card-cta,.program-filter-link,.home-catalog-actions a,.action-link{color:var(--action)!important}
+.elab-section-more{color:var(--action-ink)}
+.elab-section-more::after{background:var(--action)}
+
+/* Each service owns a dedicated, editable photograph. */
+.elab-service-card{min-height:360px!important;padding:0!important;overflow:hidden;background:#fff!important}
+.service-card-photo,.listing-service-photo{position:relative;display:block;overflow:hidden;background:#e9eeeb}
+.service-card-photo{height:148px;margin:0}
+.service-card-photo::after,.listing-service-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(16,27,24,.16))}
+.service-card-photo img,.listing-service-photo img{width:100%;height:100%;object-fit:cover;transition:transform .55s cubic-bezier(.2,.7,.2,1),filter .35s ease}
+.elab-service-card:hover .service-card-photo img,.service-listing-grid>a:hover .listing-service-photo img{transform:scale(1.045);filter:saturate(1.06)}
+.elab-service-card .elab-service-card-top{padding:23px 23px 0}.elab-service-card>div:last-child{display:flex;flex:1;flex-direction:column;padding:12px 23px 24px}.elab-service-card .elab-card-cta{margin-top:auto;padding-top:18px}
+.service-listing-grid>a{min-height:410px!important;padding:0!important;overflow:hidden;background:#fff}
+.listing-service-photo{height:185px}.service-listing-grid>a h2{margin:22px 24px 8px;font-family:var(--site-body-font),sans-serif;font-weight:760;letter-spacing:-.035em}.service-listing-grid>a>p{margin:0 24px;color:#65717b}.service-listing-grid>a>b{margin:0 24px 24px;padding-top:22px!important}
+
+/* Programme cards use the site's typographic system and degree-specific accents. */
+.elab-finder .program-card{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(155deg,#fff 68%,var(--action-soft))}
+.elab-finder .program-card::before{content:"";position:absolute;z-index:-1;top:0;right:0;left:0;height:5px;background:var(--action)}
+.elab-finder .program-card[data-degree*="Lisans"]::before{background:#6686a3}.elab-finder .program-card[data-degree*="Yüksek"]::before{background:#8b73a7}.elab-finder .program-card[data-degree*="Doktora"]::before{background:#9a725f}.elab-finder .program-card[data-degree*="Ön"]::before{background:#648a77}
+.elab-finder .program-card h3{font-family:var(--site-body-font),sans-serif;font-weight:760;letter-spacing:-.045em}
+.elab-finder .degree-badge{border:1px solid #dde5ea;border-radius:7px;background:#eef2f5}
+.elab-finder .program-card:hover{border-color:var(--action-border)!important;transform:translateY(-5px)}
+
+/* University cards show a managed logo or a restrained monogram fallback. */
+.university-mark{display:grid;flex:none;width:52px;height:52px;place-items:center;overflow:hidden;border:1px solid var(--action-border);border-radius:12px;background:#fff;color:var(--action-ink);box-shadow:0 8px 22px rgba(29,43,52,.06)}
+.university-mark img{width:100%;height:100%;object-fit:contain;padding:6px}.university-mark b{font-family:var(--site-body-font),sans-serif;font-size:12px;font-weight:820;letter-spacing:.04em}
+.catalog-university-card{position:relative;isolation:isolate;min-height:335px!important;overflow:hidden;background:linear-gradient(150deg,#fff 72%,var(--action-soft))!important}
+.catalog-university-card::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:0;width:5px;background:var(--action)}
+.catalog-university-card.is-foundation::before{background:#8b73a7}.catalog-university-card.is-public::before{background:#6686a3}
+.catalog-university-meta{display:flex!important;align-items:center;justify-content:space-between;gap:18px;margin:0 0 28px!important}.catalog-university-meta>p{display:flex;flex:1;align-items:flex-start;justify-content:space-between;gap:12px;margin:0}.catalog-university-meta>p span{padding:6px 8px;border:1px solid #e0e6eb;border-radius:7px;background:rgba(255,255,255,.7);font-size:10px;font-weight:750}
+.catalog-university-card h2{font-family:var(--site-body-font),sans-serif!important;font-size:clamp(22px,1.8vw,29px)!important;font-weight:780!important;letter-spacing:-.045em!important;line-height:1.08!important}
+.catalog-university-card:hover{border-color:var(--action-border);box-shadow:0 18px 42px rgba(31,48,59,.09);transform:translateY(-4px)}
+.home-university-meta{display:flex;align-items:center;justify-content:space-between;gap:16px}.home-university-meta .university-mark{width:42px;height:42px}.elab-university-grid>a{position:relative;overflow:hidden;background:linear-gradient(145deg,#fff 72%,var(--action-soft))}.elab-university-grid>a::before{content:"";position:absolute;top:0;right:0;left:0;height:4px;background:var(--action)}.elab-university-grid>a>strong{font-family:var(--site-body-font),sans-serif;font-weight:760;letter-spacing:-.035em}.elab-university-grid>a>b{color:var(--action)!important}
+
+/* The university profile hero replaces the giant initials with useful identity and photography. */
+.catalog-brand-panel{position:relative;isolation:isolate;display:flex;min-height:560px;align-items:flex-end;overflow:hidden;padding:34px!important;background:#1b2228!important;color:#fff;text-align:left!important}
+.catalog-brand-panel>img{position:absolute;z-index:-2;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.82)}
+.catalog-brand-panel::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(18,27,32,.18),rgba(18,27,32,.88))}
+.catalog-brand-identity{display:flex;align-items:center;gap:16px;width:100%;padding-top:22px;border-top:1px solid rgba(255,255,255,.35)}.catalog-brand-identity .university-mark{width:64px;height:64px;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.94);color:#24333d}.catalog-brand-identity p{margin:0!important}.catalog-brand-identity strong,.catalog-brand-identity small{display:block}.catalog-brand-identity strong{font-size:17px;line-height:1.25}.catalog-brand-identity small{margin-top:7px;color:rgba(255,255,255,.72);font-size:11px}
+
+/* Related programs remain compact until the visitor requests the full list. */
+.university-detail-grid{align-items:start}.university-detail-grid>div:first-child{position:sticky;top:24px;padding:28px;border:1px solid #e0e5e7;border-radius:18px;background:linear-gradient(145deg,#fff,var(--action-soft))}.university-detail-grid>div:first-child h2{font-family:var(--site-body-font),sans-serif;font-weight:780;letter-spacing:-.04em}.university-detail-grid>div:first-child p{color:#5b6872;line-height:1.7}
+.university-program-rows>a{transition:background .22s ease,padding .22s ease}.university-program-rows>a:hover{padding-inline:14px;background:var(--action-soft)}.university-program-rows h3{font-family:var(--site-body-font),sans-serif!important;font-weight:720!important;letter-spacing:-.035em}.university-program-rows>a>b{display:grid;width:28px;height:28px;place-items:center;border:1px solid var(--action-border);border-radius:8px;background:#fff;color:var(--action-ink)}
+.program-list-toggle{width:100%;min-height:50px;margin-top:18px;border:1px solid var(--action-border);background:var(--action-soft);color:var(--action-ink);font:inherit;font-size:12px;font-weight:760;cursor:pointer}.program-list-toggle:hover{border-color:var(--action);background:#fff}
+
+/* Process page is a balanced editorial layout rather than an open-ended empty grid. */
+.process-showcase{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:18px;align-items:stretch}.process-showcase .process-page-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.process-showcase .process-page-grid>article{position:relative;min-height:240px;padding:30px;border:1px solid #dde4e8;border-radius:18px;background:linear-gradient(145deg,#fff,var(--action-soft));transition:transform .25s ease,box-shadow .25s ease}.process-showcase .process-page-grid>article:hover{transform:translateY(-4px);box-shadow:0 18px 42px rgba(30,47,57,.08)}.process-page-grid>article>span{border:1px solid var(--action-border)!important;border-radius:7px!important;background:#fff!important;color:var(--action-ink)!important}.process-showcase .process-page-grid h2{font-family:var(--site-body-font),sans-serif;font-size:28px;font-weight:780;letter-spacing:-.045em}.process-showcase .process-page-grid p{color:#5e6a73;line-height:1.65}
+.process-media{position:relative;isolation:isolate;display:flex;min-height:492px;align-items:flex-end;overflow:hidden;padding:32px;border-radius:18px;background:#1b2228;color:#fff}.process-media>img{position:absolute;z-index:-2;inset:0;width:100%;height:100%;object-fit:cover}.process-media::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(15,24,29,.15),rgba(15,24,29,.9))}.process-media>div{display:flex;align-items:baseline;gap:12px;width:100%;padding-top:18px;border-top:1px solid rgba(255,255,255,.35)}.process-media strong{font-size:72px;line-height:.8;letter-spacing:-.08em}.process-media span{font-size:20px;font-weight:760}
+
+/* Media management: previews, per-service images and per-university identity are persistent. */
+.media-admin{display:grid;gap:28px}.media-section-head{padding:22px 4px 4px;border-top:1px solid #dce2e6}.media-section-head p{margin:0 0 7px;color:#73808a;font-size:10px;font-weight:800;letter-spacing:.14em}.media-section-head h2{margin:0;font-size:26px;letter-spacing:-.04em}.media-section-head span{display:block;margin-top:8px;color:#69757e;font-size:12px}.media-section-head label{display:grid;gap:7px;max-width:620px;margin-top:18px;color:#56636c;font-size:11px;font-weight:750}.media-section-head select{min-height:46px;border:1px solid #d9e0e5;border-radius:9px;background:#fff;padding:0 12px;font:inherit}.media-form{align-content:start}.admin-image-preview,.admin-image-empty{width:100%;height:190px;border:1px solid #dce3e7;border-radius:12px;background:#eef2f3;object-fit:cover}.admin-image-empty{display:grid;place-items:center;padding:20px;color:#75818a;font-size:12px;text-align:center}.media-form-actions{display:flex;flex-wrap:wrap;gap:8px}.media-form-actions button{flex:1;min-width:150px}.media-form-actions .admin-secondary{border:1px solid #d7dee3;background:#fff;color:#58656e}
+
+@media(max-width:980px){
+ .process-showcase{grid-template-columns:1fr}.process-media{min-height:420px}.catalog-brand-panel{min-height:460px}.university-detail-grid>div:first-child{position:static}
+}
+@media(max-width:700px){
+ .elab-page .elab-pill,.elab-inner-page .elab-pill{border-radius:10px!important}.elab-service-card{min-height:330px!important}.service-card-photo{height:138px}.service-listing-grid>a{min-height:360px!important}.listing-service-photo{height:165px}
+ .catalog-university-card{min-height:290px!important;padding:22px!important}.catalog-university-meta{margin-bottom:20px!important}.catalog-university-meta>p{align-items:flex-end;flex-direction:column;gap:5px}.university-mark{width:46px;height:46px}.catalog-university-card h2{font-size:23px!important}
+ .catalog-brand-panel{min-height:360px;padding:24px!important}.catalog-brand-identity .university-mark{width:54px;height:54px}.catalog-brand-identity strong{font-size:14px}
+ .university-detail-grid>div:first-child{padding:21px}.university-program-rows>a{grid-template-columns:minmax(0,1fr) 30px!important;gap:5px 12px}.university-program-rows>a>span,.university-program-rows>a>p{grid-column:1}.university-program-rows>a>b{grid-column:2;grid-row:1/4;align-self:center}.university-program-rows h3{font-size:20px!important}
+ .process-showcase .process-page-grid{grid-template-columns:1fr}.process-showcase .process-page-grid>article{min-height:190px!important}.process-media{min-height:340px}.process-media strong{font-size:56px}.process-media span{font-size:17px}
+ .media-form-actions{flex-direction:column}.media-form-actions button{width:100%}
+}
+@media(prefers-reduced-motion:reduce){.service-card-photo img,.listing-service-photo img,.catalog-university-card,.process-showcase .process-page-grid>article,.university-program-rows>a{transition:none!important}}

@@ -1,5 +1,6 @@
 import Link from "@/components/NativeLink";
 import type { University } from "@/lib/content";
+import { UniversityMark } from "./UniversityMark";
 
 const PAGE_SIZE=12;
 const catalogText={
@@ -29,7 +30,7 @@ export function UniversityCatalog({universities,locale,initialPage=1,filters,pro
       <button className="filter-submit" type="submit">{t.apply}</button><Link className="filter-clear" href={`/${locale}/universiteler`}>{t.clear}</Link>
     </form>
     <div className="catalog-page-frame" id="universite-listesi"><p className="catalog-count">{filtered.length} {t.results} · {t.page} {currentPage}/{pageCount}</p>
-    <div className="catalog-cards">{visible.map(u=><Link href={`/${locale}/universiteler/${u.slug}`} className="catalog-university-card" key={u.id}><div><span>{u.city}</span><span>{u.institutionType==="Devlet"?t.state:u.institutionType==="Vakıf"?t.foundation:u.institutionType}</span></div><h2>{u.name}</h2><p>{programCounts[u.slug]||0} {t.programs} · {u.founded&&u.founded!=="—"?`${u.founded} ${t.founded}`:""}</p><b>{t.view}</b></Link>)}</div></div>
+    <div className="catalog-cards">{visible.map(u=><Link href={`/${locale}/universiteler/${u.slug}`} className={`catalog-university-card ${u.institutionType==="Vakıf"?"is-foundation":"is-public"}`} key={u.id}><div className="catalog-university-meta"><UniversityMark name={u.name} logoUrl={u.logoUrl}/><p><span>{u.city}</span><span>{u.institutionType==="Devlet"?t.state:u.institutionType==="Vakıf"?t.foundation:u.institutionType}</span></p></div><h2>{u.name}</h2><p>{programCounts[u.slug]||0} {t.programs} · {u.founded&&u.founded!=="—"?`${u.founded} ${t.founded}`:""}</p><b>{t.view}</b></Link>)}</div></div>
     {!visible.length&&<p className="empty-state">{t.empty}</p>}
     {pageCount>1&&<nav className="catalog-pagination" aria-label={t.page}>{currentPage===1?<span className="pagination-disabled">{t.previous}</span>:<Link href={pageUrl(locale,currentPage-1,filters)}>{t.previous}</Link>}<span>{t.page} {currentPage} / {pageCount}</span>{currentPage===pageCount?<span className="pagination-disabled">{t.next}</span>:<Link href={pageUrl(locale,currentPage+1,filters)}>{t.next}</Link>}</nav>}
   </div>;
