@@ -881,3 +881,17 @@ h1 { margin:0; font-family:var(--site-heading-font),serif; font-size:clamp(60px,
  .media-form-actions{flex-direction:column}.media-form-actions button{width:100%}
 }
 @media(prefers-reduced-motion:reduce){.service-card-photo img,.listing-service-photo img,.catalog-university-card,.process-showcase .process-page-grid>article,.university-program-rows>a{transition:none!important}}
+
+/* Narrow-screen containment: no heading, consent control or header action may widen the page. */
+html,body{max-width:100%;overflow-x:hidden}
+.elab-page,.elab-inner-page{max-width:100%;overflow-x:hidden}
+@media(max-width:600px){
+ .elab-header .admin-header-link{display:none}.elab-header .elab-header-actions{margin-left:auto}.elab-header .elab-brand{min-width:0}.elab-header .elab-brand>span:last-child{max-width:125px;overflow:hidden;text-overflow:ellipsis}
+ .elab-hero-copy,.listing-page,.listing-page>header,.contact-page-hero,.contact-page-details{min-width:0;max-width:100%}
+ .elab-hero h1{max-width:100%;font-size:clamp(43px,12vw,48px)!important;line-height:1!important;letter-spacing:-.06em!important;overflow-wrap:anywhere}
+ .elab-hero-first{font-size:.72em!important}.elab-hero-second{overflow-wrap:anywhere}
+ .listing-page>header h1,.program-detail h1,.university-detail h1,.service-detail h1{font-size:clamp(38px,11vw,45px)!important;overflow-wrap:anywhere}
+ .listing-page>header>p:last-child{font-size:14px}
+ .cookie-banner{box-sizing:border-box;max-width:calc(100vw - 20px);padding:17px 14px}.cookie-banner b{font-size:17px}.cookie-actions{display:grid!important;grid-template-columns:1.25fr .75fr .75fr;width:100%;gap:6px!important}.cookie-actions button{min-width:0!important;padding:9px 5px!important;white-space:normal;font-size:8px!important;line-height:1.25}.cookie-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ .elab-page .mobile-cta,.elab-inner-page .mobile-cta{grid-template-columns:.85fr 1fr 1.15fr}.elab-page .mobile-cta a,.elab-inner-page .mobile-cta a{min-width:0;padding-inline:4px!important;border-radius:9px!important;font-size:9px;overflow-wrap:anywhere}
+}
