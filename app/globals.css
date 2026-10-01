@@ -895,3 +895,4 @@ html,body{max-width:100%;overflow-x:hidden}
  .cookie-banner{box-sizing:border-box;max-width:calc(100vw - 20px);padding:17px 14px}.cookie-banner b{font-size:17px}.cookie-actions{display:grid!important;grid-template-columns:1.25fr .75fr .75fr;width:100%;gap:6px!important}.cookie-actions button{min-width:0!important;padding:9px 5px!important;white-space:normal;font-size:8px!important;line-height:1.25}.cookie-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
  .elab-page .mobile-cta,.elab-inner-page .mobile-cta{grid-template-columns:.85fr 1fr 1.15fr}.elab-page .mobile-cta a,.elab-inner-page .mobile-cta a{min-width:0;padding-inline:4px!important;border-radius:9px!important;font-size:9px;overflow-wrap:anywhere}
 }
+@media(min-width:601px){.elab-header .elab-top-nav a{padding-inline:8px;font-size:12px}.elab-header .elab-top-nav .top-nav-request{padding-inline:11px}}
