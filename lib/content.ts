@@ -41,7 +41,7 @@ const defaultSettings: SiteSettings = {
 };
 
 const defaultServiceImages:Record<string,string>={
-  "universite-bolum-secimi":"https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1600&q=82",
+  "universite-bolum-secimi":"/td-campus.jpg",
   "kayit-sureci":"https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1600&q=82",
   "ikamet-izni":"https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1600&q=82",
   "adres-kayit":"https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1600&q=82",
