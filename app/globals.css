@@ -896,3 +896,17 @@ html,body{max-width:100%;overflow-x:hidden}
  .elab-page .mobile-cta,.elab-inner-page .mobile-cta{grid-template-columns:.85fr 1fr 1.15fr}.elab-page .mobile-cta a,.elab-inner-page .mobile-cta a{min-width:0;padding-inline:4px!important;border-radius:9px!important;font-size:9px;overflow-wrap:anywhere}
 }
 @media(min-width:601px){.elab-header .elab-top-nav a{padding-inline:8px;font-size:12px}.elab-header .elab-top-nav .top-nav-request{padding-inline:11px}}
+
+/* October 6 QA: centred desktop navigation, collision-free service cards and genuine logos only. */
+.elab-service-card .elab-service-card-top>span:only-child{
+ display:block;width:auto;height:auto;max-width:none;border:0;border-radius:0;background:transparent;color:inherit;
+ font-family:var(--site-body-font),sans-serif;font-size:20px;font-weight:780;line-height:1.22;letter-spacing:-.035em;
+}
+.elab-service-card .elab-service-card-top{min-height:0;padding:22px 23px 9px}
+.elab-service-card>div:last-child{padding-top:0}
+@media(min-width:1261px){
+ .elab-header{display:grid;grid-template-columns:minmax(215px,1fr) auto minmax(215px,1fr);column-gap:24px}
+ .elab-header .elab-brand{justify-self:start}
+ .elab-header .elab-top-nav{justify-self:center;justify-content:center;overflow:visible}
+ .elab-header .elab-header-actions{justify-self:end}
+}
