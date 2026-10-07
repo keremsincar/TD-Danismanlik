@@ -910,3 +910,12 @@ html,body{max-width:100%;overflow-x:hidden}
  .elab-header .elab-top-nav{justify-self:center;justify-content:center;overflow:visible}
  .elab-header .elab-header-actions{justify-self:end}
 }
+
+/* October 7 mobile QA: keep the call action legible and frame people, not clothing. */
+.elab-page .mobile-cta>a:first-child,.elab-inner-page .mobile-cta>a:first-child{
+ border:1px solid #c6d3dc;background:#dfe8ee!important;color:#263641!important;font-weight:820;
+}
+@media(max-width:700px){
+ .elab-service-grid>.elab-service-card:first-child .service-card-photo{height:185px}
+ .elab-service-grid>.elab-service-card:first-child .service-card-photo img{object-position:center 18%}
+}
