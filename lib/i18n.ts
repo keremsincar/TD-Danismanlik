@@ -89,7 +89,9 @@ const faqTranslations:Record<Exclude<Locale,"tr">,Record<number,[string,string]>
 export function localizeFaqs<T extends {sortOrder:number;question:string;answer:string}>(locale:string,faqs:T[]):T[] {
  if(locale==="tr"||!faqTranslations[locale as Exclude<Locale,"tr">])return faqs;
  const translations=faqTranslations[locale as Exclude<Locale,"tr">];
- return faqs.map(faq=>translations[faq.sortOrder]?{...faq,question:translations[faq.sortOrder][0],answer:translations[faq.sortOrder][1]}:faq);
+ return faqs
+   .filter(faq=>Boolean(translations[faq.sortOrder]))
+   .map(faq=>({...faq,question:translations[faq.sortOrder][0],answer:translations[faq.sortOrder][1]}));
 }
 const pageIntros={
  en:{hizmetler:["Services tailored to your needs.","We plan applications, enrolment and official steps around your individual circumstances."],universiteler:["University guide.","Explore public and foundation universities by city, type and establishment year. Confirm admission conditions with the institution."],bolumler:["Find a program.","Filter the supplied catalogue by city, university, degree, language and field. Confirm current fees and admission conditions in the university’s official notice."],surec:["Know every step.","Your case is unique, but we keep the timing and responsibilities clear throughout."],yorumlar:["Notes from different journeys.","Short, personal accounts from application, enrolment and document processes."],sss:["Your questions, answered.","These answers are general guidance. We clarify the details of your case in a consultation."]},
