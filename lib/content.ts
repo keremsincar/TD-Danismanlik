@@ -27,9 +27,26 @@ export const defaultHomeCopy: HomeCopy = {
 };
 export type Service = { id:number; slug:string; title:string; summary:string; detail:string; icon:string; image:string; active:number; sortOrder:number; updatedAt:string };
 export type University = { id:number; slug:string; name:string; city:string; country:string; description:string; featured:number; active:number; updatedAt:string; institutionType:string; founded:string; image:string; logoUrl:string };
-export type Program = { id:number; universityId:number; universityName:string; universitySlug:string; slug:string; name:string; degreeType:string; language:string; duration:string; tuitionFee:string; description:string; active:number; updatedAt:string; field?:string; englishName?:string; source?:string };
+export type Program = { id:number; universityId:number; universityName:string; universitySlug:string; slug:string; name:string; degreeType:string; language:string; duration:string; tuitionFee:string; description:string; active:number; updatedAt:string; field?:string; englishName?:string; turkishName?:string; source?:string };
 type ReferenceProgram = { id:number; universitySlug:string; universityName:string; slug:string; name:string; englishName:string; degreeType:string; field:string; language:string; duration:string; tuitionFee:string; source:string };
 const referencePrograms=referenceProgramsRaw as ReferenceProgram[];
+const normalizeProgramKey=(value:string)=>value.trim().toLocaleLowerCase("en-US").replace(/\s+/g," ");
+const turkishNameByEnglish=new Map<string,string>();
+for(const item of referencePrograms){
+  if(item.englishName?.trim()&&item.name?.trim()&&normalizeProgramKey(item.englishName)!==normalizeProgramKey(item.name)){
+    turkishNameByEnglish.set(normalizeProgramKey(item.englishName),item.name.trim());
+  }
+}
+const turkishProgramOverrides=new Map<string,string>([
+  ["accounting and auditing","Muhasebe ve Denetim"],
+  ["advertising and strategic brand communication","Reklamcılık ve Stratejik Marka İletişimi"],
+  ["african studies and international relations","Afrika Çalışmaları ve Uluslararası İlişkiler"],
+]);
+function turkishProgramName(name:string,englishName?:string){
+  const key=normalizeProgramKey(englishName||name);
+  return turkishNameByEnglish.get(key)||turkishProgramOverrides.get(key)||name;
+}
+
 const referenceProgramCounts=referencePrograms.reduce<Record<string,number>>((counts,item)=>{counts[item.universitySlug]=(counts[item.universitySlug]||0)+1;return counts;},{});
 export type Consultation = { id:number; name:string; phone:string; whatsapp:string; email:string; service:string; university:string|null; program:string|null; message:string; preferredContact:string; kvkkAcceptedAt:string; status:string; adminNote:string; createdAt:string };
 
@@ -211,7 +228,7 @@ export async function getUniversity(slug:string): Promise<University|null> { awa
 function cleanProgramLanguage(value:string){const language=value.trim();return !language||language.length>32||/doğrulanmadı|whatsapp|iletişime geç/i.test(language)?"":language;}
 function cleanProgram(program:Program):Program{return {...program,language:cleanProgramLanguage(program.language)};}
 export async function getPrograms(universityId?:number,activeOnly=true): Promise<Program[]> { await ensureDatabase(); const where=activeOnly?" WHERE p.active=1 AND u.active=1":""; const conjunction=where?" AND":" WHERE"; const q="SELECT p.id,p.university_id AS universityId,u.name AS universityName,u.slug AS universitySlug,p.slug,p.name,p.degree_type AS degreeType,p.language,p.duration,p.tuition_fee AS tuitionFee,p.description,p.active,p.updated_at AS updatedAt FROM programs p JOIN universities u ON u.id=p.university_id"+where+(universityId?`${conjunction} p.university_id=?`:"")+" ORDER BY p.name"; const stmt=db().prepare(q); return (await (universityId?stmt.bind(universityId):stmt).all<Program>()).results.map(cleanProgram); }
-function referenceToProgram(item:ReferenceProgram,university:University):Program{return cleanProgram({id:item.id,universityId:university.id,universityName:university.name,universitySlug:university.slug,slug:item.slug,name:item.name,englishName:item.englishName,degreeType:item.degreeType,field:item.field,language:item.language,duration:item.duration,tuitionFee:item.tuitionFee,source:item.source,description:`${university.name} bünyesindeki ${item.name} programı. Eğitim dili, süre, ücret, kontenjan ve kabul koşulları dönemsel olarak değişebilir; başvuru öncesinde güncel resmî kaynağı kontrol edin.`,active:1,updatedAt:"2026-09-10T00:00:00.000Z"});}
+function referenceToProgram(item:ReferenceProgram,university:University):Program{return cleanProgram({id:item.id,universityId:university.id,universityName:university.name,universitySlug:university.slug,slug:item.slug,name:item.name,turkishName:turkishProgramName(item.name,item.englishName),englishName:item.englishName,degreeType:item.degreeType,field:item.field,language:item.language,duration:item.duration,tuitionFee:item.tuitionFee,source:item.source,description:`${university.name} bünyesindeki ${item.name} programı. Eğitim dili, süre, ücret, kontenjan ve kabul koşulları dönemsel olarak değişebilir; başvuru öncesinde güncel resmî kaynağı kontrol edin.`,active:1,updatedAt:"2026-09-10T00:00:00.000Z"});}
 export async function getCatalogUniversities():Promise<University[]>{const universities=await getUniversities();return universities.sort((a,b)=>a.name.localeCompare(b.name,"tr"));}
 export function getCatalogProgramCounts(){return {...referenceProgramCounts};}
 export function getCatalogProgramTotal(){return referencePrograms.length;}
@@ -241,6 +258,7 @@ export async function searchCatalogPrograms(options:ProgramSearch={}){
       item.name.trim().toLocaleLowerCase("tr-TR"),
       {
         name:item.name.trim(),
+        turkishName:turkishProgramName(item.name,item.englishName),
         englishName:item.englishName?.trim()||item.name.trim(),
         russianName:(item as Program & {russianName?:string}).russianName?.trim()||"",
         arabicName:(item as Program & {arabicName?:string}).arabicName?.trim()||""
