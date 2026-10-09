@@ -4,7 +4,7 @@ import { ensureDatabase, rawDatabase } from "@/lib/content";
 
 export const ADMIN_COOKIE = "td_admin_session";
 export const PRIMARY_ADMIN_EMAIL = "info@tddanismanlik.com";
-const SESSION_DAYS = 7;
+const SESSION_HOURS = 12;
 const PASSWORD_ITERATIONS = 100_000;
 const LEGACY_PASSWORD_ITERATIONS = 210_000;
 
@@ -79,8 +79,9 @@ export async function getNotificationAdminEmails():Promise<string[]> {
 
 export async function createAdminSession(userId:number) {
   await ensureDatabase();
-  const token=randomToken(32),tokenHash=await sha256(token),now=new Date(),expires=new Date(now.getTime()+SESSION_DAYS*86400000);
+  const token=randomToken(32),tokenHash=await sha256(token),now=new Date(),expires=new Date(now.getTime()+SESSION_HOURS*3600000);
   await rawDatabase().batch([
+    rawDatabase().prepare("DELETE FROM admin_sessions WHERE user_id=?").bind(userId),
     rawDatabase().prepare("INSERT INTO admin_sessions (token_hash,user_id,expires_at,created_at) VALUES (?,?,?,?)").bind(tokenHash,userId,expires.toISOString(),now.toISOString()),
     rawDatabase().prepare("UPDATE admin_users SET last_login_at=?,updated_at=? WHERE id=?").bind(now.toISOString(),now.toISOString(),userId),
     rawDatabase().prepare("DELETE FROM admin_sessions WHERE expires_at<=?").bind(now.toISOString()),
