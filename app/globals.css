@@ -1543,12 +1543,12 @@ html,body{max-width:100%;overflow-x:hidden}
 .elab-inner-page{
   --brand-ink:#20282c;
   --brand-muted:#66736d;
-  --brand-surface:#f6f6f1;
-  --brand-card:#fbfbf8;
-  --brand-line:#dfe3dc;
-  --brand-action:#5f806d;
-  --brand-action-hover:#4d6d5b;
-  --brand-action-soft:#e7eee9;
+  --brand-surface:#f2f5f8;
+  --brand-card:#fbfcfd;
+  --brand-line:#dce4ea;
+  --brand-action:#6686a3;
+  --brand-action-hover:#567792;
+  --brand-action-soft:#e8eef3;
   --brand-dark:#1d2328;
   font-family:var(--font-plex),sans-serif;
   color:var(--brand-ink);
@@ -1644,7 +1644,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .elab-inner-page select:focus,
 .elab-inner-page textarea:focus{
   outline:none!important;
-  border-color:#88a393!important;
+  border-color:#829db4!important;
   box-shadow:0 0 0 3px rgba(95,128,109,.12)!important;
 }
 .elab-page .button-primary,
@@ -1691,7 +1691,7 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 .program-filter-main label span,
 .program-advanced-filter-grid label span{
-  color:#68766f!important;
+  color:#667789!important;
   font-size:11px!important;
   font-weight:700!important;
   text-transform:uppercase;
@@ -1711,7 +1711,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .program-filter-clear{
   align-self:center!important;
   padding:10px 4px!important;
-  color:#67796e!important;
+  color:#667b8e!important;
   font-size:13px!important;
   font-weight:650!important;
   text-decoration:none!important;
@@ -1728,7 +1728,7 @@ html,body{max-width:100%;overflow-x:hidden}
   padding:8px 11px!important;
   border-radius:9px!important;
   background:var(--brand-action-soft)!important;
-  color:#496352!important;
+  color:#526f87!important;
   font-size:12px!important;
   font-weight:700!important;
 }
@@ -1744,7 +1744,7 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 .program-results-meta{
   margin:30px 0 18px!important;
-  color:#6b7770!important;
+  color:#6d7b88!important;
   font-size:14px!important;
 }
 .program-listing-grid{
@@ -1801,7 +1801,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .catalog-filters label{
   display:grid!important;
   gap:7px!important;
-  color:#68766f!important;
+  color:#667789!important;
   font-size:11px!important;
   font-weight:700!important;
   text-transform:uppercase;
@@ -1823,9 +1823,9 @@ html,body{max-width:100%;overflow-x:hidden}
   border-radius:10px!important;
 }
 .catalog-filters .filter-clear{
-  border:1px solid #ced8d1!important;
+  border:1px solid #d1dbe3!important;
   background:var(--brand-action-soft)!important;
-  color:#4f6756!important;
+  color:#526d83!important;
 }
 .catalog-page-frame{
   padding:0!important;
@@ -1833,7 +1833,7 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 .catalog-count{
   margin:0 0 18px!important;
-  color:#6b7770!important;
+  color:#6d7b88!important;
   font-size:14px!important;
 }
 .catalog-cards{
@@ -1848,11 +1848,11 @@ html,body{max-width:100%;overflow-x:hidden}
   box-shadow:0 8px 22px rgba(28,40,33,.035)!important;
 }
 .catalog-university-card>div{
-  color:#6b7770!important;
+  color:#6d7b88!important;
 }
 .catalog-university-card>div span:last-child{
   background:var(--brand-action-soft)!important;
-  color:#496352!important;
+  color:#526f87!important;
 }
 .catalog-university-card h2{
   margin:24px 0 10px!important;
@@ -1907,7 +1907,7 @@ html,body{max-width:100%;overflow-x:hidden}
   gap:8px!important;
 }
 .preference-form label span{
-  color:#68766f!important;
+  color:#667789!important;
   font-size:12px!important;
   font-weight:700!important;
 }
@@ -1930,12 +1930,12 @@ html,body{max-width:100%;overflow-x:hidden}
   display:flex!important;
   justify-content:space-between!important;
   gap:24px!important;
-  color:#6b7770!important;
+  color:#6d7b88!important;
 }
 
 /* Reviews */
 .home-reviews{
-  background:#eef2ed!important;
+  background:#edf2f6!important;
 }
 .home-review-grid{
   display:grid;
@@ -1972,7 +1972,7 @@ html,body{max-width:100%;overflow-x:hidden}
   place-items:center;
   border-radius:50%;
   background:var(--brand-action-soft);
-  color:#496352;
+  color:#526f87;
   font-weight:800;
 }
 .home-review-grid footer strong,
@@ -1981,7 +1981,7 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 .home-review-grid footer small{
   margin-top:3px;
-  color:#758078;
+  color:#758390;
 }
 
 /* About/legal content */
@@ -2004,7 +2004,7 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 .legal-page article p{
   margin:0!important;
-  color:#5f6c65!important;
+  color:#5f6d79!important;
   font-size:16px!important;
   line-height:1.9!important;
 }
@@ -2027,7 +2027,7 @@ html,body{max-width:100%;overflow-x:hidden}
   color:#fff!important;
 }
 .request-page>section>p:not(.section-index){
-  color:#c9d1cc!important;
+  color:#c9d2da!important;
 }
 .consultation-form{
   padding:46px!important;
@@ -2037,7 +2037,7 @@ html,body{max-width:100%;overflow-x:hidden}
   gap:18px!important;
 }
 .consultation-form label{
-  color:#5e6d65!important;
+  color:#5e6e7c!important;
   font-size:12px!important;
   font-weight:650!important;
 }
@@ -2055,11 +2055,11 @@ html,body{max-width:100%;overflow-x:hidden}
 
 /* Contact */
 .contact-page-details{
-  background:#f8faf7!important;
+  background:#f7f9fb!important;
   border-color:var(--brand-line)!important;
 }
 .contact-route-notes article{
-  background:#eef2ed!important;
+  background:#edf2f6!important;
   border-color:var(--brand-line)!important;
 }
 
