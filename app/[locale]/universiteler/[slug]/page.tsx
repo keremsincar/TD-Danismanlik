@@ -8,10 +8,19 @@ import { UniversityMark } from "@/components/UniversityMark";
 import { ExpandableProgramList } from "@/components/ExpandableProgramList";
 
 export const dynamic="force-dynamic";
-export async function generateMetadata({params}:{params:Promise<{slug:string}>}) {
-  const {slug}=await params;
+export async function generateMetadata({params}:{params:Promise<{locale:string;slug:string}>}) {
+  const {locale,slug}=await params;
   const u=await getUniversity(slug);
-  return u?{title:`${u.name} | TD Danışmanlık`,description:`${u.name}: ${u.city}, ${u.institutionType.toLocaleLowerCase("tr-TR")} üniversitesi. Program ve başvuru bilgilerini inceleyin.`}:{};
+  if(!u)return{};
+  const description=locale==="en"
+    ? `${u.name} in ${u.city}. Review available programs and application information.`
+    : locale==="ru"
+      ? `${u.name} — университет в городе ${u.city}. Изучите программы и информацию о поступлении.`
+      : locale==="ar"
+        ? `${u.name} في ${u.city}. استعرض البرامج ومعلومات التقديم.`
+        : `${u.name}: ${u.city}. Program ve başvuru bilgilerini inceleyin.`;
+  const title=`${u.name} | TD Danışmanlık`;
+  return{title,description,openGraph:{title,description},twitter:{card:"summary",title,description}};
 }
 
 export default async function UniversityPage({params}:{params:Promise<{locale:string;slug:string}>}) {
