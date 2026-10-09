@@ -337,7 +337,13 @@ export async function getProgramsForProgramIdentity(identity:string,filters:Omit
   const target=canonicalProgramKey(identity);
   return all.filter(item=>{
     const university=universityBySlug.get(item.universitySlug);
-    return canonicalProgramKey(item.name,item.englishName,item.turkishName)===target
+    const aliases=new Set([
+      canonicalProgramKey(item.name,item.englishName,item.turkishName),
+      canonicalProgramKey(item.name),
+      item.englishName?canonicalProgramKey(item.englishName):"",
+      item.turkishName?canonicalProgramKey(item.turkishName):""
+    ].filter(Boolean));
+    return aliases.has(target)
       &&(!filters.city||university?.city===filters.city)
       &&(!filters.university||item.universitySlug===filters.university)
       &&(!filters.degree||item.degreeType===filters.degree)
