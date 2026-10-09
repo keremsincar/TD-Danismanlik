@@ -1249,288 +1249,582 @@ html,body{max-width:100%;overflow-x:hidden}
   }
 }
 
+/* ===== FINAL PUBLIC DESIGN SYSTEM ===== */
 
-/* ===== PROFESSIONAL SITE POLISH ===== */
-
-.home-trust-strip{
-  max-width:1240px;
-  margin:0 auto;
-  padding:22px 28px;
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:1px;
-  border:1px solid #e2e8ee;
-  border-radius:20px;
-  background:#e2e8ee;
-  overflow:hidden;
-}
-
-.home-trust-strip>div{
-  min-height:110px;
-  padding:22px 24px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:8px;
-  background:#fff;
-}
-
-.home-trust-strip strong{
-  font-size:15px;
-  letter-spacing:.01em;
-  color:#202a34;
-}
-
-.home-trust-strip span{
-  color:#667789;
-  line-height:1.55;
-  font-size:14px;
-}
-
-.program-filter-bar{
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:16px;
-  align-items:end;
-}
-
-.program-filter-bar label{
-  min-width:0;
-}
-
-.program-filter-bar input,
-.program-filter-bar select{
-  width:100%;
-}
-
-.program-filter-bar .button{
-  min-height:48px;
-}
-
-.top-nav-request{
-  border:1px solid rgba(32,37,43,.15);
-  border-radius:999px;
-  padding:10px 16px !important;
-  font-weight:700;
-  background:#20252b;
-  color:#fff !important;
-}
-
-[dir="rtl"] .university-program-arrow,
-[dir="rtl"] .university-program-card-footer span:last-child{
-  transform:scaleX(-1);
-}
-
-[dir="rtl"] .university-program-card:hover .university-program-arrow{
-  transform:scaleX(-1) translate(2px,-2px);
-}
-
-[dir="rtl"] .program-pagination,
-[dir="rtl"] .breadcrumb{
-  direction:rtl;
-}
-
-@media (max-width:980px){
-  .home-trust-strip{
-    grid-template-columns:1fr;
-  }
-
-  .program-filter-bar{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-}
-
-@media (max-width:640px){
-  .home-trust-strip{
-    padding:1px;
-    border-radius:16px;
-  }
-
-  .home-trust-strip>div{
-    min-height:auto;
-    padding:18px;
-  }
-
-  .program-filter-bar{
-    grid-template-columns:1fr;
-  }
-
-  .top-nav-request{
-    border-radius:12px;
-  }
-}
-
-
-/* ===== URGENT UI HOTFIX ===== */
-
-/* Keep public pages visually connected to the site's brand instead of large blank white panels. */
+.elab-page,
 .elab-inner-page{
-  background:#f3f6f8;
+  --brand-ink:#20252b;
+  --brand-text:#52606d;
+  --brand-muted:#768391;
+  --brand-surface:#f3f6f8;
+  --brand-card:#ffffff;
+  --brand-line:#dfe6ec;
+  --brand-accent:#6686a3;
+  --brand-accent-hover:#587791;
+  --brand-accent-soft:#e8eef3;
+  --brand-dark:#1c2228;
+  font-family:var(--font-plex),sans-serif;
+  color:var(--brand-ink);
+  background:var(--brand-surface);
+}
+
+/* Typography */
+.elab-page h1,
+.elab-inner-page h1,
+.elab-page .elab-section h2,
+.elab-inner-page .listing-page>header h1,
+.elab-inner-page .legal-page h1,
+.elab-inner-page .preference-page>header h1,
+.elab-inner-page .contact-page h1,
+.elab-inner-page .request-page h1{
+  font-family:var(--font-serif),serif!important;
+  font-weight:520!important;
+  letter-spacing:-.045em!important;
+}
+.elab-page h2:not(.elab-section h2),
+.elab-inner-page h2,
+.elab-page h3,
+.elab-inner-page h3,
+.elab-page button,
+.elab-inner-page button,
+.elab-page input,
+.elab-inner-page input,
+.elab-page select,
+.elab-inner-page select,
+.elab-page textarea,
+.elab-inner-page textarea,
+.elab-page nav,
+.elab-inner-page nav{
+  font-family:var(--font-plex),sans-serif!important;
+}
+
+/* Shared controls */
+.elab-page input,
+.elab-page select,
+.elab-page textarea,
+.elab-inner-page input,
+.elab-inner-page select,
+.elab-inner-page textarea{
+  border:1px solid #d6dfe6!important;
+  border-radius:11px!important;
+  background:#fff!important;
+  color:var(--brand-ink)!important;
+  box-shadow:none!important;
+}
+.elab-page input:focus,
+.elab-page select:focus,
+.elab-page textarea:focus,
+.elab-inner-page input:focus,
+.elab-inner-page select:focus,
+.elab-inner-page textarea:focus{
+  outline:none!important;
+  border-color:#8da5b8!important;
+  box-shadow:0 0 0 3px rgba(102,134,163,.12)!important;
+}
+.elab-page .button-primary,
+.elab-inner-page .button-primary,
+.elab-inner-page .filter-submit,
+.elab-inner-page .preference-form button,
+.elab-inner-page .contact-email form>button{
+  background:var(--brand-accent)!important;
+  border:1px solid var(--brand-accent)!important;
+  color:#fff!important;
+  border-radius:10px!important;
+  box-shadow:none!important;
+}
+.elab-page .button-primary:hover,
+.elab-inner-page .button-primary:hover,
+.elab-inner-page .filter-submit:hover,
+.elab-inner-page .preference-form button:hover,
+.elab-inner-page .contact-email form>button:hover{
+  background:var(--brand-accent-hover)!important;
+  border-color:var(--brand-accent-hover)!important;
+}
+
+/* Inner page rhythm */
+.elab-inner-page .breadcrumb{
+  max-width:1480px;
+  margin:0 auto;
+  padding:18px clamp(24px,4vw,64px);
+  border-bottom:0!important;
+  background:transparent!important;
+  color:var(--brand-muted);
+  font-size:12px;
 }
 .elab-inner-page .listing-page,
+.elab-inner-page .preference-page,
 .elab-inner-page .legal-page,
-.elab-inner-page .contact-page{
-  background:transparent;
+.elab-inner-page .request-page{
+  max-width:1480px;
+  margin:0 auto 28px!important;
 }
-.contact-page-details{
-  background:linear-gradient(145deg,#f8fafc 0%,#edf3f7 100%);
-  box-shadow:0 18px 48px rgba(30,45,60,.05);
+.elab-inner-page .listing-page{
+  padding:72px clamp(24px,4vw,64px) 92px!important;
+  border:1px solid var(--brand-line)!important;
+  border-radius:28px!important;
+  background:linear-gradient(180deg,#f8fafc 0%,#eef3f6 100%)!important;
 }
-.legal-page{
-  padding-bottom:70px;
+.elab-inner-page .listing-page>header{
+  max-width:900px!important;
+  margin-bottom:42px!important;
 }
-.legal-page article{
-  max-width:980px;
-  margin:34px auto 0;
-  padding:48px 56px;
-  border:1px solid #e0e7ed;
-  border-radius:28px;
-  background:linear-gradient(180deg,#ffffff 0%,#f7fafc 100%)!important;
-  box-shadow:0 18px 45px rgba(28,43,58,.05);
+.elab-inner-page .listing-page>header h1{
+  margin:0 0 18px!important;
+  font-size:clamp(54px,6vw,88px)!important;
+  line-height:.95!important;
 }
-.legal-page article p{
-  margin:0;
-  font-size:16px;
-  line-height:1.9;
-  color:#536272;
-}
-.legal-page article p+p{
-  margin-top:24px;
+.elab-inner-page .listing-page>header>p:last-child{
+  max-width:760px!important;
+  margin-top:18px!important;
+  color:var(--brand-text)!important;
+  font-size:17px!important;
+  line-height:1.72!important;
 }
 
-/* Cleaner, compact program filters. Advanced filters stay out of the way until needed. */
-.program-filter-bar{
-  display:block;
-  margin:0 0 26px;
-  padding:18px;
-  border:1px solid #dfe6ec;
-  border-radius:22px;
-  background:rgba(255,255,255,.92);
-  box-shadow:0 10px 30px rgba(28,43,58,.04);
+/* Program catalogue */
+.program-index-page .program-filter-bar{
+  margin:0 0 30px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
 }
 .program-filter-main{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 170px 132px auto;
-  gap:12px;
-  align-items:end;
+  display:grid!important;
+  grid-template-columns:minmax(360px,1fr) 175px 130px auto!important;
+  gap:14px!important;
+  align-items:end!important;
+  padding:18px!important;
+  border:1px solid var(--brand-line)!important;
+  border-radius:18px!important;
+  background:#fff!important;
+  box-shadow:0 10px 28px rgba(31,42,51,.05)!important;
 }
 .program-filter-main label,
 .program-advanced-filter-grid label{
-  display:grid;
-  gap:7px;
-  min-width:0;
+  display:grid!important;
+  gap:7px!important;
 }
 .program-filter-main label span,
 .program-advanced-filter-grid label span{
-  font-size:12px;
-  font-weight:750;
-  color:#4f5e6d;
+  color:#647587!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  text-transform:uppercase;
+  letter-spacing:.055em;
 }
 .program-filter-main input,
 .program-filter-main select,
 .program-advanced-filter-grid select{
-  width:100%;
-  min-width:0;
-  min-height:46px;
-  padding:0 13px;
-  border:1px solid #d8e0e7;
-  border-radius:12px;
-  background:#f8fafb;
-  color:#1d2832;
-  font:inherit;
-}
-.program-filter-main input:focus,
-.program-filter-main select:focus,
-.program-advanced-filter-grid select:focus{
-  outline:none;
-  border-color:#7f9ab2;
-  box-shadow:0 0 0 3px rgba(102,134,163,.12);
+  min-height:46px!important;
+  padding:0 13px!important;
+  font-size:14px!important;
 }
 .program-filter-main .button{
-  min-height:46px;
-  border-radius:12px;
+  min-height:46px!important;
+  padding:0 22px!important;
 }
 .program-filter-clear{
-  align-self:center;
-  font-size:13px;
-  font-weight:700;
-  color:#61798e;
-  text-decoration:none;
+  align-self:center!important;
+  padding:10px 4px!important;
+  color:#667b8e!important;
+  font-size:13px!important;
+  font-weight:650!important;
+  text-decoration:none!important;
 }
 .program-advanced-filters{
-  margin-top:12px;
-  border-top:1px solid #e5eaee;
-  padding-top:12px;
+  margin:10px 4px 0!important;
+  padding:0!important;
+  border:0!important;
 }
 .program-advanced-filters summary{
-  width:max-content;
+  display:inline-flex!important;
+  align-items:center!important;
+  width:auto!important;
+  padding:8px 11px!important;
+  border-radius:9px!important;
+  background:var(--brand-accent-soft)!important;
+  color:#526f87!important;
+  font-size:12px!important;
+  font-weight:700!important;
   cursor:pointer;
-  color:#5c7488;
-  font-size:13px;
-  font-weight:800;
-  list-style:none;
-}
-.program-advanced-filters summary::-webkit-details-marker{display:none}
-.program-advanced-filters summary::after{
-  content:" +";
-}
-.program-advanced-filters[open] summary::after{
-  content:" −";
 }
 .program-advanced-filter-grid{
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:12px;
-  margin-top:14px;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:12px!important;
+  margin-top:12px!important;
+  padding:16px!important;
+  border:1px solid var(--brand-line)!important;
+  border-radius:15px!important;
+  background:#fff!important;
+}
+.program-results-meta{
+  margin:30px 0 18px!important;
+  color:#6d7b88!important;
+  font-size:14px!important;
+}
+.program-listing-grid{
+  gap:18px!important;
 }
 .program-card{
-  background:linear-gradient(180deg,#fff 0%,#fbfcfd 100%)!important;
-  box-shadow:0 8px 24px rgba(34,48,64,.035);
+  min-height:235px!important;
+  padding:27px!important;
+  border:1px solid var(--brand-line)!important;
+  border-radius:18px!important;
+  background:#fff!important;
+  box-shadow:0 8px 22px rgba(31,42,51,.035)!important;
+}
+.program-card h2{
+  margin-bottom:18px!important;
+  font-family:var(--font-plex),sans-serif!important;
+  font-size:25px!important;
+  font-weight:700!important;
+  line-height:1.12!important;
+  letter-spacing:-.025em!important;
+  color:var(--brand-ink)!important;
+}
+.program-card p{
+  color:#6d7b88!important;
+  font-size:14px!important;
+  line-height:1.6!important;
+}
+.program-card b{
+  color:var(--brand-accent)!important;
+  font-size:13px!important;
 }
 .program-card:hover{
-  transform:translateY(-2px);
-  box-shadow:0 14px 34px rgba(34,48,64,.07);
+  transform:translateY(-3px)!important;
+  box-shadow:0 16px 34px rgba(31,42,51,.08)!important;
+}
+.program-pagination a.is-active{
+  background:var(--brand-dark)!important;
+  border-color:var(--brand-dark)!important;
 }
 
-/* Preference robot: program selector gets full width so the full catalogue is easy to scan. */
-.preference-form .preference-program{
-  grid-column:1/-1;
+/* University catalogue */
+.catalog-filters{
+  display:grid!important;
+  grid-template-columns:minmax(280px,1.35fr) .9fr .9fr .95fr auto auto!important;
+  gap:12px!important;
+  align-items:end!important;
+  margin-bottom:28px!important;
+  padding:18px!important;
+  border:1px solid var(--brand-line)!important;
+  border-radius:18px!important;
+  background:#fff!important;
+  box-shadow:0 10px 28px rgba(31,42,51,.05)!important;
 }
-.preference-form .preference-program select{
-  width:100%;
+.catalog-filters label{
+  display:grid!important;
+  gap:7px!important;
+  color:#647587!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  text-transform:uppercase;
+  letter-spacing:.055em;
 }
-
-/* Keep home FAQ compact; only the first questions are rendered there. */
-.home-faq-compact{
-  overflow:hidden;
+.catalog-filters input,
+.catalog-filters select{
+  min-height:46px!important;
+  padding:0 13px!important;
+  font-size:14px!important;
 }
-
-/* Softer empty-state / catalogue surfaces. */
-.empty-state,
+.catalog-filters .filter-submit,
+.catalog-filters .filter-clear{
+  min-height:46px!important;
+  padding:0 18px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-radius:10px!important;
+}
+.catalog-filters .filter-clear{
+  border:1px solid #d1dbe3!important;
+  background:var(--brand-accent-soft)!important;
+  color:#526d83!important;
+}
 .catalog-page-frame{
-  background:rgba(255,255,255,.72);
+  padding:0!important;
+  background:transparent!important;
+}
+.catalog-count{
+  margin:0 0 18px!important;
+  color:#6d7b88!important;
+  font-size:14px!important;
+}
+.catalog-cards{
+  gap:18px!important;
+}
+.catalog-university-card{
+  position:relative;
+  min-height:275px!important;
+  padding:27px!important;
+  overflow:hidden;
+  border:1px solid var(--brand-line)!important;
+  border-radius:18px!important;
+  background:#fff!important;
+  box-shadow:0 8px 22px rgba(31,42,51,.035)!important;
+}
+.catalog-university-card::before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:4px;
+  background:var(--brand-accent);
+  opacity:.75;
+}
+.catalog-university-card>div{
+  color:#6d7b88!important;
+}
+.catalog-university-card>div span:last-child{
+  padding:5px 9px!important;
+  border-radius:999px!important;
+  background:var(--brand-accent-soft)!important;
+  color:#526f87!important;
+}
+.catalog-university-card h2{
+  margin:24px 0 10px!important;
+  font-family:var(--font-plex),sans-serif!important;
+  font-size:24px!important;
+  font-weight:700!important;
+  line-height:1.15!important;
+  letter-spacing:-.025em!important;
+}
+.catalog-university-card b{
+  color:var(--brand-accent)!important;
+}
+.catalog-university-card:hover{
+  transform:translateY(-3px)!important;
+  box-shadow:0 16px 34px rgba(31,42,51,.08)!important;
+}
+.catalog-pagination a{
+  border-color:#d4dde4!important;
+  background:#fff!important;
+}
+.catalog-pagination a[aria-current=page]{
+  background:var(--brand-dark)!important;
+  border-color:var(--brand-dark)!important;
+  color:#fff!important;
 }
 
-/* About / legal typography spacing on mobile too. */
-@media(max-width:900px){
-  .program-filter-main{
-    grid-template-columns:1fr 150px;
-  }
-  .program-filter-main .button,
-  .program-filter-clear{
-    grid-column:auto;
+/* Program matcher */
+.preference-page{
+  padding:72px clamp(24px,4vw,64px) 92px!important;
+  border:1px solid var(--brand-line)!important;
+  border-radius:28px!important;
+  background:linear-gradient(180deg,#f8fafc 0%,#eef3f6 100%)!important;
+}
+.preference-page>header{
+  max-width:900px!important;
+  margin-bottom:40px!important;
+}
+.preference-page>header h1{
+  font-size:clamp(54px,6vw,88px)!important;
+  line-height:.96!important;
+}
+.preference-form{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:16px!important;
+  padding:24px!important;
+  border:1px solid var(--brand-line)!important;
+  border-radius:20px!important;
+  background:#fff!important;
+  box-shadow:0 10px 28px rgba(31,42,51,.05)!important;
+}
+.preference-form label{
+  display:grid!important;
+  gap:8px!important;
+}
+.preference-form label span{
+  color:#647587!important;
+  font-size:12px!important;
+  font-weight:700!important;
+}
+.preference-form select{
+  min-height:50px!important;
+  padding:0 14px!important;
+  font-size:14px!important;
+}
+.preference-form .preference-program{
+  grid-column:1/-1!important;
+}
+.preference-form button{
+  grid-column:1/-1!important;
+  min-height:52px!important;
+}
+.preference-page>footer{
+  margin-top:20px!important;
+  padding:0 4px!important;
+  display:flex!important;
+  justify-content:space-between!important;
+  gap:24px!important;
+  color:#6d7b88!important;
+}
+
+/* Homepage reviews */
+.home-reviews{
+  background:#edf2f6!important;
+}
+.home-review-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:18px;
+}
+.home-review-grid article{
+  min-height:280px;
+  padding:28px;
+  border:1px solid var(--brand-line);
+  border-radius:20px;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.home-review-grid blockquote{
+  margin:0;
+  font-family:var(--font-serif),serif;
+  font-size:24px;
+  line-height:1.38;
+  letter-spacing:-.02em;
+}
+.home-review-grid footer{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-top:28px;
+}
+.home-review-grid footer>span{
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:var(--brand-accent-soft);
+  color:#526f87;
+  font-weight:800;
+}
+.home-review-grid footer strong,
+.home-review-grid footer small{
+  display:block;
+}
+.home-review-grid footer small{
+  margin-top:3px;
+  color:#758390;
+}
+
+/* About and legal content */
+.legal-page{
+  padding-bottom:72px!important;
+}
+.legal-page header{
+  padding-bottom:34px!important;
+}
+.legal-page article{
+  max-width:960px!important;
+  margin:34px auto 0!important;
+  padding:48px 54px!important;
+  border:1px solid var(--brand-line)!important;
+  border-radius:22px!important;
+  background:#fff!important;
+  box-shadow:0 10px 28px rgba(31,42,51,.04)!important;
+  display:grid!important;
+  gap:22px!important;
+}
+.legal-page article p{
+  margin:0!important;
+  color:#5f6d79!important;
+  font-size:16px!important;
+  line-height:1.9!important;
+}
+
+/* Consultation form */
+.request-page{
+  display:grid!important;
+  grid-template-columns:minmax(320px,.75fr) minmax(540px,1.25fr)!important;
+  overflow:hidden!important;
+  border:1px solid var(--brand-line)!important;
+  border-radius:28px!important;
+  background:#fff!important;
+  box-shadow:0 14px 36px rgba(31,42,51,.055)!important;
+}
+.request-page>section{
+  padding:52px!important;
+  background:var(--brand-dark)!important;
+  color:#fff!important;
+}
+.request-page>section h1{
+  color:#fff!important;
+}
+.request-page>section>p:not(.section-index){
+  color:#c9d2da!important;
+}
+.consultation-form{
+  padding:46px!important;
+  background:#fff!important;
+}
+.consultation-form .form-grid{
+  gap:18px!important;
+}
+.consultation-form label{
+  color:#5e6e7c!important;
+  font-size:12px!important;
+  font-weight:650!important;
+}
+.consultation-form input,
+.consultation-form select,
+.consultation-form textarea{
+  margin-top:7px!important;
+  min-height:48px!important;
+  padding:12px 14px!important;
+  font-size:14px!important;
+}
+.consultation-form textarea{
+  min-height:150px!important;
+}
+
+/* Contact and section continuity */
+.contact-page-details{
+  background:#f7f9fb!important;
+  border-color:var(--brand-line)!important;
+}
+.contact-route-notes article{
+  background:#edf2f6!important;
+  border-color:var(--brand-line)!important;
+}
+.compact-contact,
+.home-reviews,
+.elab-faq.home-faq-compact{
+  border-top:1px solid var(--brand-line)!important;
+}
+
+@media(max-width:1100px){
+  .catalog-filters{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
   }
   .program-advanced-filter-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .home-review-grid{
+    grid-template-columns:1fr 1fr;
+  }
+  .request-page{
+    grid-template-columns:1fr!important;
   }
 }
-@media(max-width:620px){
+@media(max-width:720px){
   .program-filter-main,
-  .program-advanced-filter-grid{
+  .catalog-filters,
+  .program-advanced-filter-grid,
+  .preference-form{
+    grid-template-columns:1fr!important;
+  }
+  .home-review-grid{
     grid-template-columns:1fr;
   }
   .legal-page article{
-    margin:24px 14px 0;
-    padding:28px 22px;
-    border-radius:20px;
+    margin:22px 14px 0!important;
+    padding:28px 22px!important;
   }
 }
