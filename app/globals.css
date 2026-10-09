@@ -1460,3 +1460,22 @@ html,body{max-width:100%;overflow-x:hidden}
  .request-page>section{padding:44px 24px!important}.request-page>section h1{font-size:clamp(56px,16vw,76px)!important}.consultation-form-premium{padding:18px!important}.consultation-form-premium .form-grid{grid-template-columns:1fr}.consultation-submit-row>div{flex-direction:column;align-items:stretch}.submit-button{width:100%}
  .legal-page article{margin:0 14px!important;padding:30px 22px!important}
 }
+
+/* Mobile branded navigation */
+.mobile-site-menu{display:none}
+@media(max-width:980px){
+ .elab-header{display:grid!important;grid-template-columns:1fr auto!important;align-items:center!important;padding:14px 18px!important}
+ .elab-header .elab-top-nav,.elab-header>.elab-header-actions{display:none!important}
+ .mobile-site-menu{display:block;position:relative}
+ .mobile-site-menu>summary{min-width:86px;height:42px;padding:0 12px;border:1px solid #d7dfe5;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;font-size:12px;font-weight:750;cursor:pointer}
+ .mobile-site-menu>summary::-webkit-details-marker{display:none}
+ .mobile-site-menu[open]>summary b{transform:rotate(45deg)}
+ .mobile-site-menu-panel{position:absolute;z-index:90;right:0;top:50px;width:min(360px,calc(100vw - 24px));padding:12px;border:1px solid #d9e1e6;border-radius:16px;background:#fbfbf8;box-shadow:0 24px 70px rgba(26,35,42,.18)}
+ [dir="rtl"] .mobile-site-menu-panel{right:auto;left:0}
+ .mobile-site-menu-panel nav{display:grid}
+ .mobile-site-menu-panel nav>a{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;min-height:46px;padding:0 10px;border-bottom:1px solid #e4e8e5;color:#303a42;font-size:13px;font-weight:650}
+ .mobile-site-menu-panel nav>a span{color:#9aa5ad;font-size:10px}
+ .mobile-site-menu-panel nav>a.mobile-request{grid-template-columns:1fr auto;margin-top:10px;border:0;border-radius:10px;background:#1b2026;color:#fff;padding:0 14px}
+ .mobile-site-menu-panel>.language-menu{margin-top:10px}.mobile-site-menu-panel>.language-menu summary{width:100%;min-height:42px;border:1px solid #dce3e8;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center}
+ .mobile-site-menu-panel>.language-menu>div{left:0;right:0;width:100%}
+}
