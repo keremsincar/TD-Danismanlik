@@ -144,6 +144,10 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
   if(slug==="tercih-robotu"){const options=await searchCatalogPrograms({pageSize:12,sort:"degree"});return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:locale==="tr"?"Tercih Robotu":"Program Matcher"}]}><PreferenceRobot locale={locale} cities={options.cities} degrees={options.degrees} languages={options.languages} fields={options.fields}/></InnerPage>}
   if(slug==="bolumler"){
   const selectedProgram=query.program||"";
+  const searchTerm=(query.q||"").trim();
+  const sortMode=query.sort==="desc"?"desc":"asc";
+  const currentProgramPage=Math.max(1,Number.parseInt(query.programPage||"1",10)||1);
+  const perPage=24;
 
   const catalog=await searchCatalogPrograms({
     query:selectedProgram,
@@ -155,7 +159,25 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
   const compareTr=(a:string,b:string)=>
     a.trim().localeCompare(b.trim(),"tr-TR",{sensitivity:"base"});
 
-  const programNames=[...catalog.programNames].sort(compareTr);
+  const normalize=(value:string)=>
+    value.toLocaleLowerCase("tr-TR")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g,"")
+      .replace(/ı/g,"i");
+
+  const allProgramNames=[...catalog.programNames];
+
+  const filteredProgramNames=allProgramNames
+    .filter(name=>!searchTerm||normalize(name).includes(normalize(searchTerm)))
+    .sort((a,b)=>sortMode==="desc"?compareTr(b,a):compareTr(a,b));
+
+  const programPageCount=Math.max(1,Math.ceil(filteredProgramNames.length/perPage));
+  const safeProgramPage=Math.min(currentProgramPage,programPageCount);
+
+  const visibleProgramNames=filteredProgramNames.slice(
+    (safeProgramPage-1)*perPage,
+    safeProgramPage*perPage
+  );
 
   const matchingPrograms=selectedProgram
     ? catalog.programs.filter(
@@ -195,7 +217,16 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
 
   const description=selectedProgram
     ? `${selectedProgram} programının bulunduğu üniversiteleri inceleyin.`
-    : "İlgilendiğiniz bölümü seçin ve bu bölümü sunan üniversiteleri görüntüleyin.";
+    : "İlgilendiğiniz bölümü arayın, sıralayın ve bu bölümü sunan üniversiteleri görüntüleyin.";
+
+  const makePageHref=(page:number)=>{
+    const params=new URLSearchParams();
+    if(searchTerm)params.set("q",searchTerm);
+    if(sortMode==="desc")params.set("sort","desc");
+    if(page>1)params.set("programPage",String(page));
+    const qs=params.toString();
+    return `/${locale}/bolumler${qs?`?${qs}`:""}`;
+  };
 
   return <InnerPage
     settings={settings}
@@ -206,7 +237,7 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       ...(selectedProgram?[{label:selectedProgram}]:[])
     ]}
   >
-    <main className="listing-page">
+    <main className="listing-page program-index-page">
       <header>
         <p className="elab-kicker">{t.programs}</p>
         <h1>{title}</h1>
@@ -214,25 +245,99 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       </header>
 
       {!selectedProgram ? (
-        <div className="listing-grid">
-          {programNames.map(program=>(
-            <Link
-              key={program}
-              href={`/${locale}/bolumler?program=${encodeURIComponent(program)}`}
-            >
-              <h2>{program}</h2>
-              <p>Bu bölümü sunan üniversiteleri görüntüleyin.</p>
-              <b>Üniversiteleri Gör</b>
-            </Link>
-          ))}
-        </div>
+        <>
+          <form className="program-filter-bar" method="get">
+            <label>
+              <span>Bölüm ara</span>
+              <input
+                type="search"
+                name="q"
+                defaultValue={searchTerm}
+                placeholder="Örn. Bilgisayar Mühendisliği"
+              />
+            </label>
+
+            <label>
+              <span>Sırala</span>
+              <select name="sort" defaultValue={sortMode}>
+                <option value="asc">A → Z</option>
+                <option value="desc">Z → A</option>
+              </select>
+            </label>
+
+            <button className="button button-primary" type="submit">
+              Uygula
+            </button>
+
+            {(searchTerm||sortMode==="desc")&&(
+              <Link className="program-filter-clear" href={`/${locale}/bolumler`}>
+                Temizle
+              </Link>
+            )}
+          </form>
+
+          <div className="program-results-meta">
+            <strong>{filteredProgramNames.length}</strong> bölüm bulundu
+          </div>
+
+          <div className="listing-grid program-listing-grid">
+            {visibleProgramNames.map(program=>(
+              <Link
+                className="program-card"
+                key={program}
+                href={`/${locale}/bolumler?program=${encodeURIComponent(program)}`}
+              >
+                <h2>{program}</h2>
+                <p>Bu bölümü sunan üniversiteleri görüntüleyin.</p>
+                <b>Üniversiteleri Gör</b>
+              </Link>
+            ))}
+          </div>
+
+          {!visibleProgramNames.length&&(
+            <div className="empty-state">
+              Aramanıza uygun bölüm bulunamadı.
+            </div>
+          )}
+
+          {programPageCount>1&&(
+            <nav className="program-pagination" aria-label="Bölüm sayfaları">
+              {safeProgramPage>1&&(
+                <Link href={makePageHref(safeProgramPage-1)}>←</Link>
+              )}
+
+              {Array.from({length:programPageCount},(_,i)=>i+1)
+                .filter(page=>
+                  page===1||
+                  page===programPageCount||
+                  Math.abs(page-safeProgramPage)<=2
+                )
+                .map((page,index,array)=>{
+                  const previous=array[index-1];
+                  return <span key={page} className="program-page-group">
+                    {previous&&page-previous>1&&<span className="program-page-dots">…</span>}
+                    <Link
+                      className={page===safeProgramPage?"is-active":""}
+                      href={makePageHref(page)}
+                    >
+                      {page}
+                    </Link>
+                  </span>
+                })}
+
+              {safeProgramPage<programPageCount&&(
+                <Link href={makePageHref(safeProgramPage+1)}>→</Link>
+              )}
+            </nav>
+          )}
+        </>
       ) : (
         <>
-          <Link className="elab-pill" href={`/${locale}/bolumler`}>
+          <Link className="elab-pill program-back-link" href={`/${locale}/bolumler`}>
             ← Tüm Bölümler
           </Link>
 
-          <div className="listing-grid">
+          <div className="listing-grid program-university-grid">
             {fieldUniversities.map(university=>(
               <Link
                 key={university.slug}

@@ -919,3 +919,137 @@ html,body{max-width:100%;overflow-x:hidden}
  .elab-service-grid>.elab-service-card:first-child .service-card-photo{height:185px}
  .elab-service-grid>.elab-service-card:first-child .service-card-photo img{object-position:center 18%}
 }
+
+
+/* PROGRAM INDEX UX */
+.program-index-page header{
+  margin-bottom:32px;
+}
+
+.program-filter-bar{
+  display:grid;
+  grid-template-columns:minmax(260px,1fr) 180px auto auto;
+  gap:14px;
+  align-items:end;
+  margin:0 0 28px;
+  padding:20px;
+  border:1px solid rgba(20,30,45,.12);
+  border-radius:20px;
+  background:#fff;
+}
+
+.program-filter-bar label{
+  display:grid;
+  gap:8px;
+}
+
+.program-filter-bar label span{
+  font-size:.82rem;
+  font-weight:700;
+}
+
+.program-filter-bar input,
+.program-filter-bar select{
+  width:100%;
+  min-height:48px;
+  padding:0 14px;
+  border:1px solid rgba(20,30,45,.18);
+  border-radius:12px;
+  background:#fff;
+  font:inherit;
+}
+
+.program-filter-clear{
+  align-self:center;
+  text-decoration:underline;
+}
+
+.program-results-meta{
+  margin:0 0 18px;
+  color:#5d6675;
+}
+
+.program-listing-grid{
+  gap:22px;
+}
+
+.program-card{
+  display:flex !important;
+  flex-direction:column;
+  min-height:230px;
+  padding:30px !important;
+}
+
+.program-card h2{
+  margin:0 0 20px !important;
+  line-height:1.12;
+}
+
+.program-card p{
+  margin:0 0 28px !important;
+  line-height:1.6;
+  color:#5e6878;
+}
+
+.program-card b{
+  margin-top:auto;
+}
+
+.program-pagination{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin:42px 0 10px;
+}
+
+.program-page-group{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.program-pagination a{
+  display:grid;
+  place-items:center;
+  min-width:42px;
+  height:42px;
+  padding:0 12px;
+  border:1px solid rgba(20,30,45,.14);
+  border-radius:10px;
+  background:#fff;
+  text-decoration:none;
+  font-weight:700;
+}
+
+.program-pagination a.is-active{
+  background:#1d2228;
+  color:#fff;
+  border-color:#1d2228;
+}
+
+.program-page-dots{
+  padding:0 3px;
+  color:#77808e;
+}
+
+.program-back-link{
+  display:inline-flex;
+  margin-bottom:26px;
+}
+
+.program-university-grid{
+  margin-top:8px;
+}
+
+@media (max-width:760px){
+  .program-filter-bar{
+    grid-template-columns:1fr;
+  }
+
+  .program-card{
+    min-height:auto;
+    padding:24px !important;
+  }
+}
