@@ -41,7 +41,7 @@ export function UniversityCatalog({universities,locale,initialPage=1,filters,pro
         <div className="catalog-card-index">{String((currentPage-1)*PAGE_SIZE+index+1).padStart(2,"0")}</div>
         <div className="catalog-university-meta"><UniversityMark name={u.name} logoUrl={u.logoUrl}/><p><span>{u.city}</span><span>{u.institutionType==="Devlet"?t.state:u.institutionType==="Vakıf"?t.foundation:u.institutionType}</span></p></div>
         <h2>{u.name}</h2>
-        <div className="catalog-card-facts"><span>{programCounts[u.slug]?<><b>{programCounts[u.slug]}</b> {t.programs}</>:t.pending}</span>{u.founded&&u.founded!=="—"&&<span><b>{u.founded}</b> {t.founded}</span>}</div>
+        <div className="catalog-card-facts">{programCounts[u.slug]?<span><b>{programCounts[u.slug]}</b> {t.programs}</span>:null}{u.founded&&u.founded!=="—"&&<span><b>{u.founded}</b> {t.founded}</span>}</div>
         <div className="catalog-card-cta"><span>{t.view}</span><b aria-hidden="true">↗</b></div>
       </Link>)}</div>
     </div>
