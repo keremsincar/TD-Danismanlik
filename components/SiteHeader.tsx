@@ -25,7 +25,7 @@ export function SiteHeader({settings,locale="tr"}:{settings:SiteSettings;locale?
     </nav>
     <div className="header-actions elab-header-actions"><LanguageMenu locale={locale}/></div>
     <details className="mobile-site-menu">
-      <summary aria-label={t.menu}><span>Menü</span><b aria-hidden="true">＋</b></summary>
+      <summary aria-label={t.menu}><span>{t.menu}</span><b aria-hidden="true">＋</b></summary>
       <div className="mobile-site-menu-panel">
         <nav>{links.map(([href,label],index)=><Link href={href} key={href}><span>{String(index+1).padStart(2,"0")}</span>{label}</Link>)}<Link className="mobile-request" href={`${home}/danismanlik-talebi`}>{t.request}<b aria-hidden="true">↗</b></Link></nav>
         <LanguageMenu locale={locale}/>
