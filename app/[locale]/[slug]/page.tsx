@@ -165,11 +165,35 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       .replace(/[\u0300-\u036f]/g,"")
       .replace(/ı/g,"i");
 
-  const allProgramNames=[...catalog.programNames];
+  const localizedProgramOptions=catalog.programOptions.map(item=>{
+    const display=
+      locale==="tr"
+        ? item.name
+        : locale==="en"
+          ? (item.englishName||item.name)
+          : locale==="ru"
+            ? (item.russianName||item.englishName||item.name)
+            : locale==="ar"
+              ? (item.arabicName||item.englishName||item.name)
+              : (item.englishName||item.name);
 
-  const filteredProgramNames=allProgramNames
-    .filter(name=>!searchTerm||normalize(name).includes(normalize(searchTerm)))
-    .sort((a,b)=>sortMode==="desc"?compareTr(b,a):compareTr(a,b));
+    return {
+      canonical:item.name,
+      display
+    };
+  });
+
+  const filteredProgramNames=localizedProgramOptions
+    .filter(item=>
+      !searchTerm||
+      normalize(item.display).includes(normalize(searchTerm))||
+      normalize(item.canonical).includes(normalize(searchTerm))
+    )
+    .sort((a,b)=>
+      sortMode==="desc"
+        ? compareTr(b.display,a.display)
+        : compareTr(a.display,b.display)
+    );
 
   const programPageCount=Math.max(1,Math.ceil(filteredProgramNames.length/perPage));
   const safeProgramPage=Math.min(currentProgramPage,programPageCount);
@@ -284,12 +308,32 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
 
   const pc=programCopy[(locale in programCopy?locale:"tr") as keyof typeof programCopy];
 
+  const selectedProgramOption=catalog.programOptions.find(
+    item=>item.name.trim().localeCompare(
+      selectedProgram.trim(),
+      "tr-TR",
+      {sensitivity:"base"}
+    )===0
+  );
+
+  const selectedProgramDisplay=!selectedProgram
+    ? ""
+    : locale==="tr"
+      ? selectedProgram
+      : locale==="en"
+        ? (selectedProgramOption?.englishName||selectedProgram)
+        : locale==="ru"
+          ? (selectedProgramOption?.russianName||selectedProgramOption?.englishName||selectedProgram)
+          : locale==="ar"
+            ? (selectedProgramOption?.arabicName||selectedProgramOption?.englishName||selectedProgram)
+            : (selectedProgramOption?.englishName||selectedProgram);
+
   const title=selectedProgram
-    ? selectedProgram
+    ? selectedProgramDisplay
     : pc.title;
 
   const description=selectedProgram
-    ? `${selectedProgram} ${pc.selectedSuffix}`
+    ? `${selectedProgramDisplay} ${pc.selectedSuffix}`
     : pc.description;
 
   const makePageHref=(page:number)=>{
@@ -357,10 +401,10 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
             {visibleProgramNames.map(program=>(
               <Link
                 className="program-card"
-                key={program}
-                href={`/${locale}/bolumler?program=${encodeURIComponent(program)}`}
+                key={program.canonical}
+                href={`/${locale}/bolumler?program=${encodeURIComponent(program.canonical)}`}
               >
-                <h2>{program}</h2>
+                <h2>{program.display}</h2>
                 <p>{pc.cardDescription}</p>
                 <b>{pc.viewUniversities}</b>
               </Link>
@@ -417,7 +461,7 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
                 href={`/${locale}/universiteler/${university.slug}`}
               >
                 <h2>{university.name}</h2>
-                <p>{selectedProgram}</p>
+                <p>{selectedProgramDisplay}</p>
                 <b>{pc.viewUniversity}</b>
               </Link>
             ))}
