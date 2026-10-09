@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- Local, size-bounded photography is served directly by the Site. */
 import Link from "@/components/NativeLink";
-import type { HomeCopy, Service, SiteImages, SiteSettings, University } from "@/lib/content";
+import type { HomeCopy, Review, Service, SiteImages, SiteSettings, University } from "@/lib/content";
 import { CookieBanner } from "./CookieBanner";
 import { ConsentAnalytics } from "./ConsentAnalytics";
 import { SiteHeader } from "./SiteHeader";
@@ -19,7 +19,7 @@ const local={
  ar:{discover:"اكتشف تخصصك",discoverLead:"قارن البرامج والجامعات ولغات الدراسة ومعلومات الرسوم في مكان واحد.",query:"اكتب اسم البرنامج",all:"كل الجامعات",go:"عرض البرامج",featured:"جامعات مميزة",legal:["إشعار حماية البيانات","سياسة الخصوصية","سياسة ملفات الارتباط","شروط الاستخدام"],about:"من نحن",wa:"مرحباً TD Consultancy، أرغب في الحصول على معلومات عن خدماتكم."}
 } as const;
 
-export function PublicHome({settings,homeCopy,images,services,universities,faqs,locale="tr"}:{settings:SiteSettings;homeCopy:HomeCopy;images:SiteImages;services:Service[];universities:University[];faqs:FAQ[];locale?:string}) {
+export function PublicHome({settings,homeCopy,images,services,universities,faqs,reviews,locale="tr"}:{settings:SiteSettings;homeCopy:HomeCopy;images:SiteImages;services:Service[];universities:University[];faqs:FAQ[];reviews:Review[];locale?:string}) {
   const home=`/${locale}`,t=languageLabels(locale),l=local[(locale in local?locale:"tr") as keyof typeof local];
   const whatsapp=`https://wa.me/${settings.whatsapp.replace(/\D/g,"")}?text=${encodeURIComponent(l.wa)}`;
   const heroBreak=settings.heroTitle.indexOf(". ");
@@ -37,7 +37,7 @@ export function PublicHome({settings,homeCopy,images,services,universities,faqs,
 
       <section className="elab-section elab-finder" id="universiteler"><div className="elab-section-head"><p className="elab-kicker">{featuredLabel}</p><h2>{homeCopy.finderTitle}</h2><p>{homeCopy.finderIntro}</p></div><div className="elab-university-grid">{visibleUniversities.map(university=><Link href={`/${locale}/universiteler/${university.slug}`} key={university.id}><div className="home-university-meta"><UniversityMark name={university.name} logoUrl={university.logoUrl}/><span>{university.city}</span></div><strong>{university.name}</strong><b>{t.viewUniversity}</b></Link>)}</div><div className="home-catalog-actions"><Link className="elab-section-more action-link" href={`/${locale}/bolumler`}>{t.allPrograms}</Link></div></section>
 
-      <section className="elab-section elab-faq home-faq-compact" id="sss"><div><p className="elab-kicker">{t.faqKicker}</p><h2>{t.qPrompt}</h2><p>{t.qLead}</p><Link className="elab-section-more" href={`/${locale}/sss`}>{t.allFaq}</Link></div><FaqAccordion className="home-faq-accordion" items={faqs.slice(0,5)}/></section>
+      {reviews.length>0&&<section className="elab-section home-reviews"><div className="elab-section-head"><p className="elab-kicker">{t.reviewKicker}</p><h2>{homeCopy.reviewsTitle}</h2><p>{locale==="tr"?"Danışanlarımızın süreç deneyimlerinden seçili görüşler.":locale==="en"?"Selected feedback from our clients\' experiences.":locale==="ru"?"Избранные отзывы клиентов о процессе сопровождения.":"آراء مختارة من تجارب عملائنا."}</p></div><div className="home-review-grid">{reviews.slice(0,3).map(review=><article key={review.id}><blockquote>“{review.quote}”</blockquote><footer><span>{review.author.slice(0,1)}</span><div><strong>{review.author}</strong><small>{review.context}</small></div></footer></article>)}</div><Link className="elab-section-more action-link" href={"/"+locale+"/yorumlar"}>{t.allReviews}</Link></section>}\n\n      <section className="elab-section elab-faq home-faq-compact" id="sss"><div><p className="elab-kicker">{t.faqKicker}</p><h2>{t.qPrompt}</h2><p>{t.qLead}</p><Link className="elab-section-more" href={`/${locale}/sss`}>{t.allFaq}</Link></div><FaqAccordion className="home-faq-accordion" items={faqs.slice(0,5)}/></section>
 
       <section className="compact-contact"><div><p className="elab-kicker">{t.contactKicker}</p><h2>{homeCopy.contactTitle}</h2><p>{homeCopy.contactBody}</p></div><div><a className="elab-pill elab-pill-whatsapp" href={whatsapp} target="_blank" rel="noopener noreferrer"><WhatsAppIcon size={19}/> {t.whatsapp}</a><Link className="elab-pill elab-pill-neutral" href={`/${locale}/iletisim`}>{t.contact}</Link></div></section>
     </main>
