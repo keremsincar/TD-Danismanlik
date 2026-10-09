@@ -16,8 +16,8 @@ function pageUrl(locale:string,page:number,filters:Filters){const params=new URL
 export function UniversityCatalog({universities,locale,initialPage=1,filters,programCounts}:{universities:University[];locale:string;initialPage?:number;filters:Filters;programCounts:Record<string,number>}) {
   const t=catalogText[(locale in catalogText?locale:"tr") as keyof typeof catalogText];
   const term=filters.query.toLocaleLowerCase("tr-TR").trim();
-  const cities=[...new Set(universities.map(u=>u.city))].sort((a,b)=>a.localeCompare(b,"tr"));
-  const filtered=universities.filter(u=>(!term||`${u.name} ${u.city}`.toLocaleLowerCase("tr-TR").includes(term))&&(!filters.city||u.city===filters.city)&&(!filters.type||u.institutionType===filters.type)).sort((a,b)=>filters.sort==="name-desc"?b.name.localeCompare(a.name,"tr"):filters.sort==="city"?a.city.localeCompare(b.city,"tr")||a.name.localeCompare(b.name,"tr"):filters.sort==="newest"?Number(b.founded)-Number(a.founded)||a.name.localeCompare(b.name,"tr"):a.name.localeCompare(b.name,"tr"));
+  const compareTr=(a:string,b:string)=>a.trim().localeCompare(b.trim(),"tr-TR",{sensitivity:"base"});const cities=[...new Set(universities.map(u=>u.city))].sort(compareTr);
+  const filtered=universities.filter(u=>(!term||`${u.name} ${u.city}`.toLocaleLowerCase("tr-TR").includes(term))&&(!filters.city||u.city===filters.city)&&(!filters.type||u.institutionType===filters.type)).sort((a,b)=>filters.sort==="name-desc"?compareTr(b.name,a.name):filters.sort==="city"?compareTr(a.city,b.city)||compareTr(a.name,b.name):filters.sort==="newest"?Number(b.founded)-Number(a.founded)||compareTr(a.name,b.name):compareTr(a.name,b.name));
   const pageCount=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
   const currentPage=Math.min(Math.max(1,initialPage),pageCount);
   const visible=filtered.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);

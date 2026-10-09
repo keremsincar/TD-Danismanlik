@@ -229,6 +229,15 @@ export async function searchCatalogPrograms(options:ProgramSearch={}){
   const values=(key:"degreeType"|"language"|"field")=>[...new Set(all.map(item=>item[key]).filter(Boolean) as string[])].sort((a,b)=>key==="degreeType"?degreeRank(a)-degreeRank(b):a.localeCompare(b,"tr"));
   return {programs:filtered.slice((page-1)*pageSize,page*pageSize),total:filtered.length,page,pageCount,universities,cities:[...new Set(universities.map(item=>item.city))].sort((a,b)=>a.localeCompare(b,"tr")),degrees:values("degreeType"),languages:values("language"),fields:values("field")};
 }
+export async function getAllCatalogProgramsForForm():Promise<Program[]>{
+  const first=await searchCatalogPrograms({page:1,pageSize:120,sort:"program-asc"});
+  const all=[...first.programs];
+  for(let page=2;page<=first.pageCount;page++){
+    const next=await searchCatalogPrograms({page,pageSize:120,sort:"program-asc"});
+    all.push(...next.programs);
+  }
+  return all;
+}
 export async function getCatalogProgramsForUniversity(university:University,limit=96):Promise<{programs:Program[];total:number}>{const result=await searchCatalogPrograms({university:university.slug,pageSize:Math.min(120,limit),page:1});return {programs:result.programs,total:result.total};}
 export async function getProgram(slug:string): Promise<Program|null> { await ensureDatabase(); const saved=await db().prepare("SELECT p.id,p.university_id AS universityId,u.name AS universityName,u.slug AS universitySlug,p.slug,p.name,p.degree_type AS degreeType,p.language,p.duration,p.tuition_fee AS tuitionFee,p.description,p.active,p.updated_at AS updatedAt FROM programs p JOIN universities u ON u.id=p.university_id WHERE p.slug=? AND p.active=1").bind(slug).first<Program>();if(saved)return cleanProgram(saved);const reference=referencePrograms.find(item=>item.slug===slug);if(!reference)return null;const university=await getUniversity(reference.universitySlug);return university?referenceToProgram(reference,university):null; }
 export async function getFaqs(activeOnly=true): Promise<Faq[]> { await ensureDatabase(); const q=activeOnly?"SELECT id,question,answer,category,active,sort_order AS sortOrder FROM faqs WHERE active=1 ORDER BY sort_order":"SELECT id,question,answer,category,active,sort_order AS sortOrder FROM faqs ORDER BY sort_order";return (await db().prepare(q).all<Faq>()).results; }

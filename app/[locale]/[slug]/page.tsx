@@ -8,11 +8,11 @@ import { ProgramFinder } from "@/components/ProgramFinder";
 import { PreferenceRobot } from "@/components/PreferenceRobot";
 import { UniversityCatalog } from "@/components/UniversityCatalog";
 import { FaqAccordion } from "@/components/FaqAccordion";
-import { getCatalogProgramCounts,getCatalogUniversities,getFaqs,getPrograms,getReviews,getServices,getSettings,getSiteImages,getUniversities,searchCatalogPrograms } from "@/lib/content";
+import { getAllCatalogProgramsForForm,getCatalogProgramCounts,getCatalogUniversities,getFaqs,getReviews,getServices,getSettings,getSiteImages,getUniversities,searchCatalogPrograms } from "@/lib/content";
 import { languageLabels,localizeFaqs,localizeService,pageIntro,requestText } from "@/lib/i18n";
 export const dynamic="force-dynamic";
 const pages:Record<string,{title:string;lead:string;body:string[]}>= {
-  "hakkimizda":{title:"Güven, açıklık ve özen üzerine kurulu danışmanlık.",lead:"TD Danışmanlık; eğitim ve resmî işlemlerde karmaşık adımları anlaşılır, takip edilebilir bir yolculuğa dönüştürür.",body:["Her danışanın hedefi ve koşulları farklıdır. Bu nedenle sürece hazır cevaplarla değil, dikkatli bir ihtiyaç analiziyle başlarız.","Sunduğumuz bilgi ve yönlendirmeleri güncel kaynaklara göre değerlendirir; başvurunun her aşamasında şeffaf iletişimi koruruz."]},
+  "hakkimizda":{title:"Hakkımızda",lead:"TD Danışmanlık; eğitim, üniversite başvuruları ve resmî işlemlerde karmaşık adımları anlaşılır ve takip edilebilir bir sürece dönüştürür.",body:["Her danışanın hedefi, akademik geçmişi ve koşulları farklıdır. Bu nedenle standart bir yanıt yerine ihtiyaç analiziyle başlar, uygun seçenekleri birlikte değerlendiririz.","Çalışma sürecimiz; ihtiyaçların belirlenmesi, üniversite veya hizmet seçeneklerinin karşılaştırılması, gerekli belge ve başvuru adımlarının planlanması ve sürecin düzenli takibinden oluşur.","Üniversite ve bölüm seçimi, kayıt süreçleri, ikamet izni, adres kaydı, çalışma izni, vatandaşlık, tercüme ve denklik işlemleri gibi farklı alanlarda danışmanlık sunuyoruz.","Bilgileri mümkün olduğunca güncel ve resmî kaynaklarla kontrol eder, kesin kararın üniversite veya ilgili kamu kurumu tarafından verildiği durumlarda bunu açık biçimde belirtiriz.","Türkçe, İngilizce, Rusça ve Arapça iletişim altyapımız sayesinde farklı ülkelerden danışanlarla süreci daha anlaşılır biçimde yürütebiliyoruz."]},
   "gizlilik-politikasi":{title:"Gizlilik Politikası",lead:"Kişisel verilerinizin güvenliği ve şeffaf biçimde işlenmesi bizim için önceliklidir.",body:["İletişim ve danışmanlık formları aracılığıyla paylaştığınız bilgiler yalnızca talebinizi değerlendirmek, sizinle iletişime geçmek ve hizmet sunmak amacıyla kullanılır.","Verileriniz yetkisiz erişime karşı uygun teknik ve idari tedbirlerle korunur; yasal zorunluluklar dışında üçüncü kişilerle paylaşılmaz.","Verilerinize ilişkin talepleriniz için info@tddanismanlik.com adresinden bizimle iletişime geçebilirsiniz."]},
   "kvkk-aydinlatma-metni":{title:"KVKK Aydınlatma Metni",lead:"6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamındaki bilgilendirme metni.",body:["Kimlik ve iletişim bilgileriniz; danışmanlık talebinizi almak, sizinle iletişim kurmak, hizmet süreçlerini yürütmek ve yasal yükümlülükleri yerine getirmek amacıyla işlenebilir.","Kişisel verileriniz, açık rızanız veya kanunda belirtilen hukuki sebepler doğrultusunda ve amaçla sınırlı olarak saklanır.","KVKK’nın 11. maddesi kapsamındaki haklarınızı kullanmak için info@tddanismanlik.com adresine başvurabilirsiniz. Nihai hukuki metin, şirket bilgilerinin tamamlanmasının ardından hukuk danışmanınız tarafından gözden geçirilmelidir."]},
   "cerez-politikasi":{title:"Çerez Politikası",lead:"Sitemizde hangi çerezlerin neden kullanıldığını açıkça anlatıyoruz.",body:["Zorunlu çerezler sitenin güvenli ve doğru çalışması için gereklidir. Analitik ve pazarlama çerezleri yalnızca onayınızla etkinleştirilir.","Tercihlerinizi çerez bildirimindeki seçeneklerden yönetebilir veya tarayıcınız üzerinden silebilirsiniz."]},
@@ -47,8 +47,95 @@ const catalogSourceCopy={
  ru:<>Каталог составлен на основе указанного <a href="https://index-v3-eight.vercel.app" target="_blank" rel="noopener noreferrer">источника данных</a>. Условия оплаты и приёма следует уточнять по официальным объявлениям университетов.</>,
  ar:<>تُعد بيانات الدليل استناداً إلى <a href="https://index-v3-eight.vercel.app" target="_blank" rel="noopener noreferrer">مصدر البيانات</a> المذكور. وتُعتمد الإعلانات الرسمية الحديثة للجامعات في الرسوم وشروط القبول.</>,
 } as const;
-export async function generateMetadata({params}:{params:Promise<{slug:string}>}){const {slug}=await params;if(slug==="tesekkurler")return{title:"Talebiniz Alındı | TD Danışmanlık",robots:{index:false,follow:false}};if(slug==="danismanlik-talebi")return{title:"Danışmanlık Talebi | TD Danışmanlık",description:"Eğitim ve resmî işlemler için danışmanlık talebi oluşturun."};if(slug==="iletisim")return{title:"İletişim ve Yol Tarifi | TD Danışmanlık",description:"İstanbul ofisimiz, telefon, WhatsApp ve Google Maps yol tarifi."};const sectionTitles:Record<string,string>={hizmetler:"Hizmetler",universiteler:"Türkiye Üniversiteleri",bolumler:"Bölümler","tercih-robotu":"Tercih Robotu",surec:"Çalışma Sürecimiz",yorumlar:"Danışan Görüşleri",sss:"Sık Sorulan Sorular"};if(sectionTitles[slug])return{title:`${sectionTitles[slug]} | TD Danışmanlık`};const page=pages[slug];return page?{title:`${page.title} | TD Danışmanlık`,description:page.lead}:{};}
-export default async function GenericPage({params,searchParams}:{params:Promise<{locale:string;slug:string}>;searchParams:Promise<{page?:string;q?:string;city?:string;type?:string;sort?:string;university?:string;degree?:string;language?:string;field?:string;programPage?:string}>}){const [{locale,slug},query]=await Promise.all([params,searchParams]);const initialPage=Math.max(1,Number.parseInt(query.page||"1",10)||1);const [settings,services,universities,programs,images]=await Promise.all([getSettings(),getServices(),getUniversities(),getPrograms(),getSiteImages()]);const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanlik-talebi")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.request}]}><main className="request-page"><section><p className="section-index">{t.request}</p><h1>{request.title1}<br/><em>{request.title2}</em></h1><p>{request.lead}</p><div className="request-points"><span>{request.point1}</span><span>{request.point2}</span><span>{request.point3}</span></div></section><ConsultationForm {...{services,universities,programs,locale}}/></main></InnerPage>;
+export async function generateMetadata({params}:{params:Promise<{locale:string;slug:string}>}){
+  const {locale,slug}=await params;
+
+  if(slug==="tesekkurler"){
+    return{
+      title:"Talebiniz Alındı | TD Danışmanlık",
+      robots:{index:false,follow:false}
+    };
+  }
+
+  const trMeta:Record<string,{title:string;description:string}>={
+    hakkimizda:{
+      title:"Hakkımızda | TD Danışmanlık",
+      description:"TD Danışmanlık'ın çalışma yaklaşımı, danışmanlık süreci ve eğitim ile resmî işlemlerde sunduğu destek alanları."
+    },
+    hizmetler:{
+      title:"Hizmetlerimiz | TD Danışmanlık",
+      description:"Üniversite başvuruları, ikamet, vatandaşlık ve diğer resmî işlemler için sunduğumuz danışmanlık hizmetlerini inceleyin."
+    },
+    universiteler:{
+      title:"Üniversiteler | TD Danışmanlık",
+      description:"Türkiye'deki üniversiteleri şehir, kurum türü ve program seçeneklerine göre inceleyin."
+    },
+    bolumler:{
+      title:"Bölümler ve Programlar | TD Danışmanlık",
+      description:"Üniversite bölümlerini ve programlarını eğitim dili, derece türü, şehir ve üniversiteye göre inceleyin."
+    },
+    "tercih-robotu":{
+      title:"Tercih Robotu | TD Danışmanlık",
+      description:"Eğitim düzeyi, şehir ve alan tercihlerinize göre uygun üniversite programlarını keşfedin."
+    },
+    surec:{
+      title:"Çalışma Sürecimiz | TD Danışmanlık",
+      description:"Danışmanlık sürecimizin ihtiyaç analizinden başvuru ve takibe kadar nasıl ilerlediğini inceleyin."
+    },
+    yorumlar:{
+      title:"Danışan Görüşleri | TD Danışmanlık",
+      description:"TD Danışmanlık hizmetlerinden yararlanan danışanların görüşlerini inceleyin."
+    },
+    sss:{
+      title:"Sık Sorulan Sorular | TD Danışmanlık",
+      description:"Üniversite başvuruları ve resmî işlemler hakkında sık sorulan soruların yanıtlarını inceleyin."
+    },
+    iletisim:{
+      title:"İletişim | TD Danışmanlık",
+      description:"TD Danışmanlık ile iletişime geçin ve danışmanlık süreciniz hakkında bilgi alın."
+    },
+    "danismanlik-talebi":{
+      title:"Danışmanlık Talebi | TD Danışmanlık",
+      description:"Eğitim veya resmî işlemler için danışmanlık talebinizi oluşturun."
+    },
+    "gizlilik-politikasi":{
+      title:"Gizlilik Politikası | TD Danışmanlık",
+      description:"TD Danışmanlık gizlilik politikasını inceleyin."
+    },
+    "kvkk-aydinlatma-metni":{
+      title:"KVKK Aydınlatma Metni | TD Danışmanlık",
+      description:"Kişisel verilerin işlenmesine ilişkin KVKK aydınlatma metni."
+    },
+    "cerez-politikasi":{
+      title:"Çerez Politikası | TD Danışmanlık",
+      description:"TD Danışmanlık web sitesinin çerez kullanım politikasını inceleyin."
+    },
+    "kullanim-sartlari":{
+      title:"Kullanım Şartları | TD Danışmanlık",
+      description:"TD Danışmanlık web sitesi kullanım şartlarını inceleyin."
+    }
+  };
+
+  if(locale==="tr"&&trMeta[slug]){
+    return trMeta[slug];
+  }
+
+  const page=translatedPages[locale]?.[slug]??pages[slug];
+
+  if(page){
+    return{
+      title:`${page.title} | TD Danışmanlık`,
+      description:page.lead
+    };
+  }
+
+  return{
+    title:"TD Danışmanlık",
+    description:"Eğitim, üniversite başvuruları ve resmî işlemler için danışmanlık hizmetleri."
+  };
+}
+
+export default async function GenericPage({params,searchParams}:{params:Promise<{locale:string;slug:string}>;searchParams:Promise<{page?:string;q?:string;city?:string;type?:string;sort?:string;university?:string;degree?:string;language?:string;field?:string;programPage?:string}>}){const [{locale,slug},query]=await Promise.all([params,searchParams]);const initialPage=Math.max(1,Number.parseInt(query.page||"1",10)||1);const [settings,services,universities,programs,images]=await Promise.all([getSettings(),getServices(),getUniversities(),getAllCatalogProgramsForForm(),getSiteImages()]);const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanlik-talebi")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.request}]}><main className="request-page"><section><p className="section-index">{t.request}</p><h1>{request.title1}<br/><em>{request.title2}</em></h1><p>{request.lead}</p><div className="request-points"><span>{request.point1}</span><span>{request.point2}</span><span>{request.point3}</span></div></section><ConsultationForm {...{services,universities,programs,locale}}/></main></InnerPage>;
   if(slug==="iletisim")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.contact}]}><ContactPage settings={settings} locale={locale}/></InnerPage>;
   if(slug==="tesekkurler")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:request.thanksTitle}]}><main className="thanks-page"><span>✓</span><p className="section-index">{request.thanksKicker}</p><h1>{request.thanksTitle}</h1><p>{request.thanksBody}</p><div><Link className="button button-dark" href={`/${locale}`}>{request.home}</Link>{settings.whatsapp&&<a className="button button-primary" href={`https://wa.me/${settings.whatsapp.replace(/\D/g,"")}`}>{request.whatsapp}</a>}</div></main></InnerPage>;
   if(slug==="hizmetler")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.services}]}><main className="listing-page"><header><p className="elab-kicker">{settings.siteName} / {t.services}</p><h1>{pageIntro(locale,"hizmetler")[0]}</h1><p>{pageIntro(locale,"hizmetler")[1]}</p></header><div className="listing-grid service-listing-grid">{services.map(item=>{const s=localizeService(locale,item);return <Link key={s.id} href={`/${locale}/hizmetler/${s.slug}`}><span className="listing-service-photo"><img src={s.image} alt="" loading="lazy"/></span><h2>{s.title}</h2><p>{s.summary}</p><b>{t.viewService}</b></Link>})}</div></main></InnerPage>;
@@ -58,4 +145,4 @@ export default async function GenericPage({params,searchParams}:{params:Promise<
   if(slug==="surec")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.process}]}><main className="listing-page process-listing-page"><header><p className="elab-kicker">{t.processKicker}</p><h1>{pageIntro(locale,"surec")[0]}</h1><p>{pageIntro(locale,"surec")[1]}</p></header><div className="process-showcase"><div className="process-page-grid">{[[t.meet,t.meetBody],[t.roadmap,t.roadmapBody],[t.application,t.applicationBody],[t.followup,t.followupBody]].map(([title,body],index)=><article key={title}><span>{locale==="tr"?`Aşama ${index+1}`:`0${index+1}`}</span><h2>{title}</h2><p>{body}</p></article>)}</div><aside className="process-media"><img src={images.about} alt=""/><div><strong>TD</strong><span>{settings.siteName.replace(/^TD\s+/i,"")}</span></div></aside></div><Link className="elab-pill elab-pill-blue process-page-cta" href={`/${locale}/danismanlik-talebi`}>{t.request}</Link></main></InnerPage>;
   if(slug==="sss"){const faqs=localizeFaqs(locale,await getFaqs());return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.faq}]}><main className="listing-page faq-listing-page"><header><p className="elab-kicker">{t.faqKicker}</p><h1>{pageIntro(locale,"sss")[0]}</h1><p>{pageIntro(locale,"sss")[1]}</p></header><FaqAccordion className="faq-page-list" items={faqs} showCategory/></main></InnerPage>}
   if(slug==="yorumlar"){const reviews=await getReviews();return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.reviews}]}><main className="listing-page"><header><p className="elab-kicker">{t.reviewKicker}</p><h1>{pageIntro(locale,"yorumlar")[0]}</h1><p>{pageIntro(locale,"yorumlar")[1]}</p></header>{reviews.length?<div className="review-page-grid">{reviews.map(r=><article key={r.id}><blockquote>“{r.quote}”</blockquote><div className="review-page-person"><span aria-hidden="true">{r.author.slice(0,1)}</span><p><strong>{r.author}</strong><small>{r.context}</small></p></div></article>)}</div>:<div className="empty-state">{locale==="tr"?"Henüz yayımlanmış danışan görüşü bulunmuyor.":locale==="en"?"No client feedback has been published yet.":locale==="ru"?"Отзывы клиентов пока не опубликованы.":"لم تُنشر آراء العملاء بعد."}</div>}</main></InnerPage>}
-  const page=translatedPages[locale]?.[slug]??pages[slug];if(!page)notFound();const updated=locale==="en"?"Last updated: 24 September 2026":locale==="ru"?"Обновлено: 24 сентября 2026":locale==="ar"?"آخر تحديث: 24 سبتمبر 2026":"Son güncelleme: 24 Eylül 2026";return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:page.title}]}><main className="legal-page"><header><p className="section-index">TD DANIŞMANLIK</p><h1>{page.title}</h1><p>{page.lead}</p></header><article>{page.body.map(p=><p key={p}>{p}</p>)}<small>{updated}</small></article></main></InnerPage>}
+  const page=translatedPages[locale]?.[slug]??pages[slug];if(!page)notFound();const updated=locale==="en"?"Last updated: 24 September 2026":locale==="ru"?"Обновлено: 24 сентября 2026":locale==="ar"?"آخر تحديث: 24 سبتمبر 2026":"";return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:page.title}]}><main className="legal-page"><header><p className="section-index">TD DANIŞMANLIK</p><h1>{page.title}</h1><p>{page.lead}</p></header><article>{page.body.map(p=><p key={p}>{p}</p>)}{slug!=="hakkimizda"&&<small>{updated}</small>}</article></main></InnerPage>}
