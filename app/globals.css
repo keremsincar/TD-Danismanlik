@@ -1617,7 +1617,7 @@ html,body{max-width:100%;overflow-x:hidden}
   width:min(1360px,calc(100% - 32px))!important;margin:0 auto 30px!important
 }
 .elab-inner-page .listing-page{
-  padding:64px clamp(22px,4vw,56px) 76px!important;border:1px solid var(--td-line)!important;border-radius:18px!important;background:#f7f9f8!important
+  padding:54px 0 72px!important;border:0!important;border-radius:0!important;background:transparent!important
 }
 .elab-inner-page .listing-page>header{
   display:grid!important;grid-template-columns:minmax(0,1fr) minmax(280px,.56fr)!important;column-gap:70px!important;align-items:end!important;
@@ -1634,8 +1634,8 @@ html,body{max-width:100%;overflow-x:hidden}
 
 /* Preference robot */
 .preference-premium{
-  padding:64px clamp(22px,4vw,56px) 56px!important;border:1px solid var(--td-line)!important;border-radius:18px!important;
-  background:linear-gradient(145deg,#f7f9f8 0%,#edf4f6 100%)!important;overflow:hidden!important
+  padding:52px 0 58px!important;border:0!important;border-radius:0!important;
+  background:transparent!important;overflow:visible!important
 }
 .preference-hero{display:grid!important;grid-template-columns:minmax(0,1.05fr) minmax(280px,.72fr)!important;gap:46px!important;align-items:end!important;margin-bottom:28px!important}
 .preference-hero h1{max-width:720px!important;margin:0!important;font-size:clamp(48px,4.9vw,70px)!important;line-height:.96!important}
@@ -2008,9 +2008,9 @@ html,body{max-width:100%;overflow-x:hidden}
   .compact-contact-v2{padding:58px 20px!important}.compact-contact-v2 h2{font-size:43px!important}.compact-contact-actions{grid-template-columns:1fr!important}.compact-contact-actions a:first-child{grid-column:1!important}
   .elab-inner-page .breadcrumb{padding:12px 18px!important}
   .elab-inner-page .listing-page,.elab-inner-page .preference-page,.elab-inner-page .request-page,.elab-inner-page .legal-page,.contact-premium{width:calc(100% - 16px)!important;margin-bottom:8px!important}
-  .elab-inner-page .listing-page{padding:42px 16px 52px!important;border-radius:14px!important}
+  .elab-inner-page .listing-page{padding:36px 0 48px!important;border-radius:0!important}
   .elab-inner-page .listing-page>header{margin-bottom:28px!important;padding-bottom:24px!important}.elab-inner-page .listing-page>header h1{font-size:44px!important}.elab-inner-page .listing-page>header>p:last-child{font-size:13px!important}
-  .preference-premium{padding:42px 16px!important;border-radius:14px!important}.preference-hero h1{font-size:48px!important}
+  .preference-premium{padding:36px 0 44px!important;border-radius:0!important}.preference-hero h1{font-size:44px!important}
   .preference-primary{grid-template-columns:1fr!important}.preference-primary button{min-height:50px!important}.preference-refiners{grid-template-columns:1fr!important}.preference-refiners label{border-right:0!important;border-bottom:1px solid var(--td-line)!important}.preference-refiners label:last-child{border-bottom:0!important}
   .preference-footer{flex-direction:column!important}
   .catalog-filter-primary,.catalog-filter-secondary,.program-filter-primary,.program-filter-secondary{grid-template-columns:1fr!important}
