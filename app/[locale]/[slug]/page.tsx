@@ -142,7 +142,128 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
   if(slug==="hizmetler")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.services}]}><main className="listing-page"><header><p className="elab-kicker">{settings.siteName} / {t.services}</p><h1>{pageIntro(locale,"hizmetler")[0]}</h1><p>{pageIntro(locale,"hizmetler")[1]}</p></header><div className="listing-grid service-listing-grid">{services.map(item=>{const s=localizeService(locale,item);return <Link key={s.id} href={`/${locale}/hizmetler/${s.slug}`}><span className="listing-service-photo"><img src={s.image} alt="" loading="lazy"/></span><h2>{s.title}</h2><p>{s.summary}</p><b>{t.viewService}</b></Link>})}</div></main></InnerPage>;
   if(slug==="universiteler"){const catalog=await getCatalogUniversities();const filters={query:query.q||"",city:query.city||"",type:query.type||"",sort:query.sort||"name"};const source=catalogSourceCopy[(locale in catalogSourceCopy?locale:"tr") as keyof typeof catalogSourceCopy];return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.universities}]}><main className="listing-page"><header><p className="elab-kicker">{t.universities}</p><h1>{pageIntro(locale,"universiteler")[0]}</h1><p>{pageIntro(locale,"universiteler")[1]}</p></header><UniversityCatalog universities={catalog} locale={locale} initialPage={initialPage} filters={filters} programCounts={getCatalogProgramCounts()}/><p className="catalog-source">{source}</p></main></InnerPage>}
   if(slug==="tercih-robotu"){const options=await searchCatalogPrograms({pageSize:12,sort:"degree"});return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:locale==="tr"?"Tercih Robotu":"Program Matcher"}]}><PreferenceRobot locale={locale} cities={options.cities} degrees={options.degrees} languages={options.languages} fields={options.fields}/></InnerPage>}
-  if(slug==="bolumler"){const filters={query:query.q||"",city:query.city||"",university:query.university||"",degree:query.degree||"",language:query.language||"",field:query.field||"",sort:query.sort||"degree"};const catalog=await searchCatalogPrograms({...filters,page:Math.max(1,Number.parseInt(query.programPage||"1",10)||1)});return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.programs}]}><main className="listing-page elab-finder"><header><p className="elab-kicker">{t.programs}</p><h1>{pageIntro(locale,"bolumler")[0]}</h1><p>{pageIntro(locale,"bolumler")[1]}</p></header><ProgramFinder {...catalog} filters={filters} locale={locale}/></main></InnerPage>}
+  if(slug==="bolumler"){
+  const selectedField=query.field||"";
+  const catalog=await searchCatalogPrograms({
+    field:selectedField,
+    page:1,
+    pageSize:120,
+    sort:"program-asc"
+  });
+
+  const compareTr=(a:string,b:string)=>
+    a.trim().localeCompare(b.trim(),"tr-TR",{sensitivity:"base"});
+
+  const fields=[...catalog.fields].sort(compareTr);
+
+  const universityMap=new Map<
+    string,
+    {name:string;slug:string;count:number}
+  >();
+
+  if(selectedField){
+    for(const program of catalog.programs){
+      const key=program.universitySlug;
+      const current=universityMap.get(key);
+
+      if(current){
+        current.count+=1;
+      }else{
+        universityMap.set(key,{
+          name:program.universityName,
+          slug:program.universitySlug,
+          count:1
+        });
+      }
+    }
+  }
+
+  const fieldUniversities=[...universityMap.values()]
+    .sort((a,b)=>compareTr(a.name,b.name));
+
+  const title=selectedField
+    ? `${selectedField} Bölümü`
+    : locale==="tr"
+      ? "Üniversite Bölümleri"
+      : t.programs;
+
+  const description=selectedField
+    ? `${selectedField} bölümünün bulunduğu üniversiteleri inceleyin.`
+    : "İlgilendiğiniz bölümü seçin ve bu bölümü sunan üniversiteleri görüntüleyin.";
+
+  return <InnerPage
+    settings={settings}
+    locale={locale}
+    crumbs={[
+      {label:t.home,href:`/${locale}`},
+      {label:t.programs,href:`/${locale}/bolumler`},
+      ...(selectedField?[{label:selectedField}]:[])
+    ]}
+  >
+    <main className="listing-page">
+      <header>
+        <p className="elab-kicker">{t.programs}</p>
+        <h1>{title}</h1>
+        <p>{description}</p>
+      </header>
+
+      {!selectedField ? (
+        <div className="listing-grid">
+          {fields.map(field=>(
+            <Link
+              key={field}
+              href={`/${locale}/bolumler?field=${encodeURIComponent(field)}`}
+            >
+              <h2>{field}</h2>
+              <p>
+                {locale==="tr"
+                  ?"Bu bölümü sunan üniversiteleri görüntüleyin."
+                  :"View universities offering this program."}
+              </p>
+              <b>{locale==="tr"?"Üniversiteleri Gör":"View Universities"}</b>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <>
+          <Link
+            className="elab-pill"
+            href={`/${locale}/bolumler`}
+          >
+            ← {locale==="tr"?"Tüm Bölümler":"All Programs"}
+          </Link>
+
+          <div className="listing-grid">
+            {fieldUniversities.map(university=>(
+              <Link
+                key={university.slug}
+                href={`/${locale}/universiteler/${university.slug}`}
+              >
+                <h2>{university.name}</h2>
+                <p>
+                  {university.count>1
+                    ? `${university.count} program seçeneği`
+                    : selectedField}
+                </p>
+                <b>
+                  {locale==="tr"
+                    ?"Üniversiteyi İncele"
+                    :"View University"}
+                </b>
+              </Link>
+            ))}
+          </div>
+
+          {!fieldUniversities.length&&(
+            <div className="empty-state">
+              Bu bölüm için üniversite bulunamadı.
+            </div>
+          )}
+        </>
+      )}
+    </main>
+  </InnerPage>
+}
   if(slug==="surec")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.process}]}><main className="listing-page process-listing-page"><header><p className="elab-kicker">{t.processKicker}</p><h1>{pageIntro(locale,"surec")[0]}</h1><p>{pageIntro(locale,"surec")[1]}</p></header><div className="process-showcase"><div className="process-page-grid">{[[t.meet,t.meetBody],[t.roadmap,t.roadmapBody],[t.application,t.applicationBody],[t.followup,t.followupBody]].map(([title,body],index)=><article key={title}><span>{locale==="tr"?`Aşama ${index+1}`:`0${index+1}`}</span><h2>{title}</h2><p>{body}</p></article>)}</div><aside className="process-media"><img src={images.about} alt=""/><div><strong>TD</strong><span>{settings.siteName.replace(/^TD\s+/i,"")}</span></div></aside></div><Link className="elab-pill elab-pill-blue process-page-cta" href={`/${locale}/danismanlik-talebi`}>{t.request}</Link></main></InnerPage>;
   if(slug==="sss"){const faqs=localizeFaqs(locale,await getFaqs());return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.faq}]}><main className="listing-page faq-listing-page"><header><p className="elab-kicker">{t.faqKicker}</p><h1>{pageIntro(locale,"sss")[0]}</h1><p>{pageIntro(locale,"sss")[1]}</p></header><FaqAccordion className="faq-page-list" items={faqs} showCategory/></main></InnerPage>}
   if(slug==="yorumlar"){const reviews=await getReviews();return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.reviews}]}><main className="listing-page"><header><p className="elab-kicker">{t.reviewKicker}</p><h1>{pageIntro(locale,"yorumlar")[0]}</h1><p>{pageIntro(locale,"yorumlar")[1]}</p></header>{reviews.length?<div className="review-page-grid">{reviews.map(r=><article key={r.id}><blockquote>“{r.quote}”</blockquote><div className="review-page-person"><span aria-hidden="true">{r.author.slice(0,1)}</span><p><strong>{r.author}</strong><small>{r.context}</small></p></div></article>)}</div>:<div className="empty-state">{locale==="tr"?"Henüz yayımlanmış danışan görüşü bulunmuyor.":locale==="en"?"No client feedback has been published yet.":locale==="ru"?"Отзывы клиентов пока не опубликованы.":"لم تُنشر آراء العملاء بعد."}</div>}</main></InnerPage>}
