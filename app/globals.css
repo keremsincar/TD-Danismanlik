@@ -1328,7 +1328,7 @@ html,body{max-width:100%;overflow-x:hidden}
   display:grid!important;place-items:center!important;
   font-family:var(--font-serif),serif!important;font-size:18px!important
 }
-.elab-brand>span:last-child{font-size:14px!important;letter-spacing:-.015em!important}
+.elab-brand .brand-copy{display:grid!important;gap:1px!important;line-height:1.05!important}.elab-brand .brand-copy strong{font-size:14px!important;font-weight:780!important;letter-spacing:-.015em!important}.elab-brand .brand-copy small{font-size:7px!important;font-weight:750!important;letter-spacing:.09em!important;text-transform:uppercase!important;color:#7a8991!important}
 .elab-top-nav{display:flex!important;align-items:center!important;gap:3px!important;margin-left:auto!important}
 .elab-top-nav>a{
   position:relative!important;padding:10px 9px!important;border-radius:9px!important;
@@ -1445,9 +1445,9 @@ html,body{max-width:100%;overflow-x:hidden}
   animation:td-photo-in .9s cubic-bezier(.2,.75,.2,1) both
 }
 .td-journey-card{
-  position:absolute;z-index:3;left:28px;right:28px;bottom:28px;
-  padding:16px 18px 15px;border:1px solid rgba(255,255,255,.75);border-radius:14px;
-  background:rgba(255,253,250,.92);backdrop-filter:blur(12px);box-shadow:0 15px 38px rgba(23,44,58,.12);
+  position:absolute;z-index:3;left:24px;right:auto;bottom:24px;width:min(560px,calc(100% - 48px));
+  padding:14px 16px;border:1px solid rgba(255,255,255,.78);border-radius:12px;
+  background:rgba(255,253,250,.93);backdrop-filter:blur(12px);box-shadow:0 14px 34px rgba(23,44,58,.13);
   color:var(--td-ink)
 }
 .td-journey-card small{display:block;margin-bottom:13px;color:#61737f;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
@@ -1511,13 +1511,13 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 
 /* Home university catalogue — academic index cards */
-.home-university-showcase{background:#f2f5f4!important}
+.home-university-showcase{background:#f2f5f4!important;padding-top:68px!important;padding-bottom:72px!important}.home-university-showcase .elab-section-head{margin-bottom:30px!important}.home-university-showcase .elab-section-head h2{font-size:clamp(42px,4.1vw,62px)!important;max-width:700px!important}
 .home-university-grid-v2{
   display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:0!important;
   border:1px solid var(--td-line)!important;border-radius:16px!important;overflow:hidden!important;background:var(--td-line)!important
 }
 .home-university-grid-v2>a{
-  min-height:240px!important;padding:26px!important;border:0!important;border-radius:0!important;
+  min-height:190px!important;padding:22px!important;border:0!important;border-radius:0!important;
   background:var(--td-white)!important;color:var(--td-ink)!important;display:flex!important;flex-direction:column!important;
   box-shadow:none!important;outline:1px solid var(--td-line)!important;outline-offset:-1px!important
 }
@@ -1526,8 +1526,8 @@ html,body{max-width:100%;overflow-x:hidden}
 .home-university-card-top .university-mark{width:42px!important;height:42px!important;display:grid!important;place-items:center!important}
 .home-university-card-top .university-mark img{max-width:42px!important;max-height:42px!important;object-fit:contain!important;filter:grayscale(1)!important;opacity:.72!important}
 .home-university-grid-v2 strong{
-  max-width:94%!important;margin:19px 0 20px!important;
-  font-family:var(--font-serif),serif!important;font-size:clamp(25px,2vw,32px)!important;font-weight:520!important;line-height:1.06!important;letter-spacing:-.035em!important
+  max-width:94%!important;margin:14px 0 16px!important;
+  font-family:var(--font-serif),serif!important;font-size:clamp(22px,1.7vw,28px)!important;font-weight:520!important;line-height:1.08!important;letter-spacing:-.03em!important
 }
 .home-university-card-meta{
   display:flex!important;gap:14px!important;flex-wrap:wrap!important;margin-top:auto!important;padding-top:18px!important;border-top:1px solid #e1e6e7!important
@@ -1552,7 +1552,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .home-catalog-actions a:hover{transform:translateY(-2px)!important}
 
 /* Reviews — never a giant black slab */
-.home-reviews{background:#f7f1e6!important;color:var(--td-ink)!important}
+.home-reviews{background:#f7f1e6!important;color:var(--td-ink)!important}.home-reviews.is-empty{padding-top:54px!important;padding-bottom:54px!important}.home-reviews.is-empty .elab-section-head{margin-bottom:18px!important}.home-reviews.is-empty .elab-section-head h2{font-size:clamp(38px,4vw,56px)!important}.home-reviews.is-empty .home-review-empty{max-width:920px!important;padding:20px!important}
 .home-reviews .elab-section-head>p:last-child{color:#697782!important}
 .home-review-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}
 .home-review-grid article{
@@ -1589,14 +1589,14 @@ html,body{max-width:100%;overflow-x:hidden}
 /* Homepage contact — clear exit, not a giant CTA */
 .compact-contact-v2{
   position:relative!important;display:grid!important;grid-template-columns:minmax(0,1.12fr) minmax(320px,.88fr)!important;
-  gap:64px!important;align-items:center!important;margin:0!important;padding:74px clamp(28px,5.5vw,88px)!important;
+  gap:48px!important;align-items:center!important;margin:0!important;padding:52px clamp(28px,5.5vw,88px)!important;
   border:0!important;border-bottom:1px solid var(--td-line)!important;border-radius:0!important;background:var(--td-sky)!important;overflow:hidden!important
 }
 .compact-contact-v2::before{
   content:"";position:absolute;right:-110px;top:-110px;width:280px;height:280px;border:1px solid rgba(49,94,120,.18);border-radius:50%;
   box-shadow:0 0 0 45px rgba(49,94,120,.04),0 0 0 90px rgba(49,94,120,.025)
 }
-.compact-contact-v2 h2{margin:0!important;font-family:var(--font-serif)!important;font-size:clamp(46px,5vw,72px)!important;font-weight:520!important;line-height:.98!important}
+.compact-contact-v2 h2{margin:0!important;font-family:var(--font-serif)!important;font-size:clamp(40px,4.2vw,60px)!important;font-weight:520!important;line-height:1!important}
 .compact-contact-v2>div:first-child>p:last-child{max-width:660px!important;color:#526873!important;font-size:15px!important;line-height:1.7!important}
 .compact-contact-actions{position:relative;z-index:2;display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important}
 .compact-contact-actions a{
@@ -1637,10 +1637,11 @@ html,body{max-width:100%;overflow-x:hidden}
   padding:64px clamp(22px,4vw,56px) 56px!important;border:1px solid var(--td-line)!important;border-radius:18px!important;
   background:linear-gradient(145deg,#f7f9f8 0%,#edf4f6 100%)!important;overflow:hidden!important
 }
-.preference-hero{display:grid!important;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr)!important;gap:62px!important;align-items:end!important;margin-bottom:34px!important}
-.preference-hero h1{max-width:780px!important;margin:0!important;font-size:clamp(54px,5.8vw,82px)!important;line-height:.94!important}
+.preference-hero{display:grid!important;grid-template-columns:minmax(0,1.05fr) minmax(280px,.72fr)!important;gap:46px!important;align-items:end!important;margin-bottom:28px!important}
+.preference-hero h1{max-width:720px!important;margin:0!important;font-size:clamp(48px,4.9vw,70px)!important;line-height:.96!important}
 .preference-hero>p{max-width:500px!important;margin:0 0 4px!important;color:#5f717c!important;font-size:15px!important;line-height:1.7!important}
 .preference-form-premium{
+  display:block!important;width:100%!important;grid-template-columns:none!important;gap:0!important;
   padding:0!important;border:1px solid var(--td-line-strong)!important;border-radius:14px!important;background:#fff!important;overflow:hidden!important;
   box-shadow:0 16px 34px rgba(44,72,87,.06)!important
 }
@@ -1704,8 +1705,8 @@ html,body{max-width:100%;overflow-x:hidden}
   padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#76848d!important;
   font-size:9px!important;font-weight:800!important;letter-spacing:.07em!important;text-transform:uppercase!important
 }
-.catalog-university-card h2{margin:25px 0 13px!important;font-size:22px!important;line-height:1.12!important;letter-spacing:-.025em!important;font-weight:750!important}
-.catalog-card-facts{display:flex!important;gap:18px!important;flex-wrap:wrap!important;color:#6f7c85!important;font-size:11px!important}
+.catalog-university-card h2{margin:21px 0 11px!important;font-size:21px!important;line-height:1.12!important;letter-spacing:-.025em!important;font-weight:750!important}
+.catalog-card-facts{display:flex!important;gap:16px!important;flex-wrap:wrap!important;color:#6f7c85!important;font-size:10px!important}.catalog-card-facts>span{padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:#6f7c85!important;width:auto!important;height:auto!important;display:inline!important}.catalog-card-facts>span b{display:inline!important;margin:0!important;padding:0!important}
 .catalog-card-facts b{color:var(--td-blue)!important}
 .catalog-card-cta{display:flex!important;justify-content:space-between!important;align-items:center!important;margin-top:auto!important;padding-top:18px!important;border-top:1px solid #e2e7e9!important;color:var(--td-blue)!important;font-size:11px!important;font-weight:760!important}
 .catalog-card-cta b{font-size:16px!important;transition:transform .2s ease!important}.catalog-university-card:hover .catalog-card-cta b{transform:translate(3px,-3px)}
@@ -1717,6 +1718,7 @@ html,body{max-width:100%;overflow-x:hidden}
 
 /* Program catalogue */
 .program-filter-premium{
+  display:block!important;width:100%!important;grid-template-columns:none!important;gap:0!important;
   margin-bottom:24px!important;padding:0!important;border:1px solid var(--td-line-strong)!important;border-radius:14px!important;background:#fff!important;overflow:hidden!important
 }
 .program-filter-primary{display:grid!important;grid-template-columns:minmax(260px,1fr) 170px 180px!important;border-bottom:1px solid var(--td-line)!important}
@@ -1801,10 +1803,10 @@ html,body{max-width:100%;overflow-x:hidden}
 .faq-page-list{border-top:1px solid var(--td-line)!important}
 .faq-page-list article{border:0!important;border-bottom:1px solid var(--td-line)!important;border-radius:0!important;background:transparent!important;overflow:hidden!important}
 .faq-page-list article.is-open{background:#fff!important}
-.faq-page-list button,.animated-faq button{
+.faq-accordion-list article>button{
   width:100%!important;min-height:76px!important;padding:16px 10px!important;border:0!important;background:transparent!important;color:var(--td-ink)!important;
   display:grid!important;grid-template-columns:38px minmax(0,1fr) 34px!important;align-items:center!important;gap:10px!important;text-align:left!important;cursor:pointer!important
-}
+}.faq-categories button{width:auto!important;min-width:0!important;min-height:36px!important;height:36px!important;padding:0 11px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;grid-template-columns:none!important;gap:0!important;text-align:center!important}
 .faq-number{color:#8c9aa2!important;font-size:9px!important}
 .faq-question{color:var(--td-ink)!important;font-size:16px!important;font-weight:680!important;line-height:1.35!important}
 .faq-question small{display:block!important;margin-top:5px!important;color:#7b8991!important;font-size:9px!important;font-weight:700!important;letter-spacing:.06em!important;text-transform:uppercase!important}
@@ -1932,7 +1934,7 @@ html,body{max-width:100%;overflow-x:hidden}
 /* RTL */
 [dir="rtl"].elab-page .elab-kicker::before,[dir="rtl"].elab-inner-page .elab-kicker::before{box-shadow:-14px 0 0 -3px var(--td-blue)!important}
 [dir="rtl"] .catalog-university-card::before{left:auto!important;right:0!important}
-[dir="rtl"] .faq-page-list button,[dir="rtl"] .animated-faq button{text-align:right!important}
+[dir="rtl"] .faq-accordion-list article>button{text-align:right!important}
 
 /* Responsive */
 @media(max-width:1180px){
@@ -2013,7 +2015,7 @@ html,body{max-width:100%;overflow-x:hidden}
   .catalog-filter-secondary label,.program-filter-primary label,.program-filter-secondary label{border-right:0!important;border-bottom:1px solid var(--td-line)!important}
   .catalog-university-card{min-height:220px!important}.program-card-v2{min-height:170px!important}
   .process-page-grid{grid-template-columns:1fr!important}.process-page-grid::before{display:none}.process-brand-panel{min-height:330px!important}.process-brand-panel strong{margin-top:34px!important}
-  .faq-page-list button,.animated-faq button{grid-template-columns:30px minmax(0,1fr) 32px!important;padding:14px 5px!important}.faq-question{font-size:14px!important}.faq-answer-wrap p{padding:0 38px 20px!important}
+  .faq-accordion-list article>button{grid-template-columns:30px minmax(0,1fr) 32px!important;padding:14px 5px!important}.faq-question{font-size:14px!important}.faq-answer-wrap p{padding:0 38px 20px!important}
   .contact-page-hero{min-height:auto!important;padding:42px 20px!important;border-radius:14px!important}.contact-hero-copy h1{font-size:47px!important}.contact-hero-actions a{width:100%!important}
   .contact-page-details{border-radius:14px!important}.contact-details-copy{padding:30px 20px!important}.contact-details-copy h2{font-size:40px!important}.contact-details-copy dl>div{grid-template-columns:1fr!important;gap:5px!important}.contact-route-notes{grid-template-columns:1fr!important}.contact-map-shell{min-height:380px!important}
   .contact-direct-form{padding:30px 20px!important;border-radius:14px!important}
