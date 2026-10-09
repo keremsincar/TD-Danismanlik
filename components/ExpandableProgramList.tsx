@@ -47,7 +47,7 @@ export function ExpandableProgramList({
   const [expanded,setExpanded]=useState(false);
   const t=labels[(locale in labels?locale:"tr") as keyof typeof labels];
   const visible=expanded?programs:programs.slice(0,initialCount);
-  const programName=(program:Program)=>locale==="tr"?program.name:(program.englishName||program.name);
+  const programName=(program:Program)=>locale==="tr"?(program.turkishName||program.name):(program.englishName||program.name);
 
   return (
     <div className="expandable-programs">
