@@ -174,7 +174,7 @@ const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanli
   const safeProgramPage=Math.min(currentProgramPage,programPageCount);
   const visibleProgramNames=localizedProgramOptions.slice((safeProgramPage-1)*perPage,safeProgramPage*perPage);
 
-  const selectedProgramOption=selectedProgram?catalog.programOptions.find(item=>item.key===selectedProgram):undefined;
+  const selectedProgramOption=selectedProgram?catalog.programOptions.find(item=>item.key===selectedProgram||item.name===selectedProgram||item.turkishName===selectedProgram||item.englishName===selectedProgram):undefined;
   const matchingPrograms=selectedProgram?await getProgramsForProgramIdentity(selectedProgram,{
     city:query.city||"",university:query.university||"",degree:query.degree||"",language:query.language||"",field:query.field||""
   }):[];
