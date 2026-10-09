@@ -290,11 +290,11 @@ export async function searchCatalogPrograms(options:ProgramSearch={}){
       &&(!options.field||item.field===options.field);
   }).sort(compare);
 
-  const grouped=new Map<string,{key:string;name:string;turkishName:string;englishName:string;universityCount:number;degrees:Set<string>;languages:Set<string>;fields:Set<string>}>();
+  const grouped=new Map<string,{key:string;name:string;turkishName:string;englishName:string;universities:Set<string>;degrees:Set<string>;languages:Set<string>;fields:Set<string>}>();
   for(const item of filtered){
     const key=canonicalProgramKey(item.name,item.englishName,item.turkishName);
-    const current=grouped.get(key)??{key,name:item.name.trim(),turkishName:(item.turkishName||turkishProgramName(item.name,item.englishName)).trim(),englishName:(item.englishName||item.name).trim(),universityCount:0,degrees:new Set<string>(),languages:new Set<string>(),fields:new Set<string>()};
-    current.universityCount+=1;
+    const current=grouped.get(key)??{key,name:item.name.trim(),turkishName:(item.turkishName||turkishProgramName(item.name,item.englishName)).trim(),englishName:(item.englishName||item.name).trim(),universities:new Set<string>(),degrees:new Set<string>(),languages:new Set<string>(),fields:new Set<string>()};
+    current.universities.add(item.universitySlug);
     if(item.degreeType)current.degrees.add(item.degreeType);
     if(item.language)current.languages.add(item.language);
     if(item.field)current.fields.add(item.field);
@@ -306,7 +306,7 @@ export async function searchCatalogPrograms(options:ProgramSearch={}){
     name:item.name,
     turkishName:item.turkishName,
     englishName:item.englishName,
-    universityCount:item.universityCount,
+    universityCount:item.universities.size,
     degrees:[...item.degrees],
     languages:[...item.languages],
     fields:[...item.fields],
