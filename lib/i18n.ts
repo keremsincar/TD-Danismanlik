@@ -86,12 +86,19 @@ const faqTranslations:Record<Exclude<Locale,"tr">,Record<number,[string,string]>
  11:["هل تقدمون طلب الإقامة نيابة عني؟","نوضح نطاق المساعدة بعد مراجعة حالتك. القرار النهائي للجهة المختصة."],
  12:["هل يجب زيارة المكتب؟","يمكن إجراء المحادثة الأولى هاتفياً أو عبر الإنترنت. نخبرك إذا لزم الحضور."]}
 };
-export function localizeFaqs<T extends {sortOrder:number;question:string;answer:string}>(locale:string,faqs:T[]):T[] {
+const faqCategoryTranslations={
+ en:{"Üniversite":"University","Resmî İşlemler":"Official procedures","Genel":"General","Belgeler":"Documents","Kayıt":"Enrolment"},
+ ru:{"Üniversite":"Университет","Resmî İşlemler":"Официальные процедуры","Genel":"Общее","Belgeler":"Документы","Kayıt":"Зачисление"},
+ ar:{"Üniversite":"الجامعة","Resmî İşlemler":"الإجراءات الرسمية","Genel":"عام","Belgeler":"المستندات","Kayıt":"التسجيل"}
+} as const;
+export function localizeFaqs<T extends {sortOrder:number;question:string;answer:string;category?:string}>(locale:string,faqs:T[]):T[] {
  if(locale==="tr"||!faqTranslations[locale as Exclude<Locale,"tr">])return faqs;
- const translations=faqTranslations[locale as Exclude<Locale,"tr">];
+ const selected=locale as Exclude<Locale,"tr">;
+ const translations=faqTranslations[selected];
+ const categories=faqCategoryTranslations[selected] as Record<string,string>;
  return faqs
    .filter(faq=>Boolean(translations[faq.sortOrder]))
-   .map(faq=>({...faq,question:translations[faq.sortOrder][0],answer:translations[faq.sortOrder][1]}));
+   .map(faq=>({...faq,question:translations[faq.sortOrder][0],answer:translations[faq.sortOrder][1],category:faq.category?(categories[faq.category]||faq.category):faq.category}));
 }
 const pageIntros={
  en:{hizmetler:["Services tailored to your needs.","We plan applications, enrolment and official steps around your individual circumstances."],universiteler:["University guide.","Explore public and foundation universities by city, type and establishment year. Confirm admission conditions with the institution."],bolumler:["Find a program.","Filter the supplied catalogue by city, university, degree, language and field. Confirm current fees and admission conditions in the university’s official notice."],surec:["Know every step.","Your case is unique, but we keep the timing and responsibilities clear throughout."],yorumlar:["Notes from different journeys.","Short, personal accounts from application, enrolment and document processes."],sss:["Your questions, answered.","These answers are general guidance. We clarify the details of your case in a consultation."]},
