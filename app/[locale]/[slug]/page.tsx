@@ -8,7 +8,7 @@ import { ProgramFinder } from "@/components/ProgramFinder";
 import { PreferenceRobot } from "@/components/PreferenceRobot";
 import { UniversityCatalog } from "@/components/UniversityCatalog";
 import { FaqAccordion } from "@/components/FaqAccordion";
-import { getAllCatalogProgramsForForm,getCatalogProgramCounts,getCatalogUniversities,getFaqs,getReviews,getServices,getSettings,getSiteImages,getUniversities,searchCatalogPrograms } from "@/lib/content";
+import { getCatalogProgramCounts,getCatalogUniversities,getFaqs,getReviews,getServices,getSettings,getSiteImages,getUniversities,searchCatalogPrograms } from "@/lib/content";
 import { languageLabels,localizeFaqs,localizeService,pageIntro,requestText } from "@/lib/i18n";
 export const dynamic="force-dynamic";
 const pages:Record<string,{title:string;lead:string;body:string[]}>= {
@@ -136,12 +136,12 @@ export async function generateMetadata({params}:{params:Promise<{locale:string;s
 }
 
 export default async function GenericPage({params,searchParams}:{params:Promise<{locale:string;slug:string}>;searchParams:Promise<{page?:string;q?:string;city?:string;type?:string;sort?:string;university?:string;degree?:string;language?:string;field?:string;programPage?:string;program?:string}>}){const [{locale,slug},query]=await Promise.all([params,searchParams]);const initialPage=Math.max(1,Number.parseInt(query.page||"1",10)||1);const [settings,services,universities,images]=await Promise.all([getSettings(),getServices(),getUniversities(),getSiteImages()]);
-const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():[];const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanlik-talebi")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.request}]}><main className="request-page"><section><p className="section-index">{t.request}</p><h1>{request.title1}<br/><em>{request.title2}</em></h1><p>{request.lead}</p><div className="request-points"><span>{request.point1}</span><span>{request.point2}</span><span>{request.point3}</span></div></section><ConsultationForm {...{services,universities,programs,locale}}/></main></InnerPage>;
+const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanlik-talebi")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.request}]}><main className="request-page"><section><p className="section-index">{t.request}</p><h1>{request.title1}<br/><em>{request.title2}</em></h1><p>{request.lead}</p><div className="request-points"><span>{request.point1}</span><span>{request.point2}</span><span>{request.point3}</span></div></section><ConsultationForm {...{services,universities,locale}}/></main></InnerPage>;
   if(slug==="iletisim")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.contact}]}><ContactPage settings={settings} locale={locale}/></InnerPage>;
   if(slug==="tesekkurler")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:request.thanksTitle}]}><main className="thanks-page"><span>✓</span><p className="section-index">{request.thanksKicker}</p><h1>{request.thanksTitle}</h1><p>{request.thanksBody}</p><div><Link className="button button-dark" href={`/${locale}`}>{request.home}</Link>{settings.whatsapp&&<a className="button button-primary" href={`https://wa.me/${settings.whatsapp.replace(/\D/g,"")}`}>{request.whatsapp}</a>}</div></main></InnerPage>;
   if(slug==="hizmetler")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.services}]}><main className="listing-page"><header><p className="elab-kicker">{settings.siteName} / {t.services}</p><h1>{pageIntro(locale,"hizmetler")[0]}</h1><p>{pageIntro(locale,"hizmetler")[1]}</p></header><div className="listing-grid service-listing-grid">{services.map(item=>{const s=localizeService(locale,item);return <Link key={s.id} href={`/${locale}/hizmetler/${s.slug}`}><span className="listing-service-photo"><img src={s.image} alt="" loading="lazy"/></span><h2>{s.title}</h2><p>{s.summary}</p><b>{t.viewService}</b></Link>})}</div></main></InnerPage>;
   if(slug==="universiteler"){const catalog=await getCatalogUniversities();const filters={query:query.q||"",city:query.city||"",type:query.type||"",sort:query.sort||"name"};const source=catalogSourceCopy[(locale in catalogSourceCopy?locale:"tr") as keyof typeof catalogSourceCopy];return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.universities}]}><main className="listing-page"><header><p className="elab-kicker">{t.universities}</p><h1>{pageIntro(locale,"universiteler")[0]}</h1><p>{pageIntro(locale,"universiteler")[1]}</p></header><UniversityCatalog universities={catalog} locale={locale} initialPage={initialPage} filters={filters} programCounts={getCatalogProgramCounts()}/><p className="catalog-source">{source}</p></main></InnerPage>}
-  if(slug==="tercih-robotu"){const options=await searchCatalogPrograms({pageSize:12,sort:"degree"});return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:locale==="tr"?"Tercih Robotu":"Program Matcher"}]}><PreferenceRobot locale={locale} cities={options.cities} degrees={options.degrees} languages={options.languages} fields={options.fields}/></InnerPage>}
+  if(slug==="tercih-robotu"){const options=await searchCatalogPrograms({pageSize:12,sort:"degree"});const programNames=options.programOptions.map(item=>locale==="tr"?(item.turkishName||item.name):(item.englishName||item.name));return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:locale==="tr"?"Tercih Robotu":"Program Matcher"}]}><PreferenceRobot locale={locale} cities={options.cities} degrees={options.degrees} languages={options.languages} fields={options.fields} programs={programNames}/></InnerPage>}
   if(slug==="bolumler"){
   const selectedProgram=query.program||"";
   const searchTerm=(query.q||"").trim();
@@ -173,7 +173,7 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
   const localizedProgramOptions=catalog.programOptions.map(item=>{
     const display=
       locale==="tr"
-        ? item.name
+        ? (item.turkishName||item.name)
         : locale==="en"
           ? (item.englishName||item.name)
           : locale==="ru"
@@ -256,7 +256,7 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       allPrograms:"Tüm Bölümler",
       viewUniversity:"Üniversiteyi İncele",
       noUniversities:"Bu bölüm için üniversite bulunamadı.",
-      selectedSuffix:"programının bulunduğu üniversiteleri inceleyin.",
+      selectedSuffix:"programının bulunduğu üniversiteleri inceleyin.",filters:"Gelişmiş filtreler",
       city:"Şehir",allCities:"Tüm şehirler",university:"Üniversite",allUniversities:"Tüm üniversiteler",degree:"Derece",allDegrees:"Tüm dereceler",language:"Eğitim dili",allLanguages:"Tüm diller",field:"Alan",allFields:"Tüm alanlar"
     },
     en:{
@@ -274,7 +274,7 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       allPrograms:"All Programs",
       viewUniversity:"View University",
       noUniversities:"No universities found for this program.",
-      selectedSuffix:"is offered by the following universities.",
+      selectedSuffix:"is offered by the following universities.",filters:"Advanced filters",
       city:"City",allCities:"All cities",university:"University",allUniversities:"All universities",degree:"Degree",allDegrees:"All degrees",language:"Teaching language",allLanguages:"All languages",field:"Field",allFields:"All fields"
     },
     ru:{
@@ -292,7 +292,7 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       allPrograms:"Все программы",
       viewUniversity:"Смотреть университет",
       noUniversities:"Для этой программы университеты не найдены.",
-      selectedSuffix:"доступна в следующих университетах.",
+      selectedSuffix:"доступна в следующих университетах.",filters:"Дополнительные фильтры",
       city:"Город",allCities:"Все города",university:"Университет",allUniversities:"Все университеты",degree:"Степень",allDegrees:"Все степени",language:"Язык обучения",allLanguages:"Все языки",field:"Направление",allFields:"Все направления"
     },
     ar:{
@@ -310,7 +310,7 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       allPrograms:"جميع البرامج",
       viewUniversity:"عرض الجامعة",
       noUniversities:"لم يتم العثور على جامعات لهذا البرنامج.",
-      selectedSuffix:"متاح في الجامعات التالية.",
+      selectedSuffix:"متاح في الجامعات التالية.",filters:"فلاتر متقدمة",
       city:"المدينة",allCities:"كل المدن",university:"الجامعة",allUniversities:"كل الجامعات",degree:"الدرجة",allDegrees:"كل الدرجات",language:"لغة الدراسة",allLanguages:"كل اللغات",field:"المجال",allFields:"كل المجالات"
     }
   } as const;
@@ -378,73 +378,34 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       {!selectedProgram ? (
         <>
           <form className="program-filter-bar" method="get">
-            <label>
-              <span>{pc.search}</span>
-              <input
-                type="search"
-                name="q"
-                defaultValue={searchTerm}
-                placeholder={pc.placeholder}
-              />
-            </label>
+            <div className="program-filter-main">
+              <label className="program-search-field">
+                <span>{pc.search}</span>
+                <input type="search" name="q" defaultValue={searchTerm} placeholder={pc.placeholder}/>
+              </label>
+              <label className="program-sort-field">
+                <span>{pc.sort}</span>
+                <select name="sort" defaultValue={sortMode}>
+                  <option value="asc">A → Z</option>
+                  <option value="desc">Z → A</option>
+                </select>
+              </label>
+              <button className="button button-primary" type="submit">{pc.apply}</button>
+              {(searchTerm||sortMode==="desc"||query.city||query.university||query.degree||query.language||query.field)&&(
+                <Link className="program-filter-clear" href={"/"+locale+"/bolumler"}>{pc.clear}</Link>
+              )}
+            </div>
 
-            <label>
-              <span>{pc.city}</span>
-              <select name="city" defaultValue={query.city||""}>
-                <option value="">{pc.allCities}</option>
-                {catalog.cities.map(city=><option key={city} value={city}>{city}</option>)}
-              </select>
-            </label>
-
-            <label>
-              <span>{pc.university}</span>
-              <select name="university" defaultValue={query.university||""}>
-                <option value="">{pc.allUniversities}</option>
-                {catalog.universities.map(university=><option key={university.slug} value={university.slug}>{university.name}</option>)}
-              </select>
-            </label>
-
-            <label>
-              <span>{pc.degree}</span>
-              <select name="degree" defaultValue={query.degree||""}>
-                <option value="">{pc.allDegrees}</option>
-                {catalog.degrees.map(value=><option key={value} value={value}>{value}</option>)}
-              </select>
-            </label>
-
-            <label>
-              <span>{pc.language}</span>
-              <select name="language" defaultValue={query.language||""}>
-                <option value="">{pc.allLanguages}</option>
-                {catalog.languages.map(value=><option key={value} value={value}>{value}</option>)}
-              </select>
-            </label>
-
-            <label>
-              <span>{pc.field}</span>
-              <select name="field" defaultValue={query.field||""}>
-                <option value="">{pc.allFields}</option>
-                {catalog.fields.map(value=><option key={value} value={value}>{value}</option>)}
-              </select>
-            </label>
-
-            <label>
-              <span>{pc.sort}</span>
-              <select name="sort" defaultValue={sortMode}>
-                <option value="asc">A → Z</option>
-                <option value="desc">Z → A</option>
-              </select>
-            </label>
-
-            <button className="button button-primary" type="submit">
-              {pc.apply}
-            </button>
-
-            {(searchTerm||sortMode==="desc"||query.city||query.university||query.degree||query.language||query.field)&&(
-              <Link className="program-filter-clear" href={`/${locale}/bolumler`}>
-                {pc.clear}
-              </Link>
-            )}
+            <details className="program-advanced-filters" open={Boolean(query.city||query.university||query.degree||query.language||query.field)}>
+              <summary>{pc.filters}</summary>
+              <div className="program-advanced-filter-grid">
+                <label><span>{pc.city}</span><select name="city" defaultValue={query.city||""}><option value="">{pc.allCities}</option>{catalog.cities.map(city=><option key={city} value={city}>{city}</option>)}</select></label>
+                <label><span>{pc.university}</span><select name="university" defaultValue={query.university||""}><option value="">{pc.allUniversities}</option>{catalog.universities.map(university=><option key={university.slug} value={university.slug}>{university.name}</option>)}</select></label>
+                <label><span>{pc.degree}</span><select name="degree" defaultValue={query.degree||""}><option value="">{pc.allDegrees}</option>{catalog.degrees.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
+                <label><span>{pc.language}</span><select name="language" defaultValue={query.language||""}><option value="">{pc.allLanguages}</option>{catalog.languages.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
+                <label><span>{pc.field}</span><select name="field" defaultValue={query.field||""}><option value="">{pc.allFields}</option>{catalog.fields.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
+              </div>
+            </details>
           </form>
 
           <div className="program-results-meta">
