@@ -18,7 +18,7 @@ export function SiteHeader({settings,locale="tr"}:{settings:SiteSettings;locale?
     [`${home}/iletisim`,t.contact],
   ] as const;
   return <header className="site-header elab-header">
-    <Link className="brand elab-brand" href={home} aria-label={`${settings.siteName} ana sayfa`}><span className="brand-mark">TD</span><span>{settings.siteName.replace(/^TD\s+/i,"")}</span></Link>
+    <Link className="brand elab-brand" href={home} aria-label={`${settings.siteName} ana sayfa`}><span className="brand-mark">TD</span><span className="brand-copy"><strong>{settings.siteName.replace(/^TD\s+/i,"")}</strong><small>{locale==="tr"?"Eğitim · Başvuru · Süreç":locale==="en"?"Education · Application · Process":locale==="ru"?"Образование · Подача · Процесс":"التعليم · التقديم · الإجراءات"}</small></span></Link>
     <nav className="elab-nav elab-top-nav" aria-label={t.menu}>
       {links.map(([href,label])=><Link href={href} key={href}>{label}</Link>)}
       <Link className="top-nav-request" href={`${home}/danismanlik-talebi`}>{t.request}</Link>
