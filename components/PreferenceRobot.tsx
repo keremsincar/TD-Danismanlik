@@ -9,6 +9,8 @@ const copy={
 
 export function PreferenceRobot({locale,cities,degrees,languages,fields,programs}:{locale:string;cities:string[];degrees:string[];languages:string[];fields:string[];programs:string[]}){
  const t=copy[(locale in copy?locale:"tr") as keyof typeof copy];
+ const degreeLabel=(value:string)=>({tr:{"Ön Lisans":"Ön Lisans","Lisans":"Lisans","Yüksek Lisans":"Yüksek Lisans","Doktora":"Doktora"},en:{"Ön Lisans":"Associate","Lisans":"Bachelor","Yüksek Lisans":"Master","Doktora":"Doctorate"},ru:{"Ön Lisans":"Колледж","Lisans":"Бакалавриат","Yüksek Lisans":"Магистратура","Doktora":"Докторантура"},ar:{"Ön Lisans":"دبلوم","Lisans":"بكالوريوس","Yüksek Lisans":"ماجستير","Doktora":"دكتوراه"}}[(locale==="en"||locale==="ru"||locale==="ar"?locale:"tr") as "tr"|"en"|"ru"|"ar"] as Record<string,string>)[value]||value;
+ const languageLabel=(value:string)=>({tr:{"Türkçe":"Türkçe","İngilizce":"İngilizce"},en:{"Türkçe":"Turkish","İngilizce":"English"},ru:{"Türkçe":"Турецкий","İngilizce":"Английский"},ar:{"Türkçe":"التركية","İngilizce":"الإنجليزية"}}[(locale==="en"||locale==="ru"||locale==="ar"?locale:"tr") as "tr"|"en"|"ru"|"ar"] as Record<string,string>)[value]||value;
  return <main className="preference-page preference-premium">
   <header className="preference-hero">
     <div><p className="elab-kicker">{t.kicker}</p><h1>{t.title}</h1></div>
@@ -21,10 +23,10 @@ export function PreferenceRobot({locale,cities,degrees,languages,fields,programs
     <button type="submit">{t.submit}<span aria-hidden="true">↗</span></button>
    </div>
    <div className="preference-refiners">
-    <label><span>01 · {t.degree}</span><select name="degree" defaultValue=""><option value="">{t.all}</option>{degrees.map(value=><option key={value}>{value}</option>)}</select></label>
+    <label><span>01 · {t.degree}</span><select name="degree" defaultValue=""><option value="">{t.all}</option>{degrees.map(value=><option key={value} value={value}>{degreeLabel(value)}</option>)}</select></label>
     <label><span>02 · {t.field}</span><select name="field" defaultValue=""><option value="">{t.all}</option>{fields.map(value=><option key={value}>{value}</option>)}</select></label>
     <label><span>03 · {t.city}</span><select name="city" defaultValue=""><option value="">{t.all}</option>{cities.map(value=><option key={value}>{value}</option>)}</select></label>
-    <label><span>04 · {t.language}</span><select name="language" defaultValue=""><option value="">{t.all}</option>{languages.map(value=><option key={value}>{value}</option>)}</select></label>
+    <label><span>04 · {t.language}</span><select name="language" defaultValue=""><option value="">{t.all}</option>{languages.map(value=><option key={value} value={value}>{languageLabel(value)}</option>)}</select></label>
    </div>
   </form>
   <footer className="preference-footer"><p>{t.note}</p><Link href={`/${locale}/bolumler`}>{t.browse}<span aria-hidden="true">→</span></Link></footer>
