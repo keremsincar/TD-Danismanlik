@@ -1053,3 +1053,198 @@ html,body{max-width:100%;overflow-x:hidden}
     padding:24px !important;
   }
 }
+
+/* ===== UNIVERSITY PROGRAM LIST REDESIGN ===== */
+
+.expandable-programs{
+  width:100%;
+}
+
+.university-program-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+
+.university-program-card{
+  display:flex;
+  flex-direction:column;
+  min-height:210px;
+  padding:24px;
+  border:1px solid rgba(31,45,61,.12);
+  border-radius:20px;
+  background:#fff;
+  text-decoration:none;
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+}
+
+.university-program-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(80,119,154,.32);
+  box-shadow:0 14px 32px rgba(31,45,61,.08);
+}
+
+.university-program-card-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:18px;
+}
+
+.university-program-card-copy{
+  min-width:0;
+}
+
+.university-program-degree{
+  display:inline-block;
+  margin-bottom:10px;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#728194;
+}
+
+.university-program-card h3{
+  margin:0;
+  font-size:clamp(24px,2vw,34px);
+  line-height:1.05;
+  letter-spacing:-.025em;
+  color:#1c252e;
+}
+
+.university-program-arrow{
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  width:42px;
+  height:42px;
+  border:1px solid #d5e0e8;
+  border-radius:12px;
+  background:#f7fafc;
+  color:#58728a;
+  font-size:20px;
+  transition:transform .18s ease,background .18s ease;
+}
+
+.university-program-card:hover .university-program-arrow{
+  transform:translate(2px,-2px);
+  background:#eef5fa;
+}
+
+.university-program-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 22px;
+  margin-top:24px;
+  padding-top:18px;
+  border-top:1px solid #edf1f4;
+}
+
+.university-program-meta span{
+  display:grid;
+  gap:4px;
+  font-size:14px;
+  color:#536477;
+}
+
+.university-program-meta b{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+  color:#8a98a8;
+}
+
+.university-program-card-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-top:auto;
+  padding-top:22px;
+  font-size:14px;
+  font-weight:800;
+  color:#577995;
+}
+
+.program-list-toggle{
+  width:100%;
+  min-height:58px;
+  margin-top:24px;
+  padding:0 22px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  border:1px solid #cbd8e3;
+  border-radius:16px;
+  background:#f4f8fb;
+  color:#35536d;
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+  transition:background .18s ease,border-color .18s ease;
+}
+
+.program-list-toggle:hover{
+  background:#edf4f8;
+  border-color:#adc0d1;
+}
+
+.program-list-section{
+  display:grid;
+  grid-template-columns:minmax(260px,340px) minmax(0,1fr);
+  gap:56px;
+  align-items:start;
+}
+
+.program-list-section>div:first-child{
+  position:sticky;
+  top:110px;
+}
+
+.program-list-section>div:first-child h2{
+  margin:0 0 18px;
+}
+
+.program-list-section>div:first-child p{
+  line-height:1.65;
+}
+
+.program-filter-link{
+  display:inline-flex;
+  margin-top:8px;
+}
+
+@media (max-width:1100px){
+  .program-list-section{
+    grid-template-columns:1fr;
+    gap:32px;
+  }
+
+  .program-list-section>div:first-child{
+    position:static;
+  }
+}
+
+@media (max-width:760px){
+  .university-program-grid{
+    grid-template-columns:1fr;
+  }
+
+  .university-program-card{
+    min-height:auto;
+    padding:20px;
+  }
+
+  .university-program-card h3{
+    font-size:28px;
+  }
+
+  .university-program-meta{
+    margin-top:20px;
+  }
+}
