@@ -20,6 +20,6 @@ export function SiteHeader({settings,locale="tr"}:{settings:SiteSettings;locale?
       <Link href={`${home}/iletisim`}>{t.contact}</Link>
       <Link className="top-nav-request" href={`${home}/danismanlik-talebi`}>{t.request}</Link>
     </nav>
-    <div className="header-actions elab-header-actions"><LanguageMenu locale={locale}/><Link className="admin-header-link" href="/admin/login">{t.admin}</Link></div>
+    <div className="header-actions elab-header-actions"><LanguageMenu locale={locale}/></div>
   </header>;
 }

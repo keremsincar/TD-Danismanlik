@@ -1248,3 +1248,113 @@ html,body{max-width:100%;overflow-x:hidden}
     margin-top:20px;
   }
 }
+
+
+/* ===== PROFESSIONAL SITE POLISH ===== */
+
+.home-trust-strip{
+  max-width:1240px;
+  margin:0 auto;
+  padding:22px 28px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:1px;
+  border:1px solid #e2e8ee;
+  border-radius:20px;
+  background:#e2e8ee;
+  overflow:hidden;
+}
+
+.home-trust-strip>div{
+  min-height:110px;
+  padding:22px 24px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:8px;
+  background:#fff;
+}
+
+.home-trust-strip strong{
+  font-size:15px;
+  letter-spacing:.01em;
+  color:#202a34;
+}
+
+.home-trust-strip span{
+  color:#667789;
+  line-height:1.55;
+  font-size:14px;
+}
+
+.program-filter-bar{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+  align-items:end;
+}
+
+.program-filter-bar label{
+  min-width:0;
+}
+
+.program-filter-bar input,
+.program-filter-bar select{
+  width:100%;
+}
+
+.program-filter-bar .button{
+  min-height:48px;
+}
+
+.top-nav-request{
+  border:1px solid rgba(32,37,43,.15);
+  border-radius:999px;
+  padding:10px 16px !important;
+  font-weight:700;
+  background:#20252b;
+  color:#fff !important;
+}
+
+[dir="rtl"] .university-program-arrow,
+[dir="rtl"] .university-program-card-footer span:last-child{
+  transform:scaleX(-1);
+}
+
+[dir="rtl"] .university-program-card:hover .university-program-arrow{
+  transform:scaleX(-1) translate(2px,-2px);
+}
+
+[dir="rtl"] .program-pagination,
+[dir="rtl"] .breadcrumb{
+  direction:rtl;
+}
+
+@media (max-width:980px){
+  .home-trust-strip{
+    grid-template-columns:1fr;
+  }
+
+  .program-filter-bar{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width:640px){
+  .home-trust-strip{
+    padding:1px;
+    border-radius:16px;
+  }
+
+  .home-trust-strip>div{
+    min-height:auto;
+    padding:18px;
+  }
+
+  .program-filter-bar{
+    grid-template-columns:1fr;
+  }
+
+  .top-nav-request{
+    border-radius:12px;
+  }
+}
