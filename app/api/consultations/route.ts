@@ -1,6 +1,7 @@
 import { env } from "cloudflare:workers";
 import { NextResponse } from "next/server";
 import { ensureDatabase, getSettings, rawDatabase } from "@/lib/content";
+import { getNotificationAdminEmails, PRIMARY_ADMIN_EMAIL } from "@/lib/admin";
 
 const clean = (value:unknown,max=500) => typeof value === "string" ? value.trim().slice(0,max) : "";
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,9 +24,11 @@ export async function POST(request:Request) {
   const createdAt=new Date().toISOString();
   await d1.prepare("INSERT INTO consultation_requests (name,phone,whatsapp,email,service,university,program,message,preferred_contact,kvkk_accepted_at,status,admin_note,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,'NEW','',?)").bind(data.name,data.phone,data.whatsapp,data.email,data.service,data.university||null,data.program||null,data.message,data.preferredContact,createdAt,createdAt).run();
   const settings=await getSettings();
+  const adminEmails=await getNotificationAdminEmails();
+  const recipients=adminEmails.length?adminEmails:[settings.email||PRIMARY_ADMIN_EMAIL];
   const resend=(env as unknown as {RESEND_API_KEY?:string}).RESEND_API_KEY;
   if (resend) {
-    await fetch("https://api.resend.com/emails",{method:"POST",headers:{Authorization:`Bearer ${resend}`,"Content-Type":"application/json"},body:JSON.stringify({from:"TD Danışmanlık <bildirim@tddanismanlik.com>",to:[settings.email],subject:`Yeni danışmanlık talebi — ${data.name}`,html:`<h2>Yeni Danışmanlık Talebi</h2><p><b>Ad Soyad:</b> ${escapeHtml(data.name)}</p><p><b>Telefon:</b> ${escapeHtml(data.phone)}</p><p><b>E-mail:</b> ${escapeHtml(data.email)}</p><p><b>Hizmet:</b> ${escapeHtml(data.service)}</p><p><b>Mesaj:</b> ${escapeHtml(data.message)}</p>`})}).catch(()=>null);
+    await fetch("https://api.resend.com/emails",{method:"POST",headers:{Authorization:`Bearer ${resend}`,"Content-Type":"application/json"},body:JSON.stringify({from:"TD Danışmanlık <bildirim@tddanismanlik.com>",to:recipients,subject:`Yeni danışmanlık talebi — ${data.name}`,html:`<h2>Yeni Danışmanlık Talebi</h2><p><b>Ad Soyad:</b> ${escapeHtml(data.name)}</p><p><b>Telefon:</b> ${escapeHtml(data.phone)}</p><p><b>E-mail:</b> ${escapeHtml(data.email)}</p><p><b>Hizmet:</b> ${escapeHtml(data.service)}</p><p><b>Mesaj:</b> ${escapeHtml(data.message)}</p>`})}).catch(()=>null);
   }
   return NextResponse.json({ok:true});
 }

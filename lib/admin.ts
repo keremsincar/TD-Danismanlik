@@ -71,6 +71,12 @@ export async function getAdminUsers():Promise<AdminAccount[]> {
   return (await rawDatabase().prepare("SELECT id,email,name,role,active,created_at AS createdAt,updated_at AS updatedAt,last_login_at AS lastLoginAt FROM admin_users ORDER BY CASE role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END,name").all<AdminAccount>()).results;
 }
 
+export async function getNotificationAdminEmails():Promise<string[]> {
+  await ensureBootstrapOwner();
+  const row=await rawDatabase().prepare("SELECT email FROM admin_users WHERE active=1 AND role IN ('owner','admin') ORDER BY CASE WHEN last_login_at IS NULL THEN 1 ELSE 0 END,last_login_at DESC,CASE role WHEN 'owner' THEN 0 ELSE 1 END,id LIMIT 1").first<{email:string}>();
+  return row?.email?.trim()?[row.email.trim().toLowerCase()]:[];
+}
+
 export async function createAdminSession(userId:number) {
   await ensureDatabase();
   const token=randomToken(32),tokenHash=await sha256(token),now=new Date(),expires=new Date(now.getTime()+SESSION_DAYS*86400000);
