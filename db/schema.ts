@@ -94,3 +94,16 @@ export const adminSessions = sqliteTable("admin_sessions", {
   expiresAt: text("expires_at").notNull(),
   createdAt: text("created_at").notNull(),
 }, table => [index("idx_admin_sessions_user_id").on(table.userId)]);
+
+
+export const adminLoginChallenges = sqliteTable("admin_login_challenges", {
+  id: text("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => adminUsers.id),
+  email: text("email").notNull(),
+  codeHash: text("code_hash").notNull(),
+  ip: text("ip").notNull(),
+  userAgent: text("user_agent").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  attempts: integer("attempts").notNull().default(0),
+  createdAt: text("created_at").notNull(),
+}, table => [index("idx_admin_login_challenges_user_expiry").on(table.userId, table.expiresAt)]);
