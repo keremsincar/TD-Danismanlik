@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { NextResponse } from "next/server";
-import { ensureDatabase, getSettings, rawDatabase } from "@/lib/content";
-import { getNotificationAdminEmails, PRIMARY_ADMIN_EMAIL } from "@/lib/admin";
+import { ensureDatabase, rawDatabase } from "@/lib/content";
+import { PRIMARY_ADMIN_EMAIL } from "@/lib/admin";
 
 const clean = (value:unknown,max=500) => typeof value === "string" ? value.trim().slice(0,max) : "";
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,9 +23,7 @@ export async function POST(request:Request) {
   if (!limit || limit.resetAt<=now) await d1.prepare("INSERT INTO rate_limits (key,count,reset_at) VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET count=1,reset_at=excluded.reset_at").bind(key,now+3600000).run(); else await d1.prepare("UPDATE rate_limits SET count=count+1 WHERE key=?").bind(key).run();
   const createdAt=new Date().toISOString();
   await d1.prepare("INSERT INTO consultation_requests (name,phone,whatsapp,email,service,university,program,message,preferred_contact,kvkk_accepted_at,status,admin_note,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,'NEW','',?)").bind(data.name,data.phone,data.whatsapp,data.email,data.service,data.university||null,data.program||null,data.message,data.preferredContact,createdAt,createdAt).run();
-  const settings=await getSettings();
-  const adminEmails=await getNotificationAdminEmails();
-  const recipients=adminEmails.length?adminEmails:[settings.email||PRIMARY_ADMIN_EMAIL];
+  const recipients=[PRIMARY_ADMIN_EMAIL];
   const resend=(env as unknown as {RESEND_API_KEY?:string}).RESEND_API_KEY;
   if (resend) {
     await fetch("https://api.resend.com/emails",{method:"POST",headers:{Authorization:`Bearer ${resend}`,"Content-Type":"application/json"},body:JSON.stringify({from:"TD Danışmanlık <bildirim@tddanismanlik.com>",to:recipients,subject:`Yeni danışmanlık talebi — ${data.name}`,html:`<h2>Yeni Danışmanlık Talebi</h2><p><b>Ad Soyad:</b> ${escapeHtml(data.name)}</p><p><b>Telefon:</b> ${escapeHtml(data.phone)}</p><p><b>E-mail:</b> ${escapeHtml(data.email)}</p><p><b>Hizmet:</b> ${escapeHtml(data.service)}</p><p><b>Mesaj:</b> ${escapeHtml(data.message)}</p>`})}).catch(()=>null);
