@@ -47,7 +47,8 @@ function turkishProgramName(name:string,englishName?:string){
   return turkishNameByEnglish.get(key)||turkishProgramOverrides.get(key)||name;
 }
 
-const referenceProgramBySlug=new Map(referencePrograms.map(item=>[item.slug,item] as const));\nconst referenceProgramCounts=referencePrograms.reduce<Record<string,number>>((counts,item)=>{counts[item.universitySlug]=(counts[item.universitySlug]||0)+1;return counts;},{});
+const referenceProgramBySlug=new Map(referencePrograms.map(item=>[item.slug,item] as const));
+const referenceProgramCounts=referencePrograms.reduce<Record<string,number>>((counts,item)=>{counts[item.universitySlug]=(counts[item.universitySlug]||0)+1;return counts;},{});
 export type Consultation = { id:number; name:string; phone:string; whatsapp:string; email:string; service:string; university:string|null; program:string|null; message:string; preferredContact:string; kvkkAcceptedAt:string; status:string; adminNote:string; createdAt:string };
 
 const defaultSettings: SiteSettings = {
