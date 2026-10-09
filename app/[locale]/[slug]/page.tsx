@@ -8,7 +8,7 @@ import { ProgramFinder } from "@/components/ProgramFinder";
 import { PreferenceRobot } from "@/components/PreferenceRobot";
 import { UniversityCatalog } from "@/components/UniversityCatalog";
 import { FaqAccordion } from "@/components/FaqAccordion";
-import { getCatalogProgramCounts,getCatalogUniversities,getFaqs,getReviews,getServices,getSettings,getSiteImages,getUniversities,searchCatalogPrograms } from "@/lib/content";
+import { getCatalogProgramCounts,getCatalogUniversities,getFaqs,getProgramsForProgramIdentity,getReviews,getServices,getSettings,getSiteImages,getUniversities,searchCatalogPrograms } from "@/lib/content";
 import { languageLabels,localizeFaqs,localizeService,pageIntro,requestText } from "@/lib/i18n";
 export const dynamic="force-dynamic";
 const pages:Record<string,{title:string;lead:string;body:string[]}>= {
@@ -141,16 +141,16 @@ const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanli
   if(slug==="tesekkurler")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:request.thanksTitle}]}><main className="thanks-page"><span>✓</span><p className="section-index">{request.thanksKicker}</p><h1>{request.thanksTitle}</h1><p>{request.thanksBody}</p><div><Link className="button button-dark" href={`/${locale}`}>{request.home}</Link>{settings.whatsapp&&<a className="button button-primary" href={`https://wa.me/${settings.whatsapp.replace(/\D/g,"")}`}>{request.whatsapp}</a>}</div></main></InnerPage>;
   if(slug==="hizmetler")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.services}]}><main className="listing-page"><header><p className="elab-kicker">{settings.siteName} / {t.services}</p><h1>{pageIntro(locale,"hizmetler")[0]}</h1><p>{pageIntro(locale,"hizmetler")[1]}</p></header><div className="listing-grid service-listing-grid">{services.map(item=>{const s=localizeService(locale,item);return <Link key={s.id} href={`/${locale}/hizmetler/${s.slug}`}><span className="listing-service-photo"><img src={s.image} alt="" loading="lazy"/></span><h2>{s.title}</h2><p>{s.summary}</p><b>{t.viewService}</b></Link>})}</div></main></InnerPage>;
   if(slug==="universiteler"){const catalog=await getCatalogUniversities();const filters={query:query.q||"",city:query.city||"",type:query.type||"",sort:query.sort||"name"};const source=catalogSourceCopy[(locale in catalogSourceCopy?locale:"tr") as keyof typeof catalogSourceCopy];return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.universities}]}><main className="listing-page"><header><p className="elab-kicker">{t.universities}</p><h1>{pageIntro(locale,"universiteler")[0]}</h1><p>{pageIntro(locale,"universiteler")[1]}</p></header><UniversityCatalog universities={catalog} locale={locale} initialPage={initialPage} filters={filters} programCounts={getCatalogProgramCounts()}/><p className="catalog-source">{source}</p></main></InnerPage>}
-  if(slug==="tercih-robotu"){const options=await searchCatalogPrograms({pageSize:12,sort:"degree"});const programNames=options.programOptions.map(item=>locale==="tr"?(item.turkishName||item.name):(item.englishName||item.name));return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:locale==="tr"?"Tercih Robotu":"Program Matcher"}]}><PreferenceRobot locale={locale} cities={options.cities} degrees={options.degrees} languages={options.languages} fields={options.fields} programs={programNames}/></InnerPage>}
+  if(slug==="tercih-robotu"){const options=await searchCatalogPrograms({pageSize:12,sort:"degree"});const programNames=[...new Set(options.programOptions.map(item=>locale==="tr"?(item.turkishName||item.name):(item.englishName||item.name)))].sort((a,b)=>a.localeCompare(b,locale==="tr"?"tr-TR":"en",{sensitivity:"base"}));return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:locale==="tr"?"Tercih Robotu":"Program Matcher"}]}><PreferenceRobot locale={locale} cities={options.cities} degrees={options.degrees} languages={options.languages} fields={options.fields} programs={programNames}/></InnerPage>}
   if(slug==="bolumler"){
   const selectedProgram=query.program||"";
   const searchTerm=(query.q||"").trim();
   const sortMode=query.sort==="desc"?"desc":"asc";
   const currentProgramPage=Math.max(1,Number.parseInt(query.programPage||"1",10)||1);
-  const perPage=24;
+  const perPage=18;
 
   const catalog=await searchCatalogPrograms({
-    query:selectedProgram,
+    query:selectedProgram?"":searchTerm,
     city:query.city||"",
     university:query.university||"",
     degree:query.degree||"",
@@ -161,189 +161,49 @@ const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanli
     sort:"program-asc"
   });
 
-  const compareTr=(a:string,b:string)=>
-    a.trim().localeCompare(b.trim(),"tr-TR",{sensitivity:"base"});
-
-  const normalize=(value:string)=>
-    value.toLocaleLowerCase("tr-TR")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g,"")
-      .replace(/ı/g,"i");
-
+  const compareLocale=(a:string,b:string)=>a.trim().localeCompare(b.trim(),locale==="tr"?"tr-TR":locale,{sensitivity:"base"});
   const localizedProgramOptions=catalog.programOptions.map(item=>{
-    const display=
-      locale==="tr"
-        ? (item.turkishName||item.name)
-        : locale==="en"
-          ? (item.englishName||item.name)
-          : locale==="ru"
-            ? (item.russianName||item.englishName||item.name)
-            : locale==="ar"
-              ? (item.arabicName||item.englishName||item.name)
-              : (item.englishName||item.name);
+    const display=locale==="tr"
+      ? (item.turkishName||item.name)
+      : locale==="en"
+        ? (item.englishName||item.name)
+        : (item.englishName||item.name);
+    return {...item,display};
+  }).sort((a,b)=>sortMode==="desc"?compareLocale(b.display,a.display):compareLocale(a.display,b.display));
 
-    return {
-      canonical:item.name,
-      display
-    };
-  });
-
-  const filteredProgramNames=localizedProgramOptions
-    .filter(item=>
-      !searchTerm||
-      normalize(item.display).includes(normalize(searchTerm))||
-      normalize(item.canonical).includes(normalize(searchTerm))
-    )
-    .sort((a,b)=>
-      sortMode==="desc"
-        ? compareTr(b.display,a.display)
-        : compareTr(a.display,b.display)
-    );
-
-  const programPageCount=Math.max(1,Math.ceil(filteredProgramNames.length/perPage));
+  const programPageCount=Math.max(1,Math.ceil(localizedProgramOptions.length/perPage));
   const safeProgramPage=Math.min(currentProgramPage,programPageCount);
+  const visibleProgramNames=localizedProgramOptions.slice((safeProgramPage-1)*perPage,safeProgramPage*perPage);
 
-  const visibleProgramNames=filteredProgramNames.slice(
-    (safeProgramPage-1)*perPage,
-    safeProgramPage*perPage
-  );
+  const selectedProgramOption=selectedProgram?catalog.programOptions.find(item=>item.key===selectedProgram):undefined;
+  const matchingPrograms=selectedProgram?await getProgramsForProgramIdentity(selectedProgram,{
+    city:query.city||"",university:query.university||"",degree:query.degree||"",language:query.language||"",field:query.field||""
+  }):[];
 
-  const matchingPrograms=selectedProgram
-    ? catalog.programs.filter(
-        program=>program.name.trim().localeCompare(
-          selectedProgram.trim(),
-          "tr-TR",
-          {sensitivity:"base"}
-        )===0
-      )
-    : [];
-
-  const universityMap=new Map<
-    string,
-    {name:string;slug:string;count:number}
-  >();
-
+  const universityMap=new Map<string,{name:string;slug:string;degrees:Set<string>;languages:Set<string>}>();
   for(const program of matchingPrograms){
-    const current=universityMap.get(program.universitySlug);
-
-    if(current){
-      current.count+=1;
-    }else{
-      universityMap.set(program.universitySlug,{
-        name:program.universityName,
-        slug:program.universitySlug,
-        count:1
-      });
-    }
+    const current=universityMap.get(program.universitySlug)??{name:program.universityName,slug:program.universitySlug,degrees:new Set<string>(),languages:new Set<string>()};
+    if(program.degreeType)current.degrees.add(program.degreeType);
+    if(program.language)current.languages.add(program.language);
+    universityMap.set(program.universitySlug,current);
   }
-
-  const fieldUniversities=[...universityMap.values()]
-    .sort((a,b)=>compareTr(a.name,b.name));
+  const fieldUniversities=[...universityMap.values()].sort((a,b)=>compareLocale(a.name,b.name));
 
   const programCopy={
-    tr:{
-      title:"Üniversite Bölümleri",
-      description:"İlgilendiğiniz bölümü arayın, sıralayın ve bu bölümü sunan üniversiteleri görüntüleyin.",
-      search:"Bölüm ara",
-      placeholder:"Örn. Bilgisayar Mühendisliği",
-      sort:"Sırala",
-      apply:"Uygula",
-      clear:"Temizle",
-      found:"bölüm bulundu",
-      viewUniversities:"Üniversiteleri Gör",
-      cardDescription:"Bu bölümü sunan üniversiteleri görüntüleyin.",
-      noResults:"Aramanıza uygun bölüm bulunamadı.",
-      allPrograms:"Tüm Bölümler",
-      viewUniversity:"Üniversiteyi İncele",
-      noUniversities:"Bu bölüm için üniversite bulunamadı.",
-      selectedSuffix:"programının bulunduğu üniversiteleri inceleyin.",filters:"Gelişmiş filtreler",
-      city:"Şehir",allCities:"Tüm şehirler",university:"Üniversite",allUniversities:"Tüm üniversiteler",degree:"Derece",allDegrees:"Tüm dereceler",language:"Eğitim dili",allLanguages:"Tüm diller",field:"Alan",allFields:"Tüm alanlar"
-    },
-    en:{
-      title:"University Programs",
-      description:"Search and sort programs, then view the universities offering them.",
-      search:"Search program",
-      placeholder:"e.g. Computer Engineering",
-      sort:"Sort",
-      apply:"Apply",
-      clear:"Clear",
-      found:"programs found",
-      viewUniversities:"View Universities",
-      cardDescription:"View universities offering this program.",
-      noResults:"No programs matched your search.",
-      allPrograms:"All Programs",
-      viewUniversity:"View University",
-      noUniversities:"No universities found for this program.",
-      selectedSuffix:"is offered by the following universities.",filters:"Advanced filters",
-      city:"City",allCities:"All cities",university:"University",allUniversities:"All universities",degree:"Degree",allDegrees:"All degrees",language:"Teaching language",allLanguages:"All languages",field:"Field",allFields:"All fields"
-    },
-    ru:{
-      title:"Университетские программы",
-      description:"Найдите нужную программу, отсортируйте список и посмотрите университеты, где она доступна.",
-      search:"Поиск программы",
-      placeholder:"Напр. Компьютерная инженерия",
-      sort:"Сортировка",
-      apply:"Применить",
-      clear:"Очистить",
-      found:"программ найдено",
-      viewUniversities:"Смотреть университеты",
-      cardDescription:"Посмотреть университеты, предлагающие эту программу.",
-      noResults:"По вашему запросу программы не найдены.",
-      allPrograms:"Все программы",
-      viewUniversity:"Смотреть университет",
-      noUniversities:"Для этой программы университеты не найдены.",
-      selectedSuffix:"доступна в следующих университетах.",filters:"Дополнительные фильтры",
-      city:"Город",allCities:"Все города",university:"Университет",allUniversities:"Все университеты",degree:"Степень",allDegrees:"Все степени",language:"Язык обучения",allLanguages:"Все языки",field:"Направление",allFields:"Все направления"
-    },
-    ar:{
-      title:"التخصصات والبرامج الجامعية",
-      description:"ابحث عن البرنامج ورتّب النتائج ثم اعرض الجامعات التي تقدمه.",
-      search:"ابحث عن برنامج",
-      placeholder:"مثال: هندسة الحاسوب",
-      sort:"الترتيب",
-      apply:"تطبيق",
-      clear:"مسح",
-      found:"برنامج",
-      viewUniversities:"عرض الجامعات",
-      cardDescription:"اعرض الجامعات التي تقدم هذا البرنامج.",
-      noResults:"لم يتم العثور على برامج مطابقة.",
-      allPrograms:"جميع البرامج",
-      viewUniversity:"عرض الجامعة",
-      noUniversities:"لم يتم العثور على جامعات لهذا البرنامج.",
-      selectedSuffix:"متاح في الجامعات التالية.",filters:"فلاتر متقدمة",
-      city:"المدينة",allCities:"كل المدن",university:"الجامعة",allUniversities:"كل الجامعات",degree:"الدرجة",allDegrees:"كل الدرجات",language:"لغة الدراسة",allLanguages:"كل اللغات",field:"المجال",allFields:"كل المجالات"
-    }
+    tr:{title:"Üniversite Bölümleri",description:"Programları tek yerde karşılaştırın; şehir, üniversite, derece ve eğitim diliyle sonuçları daraltın.",search:"Bölüm ara",placeholder:"Örn. Bilgisayar Mühendisliği",sort:"Sıralama",apply:"Sonuçları göster",clear:"Temizle",found:"bölüm",viewUniversities:"Üniversiteleri gör",noResults:"Aramanıza uygun bölüm bulunamadı.",allPrograms:"Tüm bölümler",viewUniversity:"Üniversiteyi incele",noUniversities:"Bu bölüm için eşleşen üniversite bulunamadı.",selectedSuffix:"programını sunan üniversiteler.",city:"Şehir",allCities:"Tüm şehirler",university:"Üniversite",allUniversities:"Tüm üniversiteler",degree:"Derece",allDegrees:"Tüm dereceler",language:"Eğitim dili",allLanguages:"Tüm diller",field:"Alan",allFields:"Tüm alanlar",universityCount:"üniversite"},
+    en:{title:"University Programs",description:"Compare programs in one place and refine results by city, university, degree and teaching language.",search:"Search program",placeholder:"e.g. Computer Engineering",sort:"Sort",apply:"Show results",clear:"Clear",found:"programs",viewUniversities:"View universities",noResults:"No programs matched your search.",allPrograms:"All programs",viewUniversity:"View university",noUniversities:"No matching universities were found for this program.",selectedSuffix:"is offered by these universities.",city:"City",allCities:"All cities",university:"University",allUniversities:"All universities",degree:"Degree",allDegrees:"All degrees",language:"Teaching language",allLanguages:"All languages",field:"Field",allFields:"All fields",universityCount:"universities"},
+    ru:{title:"Университетские программы",description:"Сравнивайте программы и уточняйте результаты по городу, вузу, степени и языку обучения.",search:"Поиск программы",placeholder:"Напр. Компьютерная инженерия",sort:"Сортировка",apply:"Показать",clear:"Очистить",found:"программ",viewUniversities:"Смотреть университеты",noResults:"По вашему запросу программы не найдены.",allPrograms:"Все программы",viewUniversity:"Смотреть университет",noUniversities:"Подходящие университеты не найдены.",selectedSuffix:"доступна в этих университетах.",city:"Город",allCities:"Все города",university:"Университет",allUniversities:"Все университеты",degree:"Степень",allDegrees:"Все степени",language:"Язык обучения",allLanguages:"Все языки",field:"Направление",allFields:"Все направления",universityCount:"университетов"},
+    ar:{title:"التخصصات والبرامج الجامعية",description:"قارن البرامج وضيّق النتائج حسب المدينة والجامعة والدرجة ولغة الدراسة.",search:"ابحث عن برنامج",placeholder:"مثال: هندسة الحاسوب",sort:"الترتيب",apply:"عرض النتائج",clear:"مسح",found:"برنامج",viewUniversities:"عرض الجامعات",noResults:"لم يتم العثور على برامج مطابقة.",allPrograms:"جميع البرامج",viewUniversity:"عرض الجامعة",noUniversities:"لم يتم العثور على جامعات مطابقة.",selectedSuffix:"متاح في هذه الجامعات.",city:"المدينة",allCities:"كل المدن",university:"الجامعة",allUniversities:"كل الجامعات",degree:"الدرجة",allDegrees:"كل الدرجات",language:"لغة الدراسة",allLanguages:"كل اللغات",field:"المجال",allFields:"كل المجالات",universityCount:"جامعات"}
   } as const;
-
   const pc=programCopy[(locale in programCopy?locale:"tr") as keyof typeof programCopy];
-
-  const selectedProgramOption=catalog.programOptions.find(
-    item=>item.name.trim().localeCompare(
-      selectedProgram.trim(),
-      "tr-TR",
-      {sensitivity:"base"}
-    )===0
-  );
 
   const selectedProgramDisplay=!selectedProgram
     ? ""
     : locale==="tr"
-      ? selectedProgram
-      : locale==="en"
-        ? (selectedProgramOption?.englishName||selectedProgram)
-        : locale==="ru"
-          ? (selectedProgramOption?.russianName||selectedProgramOption?.englishName||selectedProgram)
-          : locale==="ar"
-            ? (selectedProgramOption?.arabicName||selectedProgramOption?.englishName||selectedProgram)
-            : (selectedProgramOption?.englishName||selectedProgram);
-
-  const title=selectedProgram
-    ? selectedProgramDisplay
-    : pc.title;
-
-  const description=selectedProgram
-    ? `${selectedProgramDisplay} ${pc.selectedSuffix}`
-    : pc.description;
+      ? (selectedProgramOption?.turkishName||selectedProgramOption?.name||selectedProgram)
+      : (selectedProgramOption?.englishName||selectedProgramOption?.name||selectedProgram);
+  const title=selectedProgram?selectedProgramDisplay:pc.title;
+  const description=selectedProgram?`${selectedProgramDisplay} ${pc.selectedSuffix}`:pc.description;
 
   const makePageHref=(page:number)=>{
     const params=new URLSearchParams();
@@ -359,136 +219,46 @@ const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanli
     return `/${locale}/bolumler${qs?`?${qs}`:""}`;
   };
 
-  return <InnerPage
-    settings={settings}
-    locale={locale}
-    crumbs={[
-      {label:t.home,href:`/${locale}`},
-      {label:t.programs,href:`/${locale}/bolumler`},
-      ...(selectedProgram?[{label:selectedProgramDisplay}]:[])
-    ]}
-  >
+  return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.programs,href:`/${locale}/bolumler`},...(selectedProgram?[{label:selectedProgramDisplay}]:[])]}>
     <main className="listing-page program-index-page">
-      <header>
-        <p className="elab-kicker">{t.programs}</p>
-        <h1>{title}</h1>
-        <p>{description}</p>
-      </header>
-
-      {!selectedProgram ? (
-        <>
-          <form className="program-filter-bar" method="get">
-            <div className="program-filter-main">
-              <label className="program-search-field">
-                <span>{pc.search}</span>
-                <input type="search" name="q" defaultValue={searchTerm} placeholder={pc.placeholder}/>
-              </label>
-              <label className="program-sort-field">
-                <span>{pc.sort}</span>
-                <select name="sort" defaultValue={sortMode}>
-                  <option value="asc">A → Z</option>
-                  <option value="desc">Z → A</option>
-                </select>
-              </label>
-              <button className="button button-primary" type="submit">{pc.apply}</button>
-              {(searchTerm||sortMode==="desc"||query.city||query.university||query.degree||query.language||query.field)&&(
-                <Link className="program-filter-clear" href={"/"+locale+"/bolumler"}>{pc.clear}</Link>
-              )}
-            </div>
-
-            <details className="program-advanced-filters" open={Boolean(query.city||query.university||query.degree||query.language||query.field)}>
-              <summary>{pc.filters}</summary>
-              <div className="program-advanced-filter-grid">
-                <label><span>{pc.city}</span><select name="city" defaultValue={query.city||""}><option value="">{pc.allCities}</option>{catalog.cities.map(city=><option key={city} value={city}>{city}</option>)}</select></label>
-                <label><span>{pc.university}</span><select name="university" defaultValue={query.university||""}><option value="">{pc.allUniversities}</option>{catalog.universities.map(university=><option key={university.slug} value={university.slug}>{university.name}</option>)}</select></label>
-                <label><span>{pc.degree}</span><select name="degree" defaultValue={query.degree||""}><option value="">{pc.allDegrees}</option>{catalog.degrees.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
-                <label><span>{pc.language}</span><select name="language" defaultValue={query.language||""}><option value="">{pc.allLanguages}</option>{catalog.languages.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
-                <label><span>{pc.field}</span><select name="field" defaultValue={query.field||""}><option value="">{pc.allFields}</option>{catalog.fields.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
-              </div>
-            </details>
-          </form>
-
-          <div className="program-results-meta">
-            <strong>{filteredProgramNames.length}</strong> {pc.found}
+      <header><p className="elab-kicker">{t.programs}</p><h1>{title}</h1><p>{description}</p></header>
+      {!selectedProgram?<>
+        <form className="program-filter-bar program-filter-premium" method="get">
+          <div className="program-filter-primary">
+            <label className="program-search-field"><span>{pc.search}</span><input type="search" name="q" defaultValue={searchTerm} placeholder={pc.placeholder}/></label>
+            <label className="program-sort-field"><span>{pc.sort}</span><select name="sort" defaultValue={sortMode}><option value="asc">A → Z</option><option value="desc">Z → A</option></select></label>
+            <button className="button button-primary" type="submit">{pc.apply}<span aria-hidden="true">↗</span></button>
           </div>
-
-          <div className="listing-grid program-listing-grid">
-            {visibleProgramNames.map(program=>(
-              <Link
-                className="program-card"
-                key={program.canonical}
-                href={`/${locale}/bolumler?program=${encodeURIComponent(program.canonical)}`}
-              >
-                <h2>{program.display}</h2>
-                <p>{pc.cardDescription}</p>
-                <b>{pc.viewUniversities}</b>
-              </Link>
-            ))}
+          <div className="program-filter-secondary">
+            <label><span>{pc.city}</span><select name="city" defaultValue={query.city||""}><option value="">{pc.allCities}</option>{catalog.cities.map(city=><option key={city} value={city}>{city}</option>)}</select></label>
+            <label><span>{pc.university}</span><select name="university" defaultValue={query.university||""}><option value="">{pc.allUniversities}</option>{catalog.universities.map(university=><option key={university.slug} value={university.slug}>{university.name}</option>)}</select></label>
+            <label><span>{pc.degree}</span><select name="degree" defaultValue={query.degree||""}><option value="">{pc.allDegrees}</option>{catalog.degrees.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
+            <label><span>{pc.language}</span><select name="language" defaultValue={query.language||""}><option value="">{pc.allLanguages}</option>{catalog.languages.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
+            <label><span>{pc.field}</span><select name="field" defaultValue={query.field||""}><option value="">{pc.allFields}</option>{catalog.fields.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
+            {(searchTerm||sortMode==="desc"||query.city||query.university||query.degree||query.language||query.field)&&<Link className="program-filter-clear" href={`/${locale}/bolumler`}>{pc.clear}</Link>}
           </div>
+        </form>
 
-          {!visibleProgramNames.length&&(
-            <div className="empty-state">
-              {pc.noResults}
-            </div>
-          )}
-
-          {programPageCount>1&&(
-            <nav className="program-pagination" aria-label="Bölüm sayfaları">
-              {safeProgramPage>1&&(
-                <Link href={makePageHref(safeProgramPage-1)}>←</Link>
-              )}
-
-              {Array.from({length:programPageCount},(_,i)=>i+1)
-                .filter(page=>
-                  page===1||
-                  page===programPageCount||
-                  Math.abs(page-safeProgramPage)<=2
-                )
-                .map((page,index,array)=>{
-                  const previous=array[index-1];
-                  return <span key={page} className="program-page-group">
-                    {previous&&page-previous>1&&<span className="program-page-dots">…</span>}
-                    <Link
-                      className={page===safeProgramPage?"is-active":""}
-                      href={makePageHref(page)}
-                    >
-                      {page}
-                    </Link>
-                  </span>
-                })}
-
-              {safeProgramPage<programPageCount&&(
-                <Link href={makePageHref(safeProgramPage+1)}>→</Link>
-              )}
-            </nav>
-          )}
-        </>
-      ) : (
-        <>
-          <Link className="elab-pill program-back-link" href={`/${locale}/bolumler`}>
-            ← {pc.allPrograms}
-          </Link>
-
-          <div className="listing-grid program-university-grid">
-            {fieldUniversities.map(university=>(
-              <Link
-                key={university.slug}
-                href={`/${locale}/universiteler/${university.slug}`}
-              >
-                <h2>{university.name}</h2>
-                <p>{selectedProgramDisplay}</p>
-                <b>{pc.viewUniversity}</b>
-              </Link>
-            ))}
-          </div>
-
-          {!fieldUniversities.length&&(
-            <div className="empty-state">
-              {pc.noUniversities}
-            </div>
-          )}
-        </>
-      )}
+        <div className="program-results-meta"><p><strong>{localizedProgramOptions.length}</strong> {pc.found}</p><span>{safeProgramPage}/{programPageCount}</span></div>
+        <div className="program-listing-grid program-listing-premium">{visibleProgramNames.map((program,index)=><Link className="program-card program-card-v2" key={program.key} href={`/${locale}/bolumler?program=${encodeURIComponent(program.key)}`}>
+          <div className="program-card-top"><span>{String((safeProgramPage-1)*perPage+index+1).padStart(2,"0")}</span><b>{program.universityCount} {pc.universityCount}</b></div>
+          <h2>{program.display}</h2>
+          <div className="program-card-meta">{program.degrees.slice(0,2).map(value=><span key={value}>{value}</span>)}{program.languages.slice(0,2).map(value=><span key={value}>{value}</span>)}</div>
+          <div className="program-card-cta"><span>{pc.viewUniversities}</span><b aria-hidden="true">↗</b></div>
+        </Link>)}</div>
+        {!visibleProgramNames.length&&<div className="empty-state">{pc.noResults}</div>}
+        {programPageCount>1&&<nav className="program-pagination" aria-label="Bölüm sayfaları">{safeProgramPage>1&&<Link href={makePageHref(safeProgramPage-1)}>←</Link>}<strong>{safeProgramPage} / {programPageCount}</strong>{safeProgramPage<programPageCount&&<Link href={makePageHref(safeProgramPage+1)}>→</Link>}</nav>}
+      </>:<>
+        <Link className="program-back-link" href={`/${locale}/bolumler`}>← {pc.allPrograms}</Link>
+        <div className="program-university-summary"><strong>{fieldUniversities.length}</strong><span>{pc.universityCount}</span></div>
+        <div className="program-university-grid program-university-grid-v2">{fieldUniversities.map((university,index)=><Link key={university.slug} href={`/${locale}/universiteler/${university.slug}`}>
+          <span className="program-university-index">{String(index+1).padStart(2,"0")}</span>
+          <h2>{university.name}</h2>
+          <div>{[...university.degrees].slice(0,2).map(value=><span key={value}>{value}</span>)}{[...university.languages].slice(0,2).map(value=><span key={value}>{value}</span>)}</div>
+          <b>{pc.viewUniversity}<span aria-hidden="true">↗</span></b>
+        </Link>)}</div>
+        {!fieldUniversities.length&&<div className="empty-state">{pc.noUniversities}</div>}
+      </>}
     </main>
   </InnerPage>
 }
