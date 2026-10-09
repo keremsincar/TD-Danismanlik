@@ -19,8 +19,8 @@ test("ships the TD Danışmanlık product instead of the starter", async () => {
 });
 
 test("keeps sensitive writes behind validation and authorization", async () => {
-  const [consultations, admin, auth, login] = await Promise.all([
-    read("app/api/consultations/route.ts"), read("app/api/admin/content/route.ts"), read("lib/admin.ts"), read("app/api/admin/auth/login/route.ts"),
+  const [consultations, admin, auth, login, verify] = await Promise.all([
+    read("app/api/consultations/route.ts"), read("app/api/admin/content/route.ts"), read("lib/admin.ts"), read("app/api/admin/auth/login/route.ts"), read("app/api/admin/auth/verify/route.ts"),
   ]);
   assert.match(consultations, /rate_limits/);
   assert.match(consultations, /kvkk/);
@@ -29,8 +29,11 @@ test("keeps sensitive writes behind validation and authorization", async () => {
   assert.match(admin, /origin/);
   assert.match(auth, /PBKDF2/);
   assert.match(auth, /admin_sessions/);
-  assert.match(login, /httpOnly|adminCookieOptions/);
-  assert.doesNotMatch(`${consultations}${admin}${auth}${login}`, /Tddanismanlik 7/);
+  assert.match(login, /beginAdminLoginApproval/);
+  assert.match(verify, /adminCookieOptions/);
+  assert.match(verify, /sendAdminLoginNotice/);
+  assert.match(auth, /admin_login_challenges/);
+  assert.doesNotMatch(`${consultations}${admin}${auth}${login}${verify}`, /Tddanismanlik 7/);
 });
 
 test("defines persistent content and lead tables", async () => {
