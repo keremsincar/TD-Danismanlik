@@ -42,10 +42,10 @@ const translatedPages:Record<string,Record<string,{title:string;lead:string;body
  }
 };
 const catalogSourceCopy={
- tr:<>Katalog bilgileri, belirtilen <a href="https://index-v3-eight.vercel.app" target="_blank" rel="noopener noreferrer">veri kaynağı</a> temel alınarak hazırlanır. Ücret ve kabul koşullarında üniversitelerin güncel resmî duyuruları esas alınmalıdır.</>,
- en:<>Catalog information is prepared from the stated <a href="https://index-v3-eight.vercel.app" target="_blank" rel="noopener noreferrer">data source</a>. Current official university announcements govern tuition and admission conditions.</>,
- ru:<>Каталог составлен на основе указанного <a href="https://index-v3-eight.vercel.app" target="_blank" rel="noopener noreferrer">источника данных</a>. Условия оплаты и приёма следует уточнять по официальным объявлениям университетов.</>,
- ar:<>تُعد بيانات الدليل استناداً إلى <a href="https://index-v3-eight.vercel.app" target="_blank" rel="noopener noreferrer">مصدر البيانات</a> المذكور. وتُعتمد الإعلانات الرسمية الحديثة للجامعات في الرسوم وشروط القبول.</>,
+ tr:<>Katalog verileri bilgilendirme amacıyla sunulur. Ücret, kontenjan ve kabul koşullarında üniversitelerin güncel resmî duyuruları esas alınmalıdır.</>,
+ en:<>Catalogue data is provided for guidance. Current official university announcements govern tuition, capacity and admission conditions.</>,
+ ru:<>Данные каталога носят информационный характер. Актуальные условия оплаты, мест и приёма следует проверять по официальным объявлениям университетов.</>,
+ ar:<>تُعرض بيانات الدليل لأغراض إرشادية. وتُعتمد الإعلانات الرسمية الحديثة للجامعات في الرسوم والمقاعد وشروط القبول.</>,
 } as const;
 export async function generateMetadata({params}:{params:Promise<{locale:string;slug:string}>}){
   const {locale,slug}=await params;
