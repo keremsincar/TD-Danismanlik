@@ -185,8 +185,15 @@ async function seedDefaults() {
   const faqCount = await d1.prepare("SELECT COUNT(*) AS count FROM faqs").first<{count:number}>();
   if (!faqCount?.count) await d1.batch(defaultFaqs.map(f=>d1.prepare("INSERT INTO faqs (question,answer,category,active,sort_order) VALUES (?,?,?,1,?)").bind(...f)));
   if (faqCount?.count && faqCount.count<defaultFaqs.length) await d1.batch(defaultFaqs.slice(faqCount.count).map(f=>d1.prepare("INSERT INTO faqs (question,answer,category,active,sort_order) VALUES (?,?,?,1,?)").bind(...f)));
-  const publicReviewCount = await d1.prepare("SELECT COUNT(*) AS count FROM reviews WHERE active=1 AND is_example=0").first<{count:number}>();
-  if (!publicReviewCount?.count) await d1.batch(defaultReviews.map(r=>d1.prepare("INSERT INTO reviews (author,context,quote,is_example,active,sort_order,updated_at) VALUES (?,?,?,0,1,?,?)").bind(...r,now)));
+  const seededReviewRepairMarker="HIDE_SEEDED_PLACEHOLDER_REVIEWS_V1";
+  const seededReviewRepairHandled=await d1.prepare("SELECT id FROM audit_logs WHERE action=? LIMIT 1").bind(seededReviewRepairMarker).first<{id:number}>();
+  if(!seededReviewRepairHandled){
+    const seededAuthors=defaultReviews.map(item=>item[0]);
+    for(const author of seededAuthors){
+      await d1.prepare("UPDATE reviews SET is_example=1,active=0 WHERE author=?").bind(author).run();
+    }
+    await d1.prepare("INSERT INTO audit_logs (actor,action,detail,created_at) VALUES (?,?,?,?)").bind("system",seededReviewRepairMarker,"Varsayılan örnek yorumlar kamusal yayından kaldırıldı",now).run();
+  }
 }
 
 export async function getSettings(): Promise<SiteSettings> { await ensureDatabase(); const row=await db().prepare("SELECT site_name AS siteName,hero_title AS heroTitle,hero_description AS heroDescription,cta_text AS ctaText,phone,whatsapp,address,hours,email,heading_font AS headingFont,body_font AS bodyFont,primary_color AS primaryColor,accent_color AS accentColor,updated_at AS updatedAt FROM site_settings WHERE id=1").first<SiteSettings>(); return row??defaultSettings; }
@@ -242,13 +249,18 @@ export async function searchCatalogPrograms(options:ProgramSearch={}){
 ).values()].sort((a,b)=>a.name.localeCompare(b.name,"tr-TR",{sensitivity:"base"}))};
 }
 export async function getAllCatalogProgramsForForm():Promise<Program[]>{
-  const first=await searchCatalogPrograms({page:1,pageSize:120,sort:"program-asc"});
-  const all=[...first.programs];
-  for(let page=2;page<=first.pageCount;page++){
-    const next=await searchCatalogPrograms({page,pageSize:120,sort:"program-asc"});
-    all.push(...next.programs);
+  const universities=await getCatalogUniversities();
+  const universityBySlug=new Map(universities.map(item=>[item.slug,item]));
+  const databasePrograms=await getPrograms();
+  const overrides=new Map(databasePrograms.map(item=>[item.slug,item]));
+  const referenceSlugs=new Set(referencePrograms.map(item=>item.slug));
+  const all=referencePrograms
+    .map(item=>overrides.get(item.slug)??(universityBySlug.has(item.universitySlug)?referenceToProgram(item,universityBySlug.get(item.universitySlug)!):null))
+    .filter((item):item is Program=>Boolean(item));
+  for(const item of databasePrograms){
+    if(!referenceSlugs.has(item.slug))all.push(item);
   }
-  return all;
+  return all.sort((a,b)=>a.name.localeCompare(b.name,"tr-TR",{sensitivity:"base"})||a.universityName.localeCompare(b.universityName,"tr-TR",{sensitivity:"base"}));
 }
 export async function getCatalogProgramsForUniversity(university:University,limit=96):Promise<{programs:Program[];total:number}>{const result=await searchCatalogPrograms({university:university.slug,pageSize:Math.min(120,limit),page:1});return {programs:result.programs,total:result.total};}
 export async function getProgram(slug:string): Promise<Program|null> { await ensureDatabase(); const saved=await db().prepare("SELECT p.id,p.university_id AS universityId,u.name AS universityName,u.slug AS universitySlug,p.slug,p.name,p.degree_type AS degreeType,p.language,p.duration,p.tuition_fee AS tuitionFee,p.description,p.active,p.updated_at AS updatedAt FROM programs p JOIN universities u ON u.id=p.university_id WHERE p.slug=? AND p.active=1").bind(slug).first<Program>();if(saved)return cleanProgram(saved);const reference=referencePrograms.find(item=>item.slug===slug);if(!reference)return null;const university=await getUniversity(reference.universitySlug);return university?referenceToProgram(reference,university):null; }
