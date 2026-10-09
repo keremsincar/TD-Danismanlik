@@ -151,6 +151,11 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
 
   const catalog=await searchCatalogPrograms({
     query:selectedProgram,
+    city:query.city||"",
+    university:query.university||"",
+    degree:query.degree||"",
+    language:query.language||"",
+    field:query.field||"",
     page:1,
     pageSize:120,
     sort:"program-asc"
@@ -251,7 +256,8 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       allPrograms:"Tüm Bölümler",
       viewUniversity:"Üniversiteyi İncele",
       noUniversities:"Bu bölüm için üniversite bulunamadı.",
-      selectedSuffix:"programının bulunduğu üniversiteleri inceleyin."
+      selectedSuffix:"programının bulunduğu üniversiteleri inceleyin.",
+      city:"Şehir",allCities:"Tüm şehirler",university:"Üniversite",allUniversities:"Tüm üniversiteler",degree:"Derece",allDegrees:"Tüm dereceler",language:"Eğitim dili",allLanguages:"Tüm diller",field:"Alan",allFields:"Tüm alanlar"
     },
     en:{
       title:"University Programs",
@@ -268,7 +274,8 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       allPrograms:"All Programs",
       viewUniversity:"View University",
       noUniversities:"No universities found for this program.",
-      selectedSuffix:"is offered by the following universities."
+      selectedSuffix:"is offered by the following universities.",
+      city:"City",allCities:"All cities",university:"University",allUniversities:"All universities",degree:"Degree",allDegrees:"All degrees",language:"Teaching language",allLanguages:"All languages",field:"Field",allFields:"All fields"
     },
     ru:{
       title:"Университетские программы",
@@ -285,7 +292,8 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       allPrograms:"Все программы",
       viewUniversity:"Смотреть университет",
       noUniversities:"Для этой программы университеты не найдены.",
-      selectedSuffix:"доступна в следующих университетах."
+      selectedSuffix:"доступна в следующих университетах.",
+      city:"Город",allCities:"Все города",university:"Университет",allUniversities:"Все университеты",degree:"Степень",allDegrees:"Все степени",language:"Язык обучения",allLanguages:"Все языки",field:"Направление",allFields:"Все направления"
     },
     ar:{
       title:"التخصصات والبرامج الجامعية",
@@ -302,7 +310,8 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       allPrograms:"جميع البرامج",
       viewUniversity:"عرض الجامعة",
       noUniversities:"لم يتم العثور على جامعات لهذا البرنامج.",
-      selectedSuffix:"متاح في الجامعات التالية."
+      selectedSuffix:"متاح في الجامعات التالية.",
+      city:"المدينة",allCities:"كل المدن",university:"الجامعة",allUniversities:"كل الجامعات",degree:"الدرجة",allDegrees:"كل الدرجات",language:"لغة الدراسة",allLanguages:"كل اللغات",field:"المجال",allFields:"كل المجالات"
     }
   } as const;
 
@@ -340,6 +349,11 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
     const params=new URLSearchParams();
     if(searchTerm)params.set("q",searchTerm);
     if(sortMode==="desc")params.set("sort","desc");
+    if(query.city)params.set("city",query.city);
+    if(query.university)params.set("university",query.university);
+    if(query.degree)params.set("degree",query.degree);
+    if(query.language)params.set("language",query.language);
+    if(query.field)params.set("field",query.field);
     if(page>1)params.set("programPage",String(page));
     const qs=params.toString();
     return `/${locale}/bolumler${qs?`?${qs}`:""}`;
@@ -351,7 +365,7 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
     crumbs={[
       {label:t.home,href:`/${locale}`},
       {label:t.programs,href:`/${locale}/bolumler`},
-      ...(selectedProgram?[{label:selectedProgram}]:[])
+      ...(selectedProgram?[{label:selectedProgramDisplay}]:[])
     ]}
   >
     <main className="listing-page program-index-page">
@@ -375,6 +389,46 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
             </label>
 
             <label>
+              <span>{pc.city}</span>
+              <select name="city" defaultValue={query.city||""}>
+                <option value="">{pc.allCities}</option>
+                {catalog.cities.map(city=><option key={city} value={city}>{city}</option>)}
+              </select>
+            </label>
+
+            <label>
+              <span>{pc.university}</span>
+              <select name="university" defaultValue={query.university||""}>
+                <option value="">{pc.allUniversities}</option>
+                {catalog.universities.map(university=><option key={university.slug} value={university.slug}>{university.name}</option>)}
+              </select>
+            </label>
+
+            <label>
+              <span>{pc.degree}</span>
+              <select name="degree" defaultValue={query.degree||""}>
+                <option value="">{pc.allDegrees}</option>
+                {catalog.degrees.map(value=><option key={value} value={value}>{value}</option>)}
+              </select>
+            </label>
+
+            <label>
+              <span>{pc.language}</span>
+              <select name="language" defaultValue={query.language||""}>
+                <option value="">{pc.allLanguages}</option>
+                {catalog.languages.map(value=><option key={value} value={value}>{value}</option>)}
+              </select>
+            </label>
+
+            <label>
+              <span>{pc.field}</span>
+              <select name="field" defaultValue={query.field||""}>
+                <option value="">{pc.allFields}</option>
+                {catalog.fields.map(value=><option key={value} value={value}>{value}</option>)}
+              </select>
+            </label>
+
+            <label>
               <span>{pc.sort}</span>
               <select name="sort" defaultValue={sortMode}>
                 <option value="asc">A → Z</option>
@@ -386,7 +440,7 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
               {pc.apply}
             </button>
 
-            {(searchTerm||sortMode==="desc")&&(
+            {(searchTerm||sortMode==="desc"||query.city||query.university||query.degree||query.language||query.field)&&(
               <Link className="program-filter-clear" href={`/${locale}/bolumler`}>
                 {pc.clear}
               </Link>
