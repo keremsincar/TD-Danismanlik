@@ -46,6 +46,17 @@ function turkishProgramName(name:string,englishName?:string){
   const key=normalizeProgramKey(englishName||name);
   return turkishNameByEnglish.get(key)||turkishProgramOverrides.get(key)||name;
 }
+function canonicalProgramKey(name:string,englishName?:string,turkishName?:string){
+  const source=(turkishName||turkishProgramName(name,englishName)||name)
+    .replace(/\s*\((?:İÖ|IÖ|ikinci öğretim|second education)\)\s*/gi," ")
+    .replace(/[–—-]/g," ")
+    .replace(/[^\p{L}\p{N}\s]/gu," ");
+  return source.toLocaleLowerCase("tr-TR").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ı/g,"i").replace(/\s+/g," ").trim();
+}
+function programDisplayName(program:Program,locale="tr"){
+  if(locale==="tr")return program.turkishName||turkishProgramName(program.name,program.englishName);
+  return program.englishName||program.name;
+}
 
 const referenceProgramBySlug=new Map(referencePrograms.map(item=>[item.slug,item] as const));
 const referenceProgramCounts=referencePrograms.reduce<Record<string,number>>((counts,item)=>{counts[item.universitySlug]=(counts[item.universitySlug]||0)+1;return counts;},{});
@@ -234,39 +245,110 @@ export async function getCatalogUniversities():Promise<University[]>{const unive
 export function getCatalogProgramCounts(){return {...referenceProgramCounts};}
 export function getCatalogProgramTotal(){return referencePrograms.length;}
 export type ProgramSearch={query?:string;city?:string;university?:string;degree?:string;language?:string;field?:string;sort?:string;page?:number;pageSize?:number};
-export async function searchCatalogPrograms(options:ProgramSearch={}){
+async function buildCatalogPrograms(){
   const universities=await getCatalogUniversities();
   const universityBySlug=new Map(universities.map(item=>[item.slug,item]));
   const databasePrograms=await getPrograms();
-  const overrides=new Map(databasePrograms.map(item=>{const reference=referenceProgramBySlug.get(item.slug);return [item.slug,{...item,englishName:item.englishName||reference?.englishName||item.name,turkishName:turkishProgramName(reference?.name||item.name,reference?.englishName||item.englishName||item.name),field:item.field||reference?.field} as Program] as const;}));
+  const overrides=new Map(databasePrograms.map(item=>{
+    const reference=referenceProgramBySlug.get(item.slug);
+    const enriched={...item,englishName:item.englishName||reference?.englishName||item.name,turkishName:turkishProgramName(reference?.name||item.name,reference?.englishName||item.englishName||item.name),field:item.field||reference?.field} as Program;
+    return [item.slug,enriched] as const;
+  }));
   const referenceSlugs=new Set(referencePrograms.map(item=>item.slug));
-  const all=referencePrograms.map(item=>overrides.get(item.slug)??(universityBySlug.has(item.universitySlug)?referenceToProgram(item,universityBySlug.get(item.universitySlug)!):null)).filter((item):item is Program=>Boolean(item));
-  for(const item of databasePrograms){if(!referenceSlugs.has(item.slug))all.push(item)}
+  const all=referencePrograms
+    .map(item=>overrides.get(item.slug)??(universityBySlug.has(item.universitySlug)?referenceToProgram(item,universityBySlug.get(item.universitySlug)!):null))
+    .filter((item):item is Program=>Boolean(item));
+  for(const item of databasePrograms){
+    if(!referenceSlugs.has(item.slug)){
+      all.push({...item,turkishName:turkishProgramName(item.name,item.englishName)});
+    }
+  }
+  return {all,universities,universityBySlug};
+}
+
+export async function searchCatalogPrograms(options:ProgramSearch={}){
+  const {all,universities,universityBySlug}=await buildCatalogPrograms();
   const normalize=(value:string)=>value.toLocaleLowerCase("tr-TR").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ı/g,"i");
   const query=normalize(options.query?.trim()||"");
   const degreeRank=(value:string)=>({"Ön Lisans":0,"Lisans":1,"Yüksek Lisans":2,"Doktora":3}[value]??9);
-  const byDegree=(a:Program,b:Program)=>degreeRank(a.degreeType)-degreeRank(b.degreeType)||a.universityName.localeCompare(b.universityName,"tr")||a.name.localeCompare(b.name,"tr");
-  const compare=(a:Program,b:Program)=>options.sort==="program-asc"?a.name.localeCompare(b.name,"tr")||a.universityName.localeCompare(b.universityName,"tr"):options.sort==="program-desc"?b.name.localeCompare(a.name,"tr")||a.universityName.localeCompare(b.universityName,"tr"):options.sort==="field"?(a.field||"").localeCompare(b.field||"","tr")||degreeRank(a.degreeType)-degreeRank(b.degreeType)||a.name.localeCompare(b.name,"tr"):options.sort==="university"?a.universityName.localeCompare(b.universityName,"tr")||degreeRank(a.degreeType)-degreeRank(b.degreeType)||a.name.localeCompare(b.name,"tr"):byDegree(a,b);
-  const filtered=all.filter(item=>{const university=universityBySlug.get(item.universitySlug);return (!query||normalize(`${item.name} ${item.englishName||""} ${item.universityName} ${item.field||""}`).includes(query))&&(!options.city||university?.city===options.city)&&(!options.university||item.universitySlug===options.university)&&(!options.degree||item.degreeType===options.degree)&&(!options.language||item.language===options.language)&&(!options.field||item.field===options.field)}).sort(compare);
+  const display=(item:Program)=>item.turkishName||turkishProgramName(item.name,item.englishName);
+  const compare=(a:Program,b:Program)=>{
+    if(options.sort==="program-desc")return display(b).localeCompare(display(a),"tr")||a.universityName.localeCompare(b.universityName,"tr");
+    if(options.sort==="field")return (a.field||"").localeCompare(b.field||"","tr")||degreeRank(a.degreeType)-degreeRank(b.degreeType)||display(a).localeCompare(display(b),"tr");
+    if(options.sort==="university")return a.universityName.localeCompare(b.universityName,"tr")||display(a).localeCompare(display(b),"tr");
+    if(options.sort==="program-asc")return display(a).localeCompare(display(b),"tr")||a.universityName.localeCompare(b.universityName,"tr");
+    return degreeRank(a.degreeType)-degreeRank(b.degreeType)||a.universityName.localeCompare(b.universityName,"tr")||display(a).localeCompare(display(b),"tr");
+  };
+  const filtered=all.filter(item=>{
+    const university=universityBySlug.get(item.universitySlug);
+    const searchable=`${item.name} ${item.turkishName||""} ${item.englishName||""} ${item.universityName} ${item.field||""}`;
+    return (!query||normalize(searchable).includes(query))
+      &&(!options.city||university?.city===options.city)
+      &&(!options.university||item.universitySlug===options.university)
+      &&(!options.degree||item.degreeType===options.degree)
+      &&(!options.language||item.language===options.language)
+      &&(!options.field||item.field===options.field);
+  }).sort(compare);
+
+  const grouped=new Map<string,{key:string;name:string;turkishName:string;englishName:string;universityCount:number;degrees:Set<string>;languages:Set<string>;fields:Set<string>}>();
+  for(const item of filtered){
+    const key=canonicalProgramKey(item.name,item.englishName,item.turkishName);
+    const current=grouped.get(key)??{key,name:item.name.trim(),turkishName:(item.turkishName||turkishProgramName(item.name,item.englishName)).trim(),englishName:(item.englishName||item.name).trim(),universityCount:0,degrees:new Set<string>(),languages:new Set<string>(),fields:new Set<string>()};
+    current.universityCount+=1;
+    if(item.degreeType)current.degrees.add(item.degreeType);
+    if(item.language)current.languages.add(item.language);
+    if(item.field)current.fields.add(item.field);
+    grouped.set(key,current);
+  }
+
+  const programOptions=[...grouped.values()].map(item=>({
+    key:item.key,
+    name:item.name,
+    turkishName:item.turkishName,
+    englishName:item.englishName,
+    universityCount:item.universityCount,
+    degrees:[...item.degrees],
+    languages:[...item.languages],
+    fields:[...item.fields],
+    russianName:"",
+    arabicName:""
+  })).sort((a,b)=>a.turkishName.localeCompare(b.turkishName,"tr-TR",{sensitivity:"base"}));
+
   const pageSize=Math.min(120,Math.max(12,options.pageSize||18));
   const pageCount=Math.max(1,Math.ceil(filtered.length/pageSize));
   const page=Math.min(pageCount,Math.max(1,options.page||1));
   const values=(key:"degreeType"|"language"|"field")=>[...new Set(all.map(item=>item[key]).filter(Boolean) as string[])].sort((a,b)=>key==="degreeType"?degreeRank(a)-degreeRank(b):a.localeCompare(b,"tr"));
-  return {programs:filtered.slice((page-1)*pageSize,page*pageSize),total:filtered.length,page,pageCount,universities,cities:[...new Set(universities.map(item=>item.city))].sort((a,b)=>a.localeCompare(b,"tr")),degrees:values("degreeType"),languages:values("language"),fields:values("field"),programOptions:[...new Map(
-  filtered
-    .filter(item=>item.name?.trim())
-    .map(item=>[
-      item.name.trim().toLocaleLowerCase("tr-TR"),
-      {
-        name:item.name.trim(),
-        turkishName:turkishProgramName(item.name,item.englishName),
-        englishName:item.englishName?.trim()||item.name.trim(),
-        russianName:(item as Program & {russianName?:string}).russianName?.trim()||"",
-        arabicName:(item as Program & {arabicName?:string}).arabicName?.trim()||""
-      }
-    ])
-).values()].sort((a,b)=>a.name.localeCompare(b.name,"tr-TR",{sensitivity:"base"}))};
+  return {
+    programs:filtered.slice((page-1)*pageSize,page*pageSize),
+    total:filtered.length,
+    page,
+    pageCount,
+    universities,
+    cities:[...new Set(universities.map(item=>item.city))].sort((a,b)=>a.localeCompare(b,"tr")),
+    degrees:values("degreeType"),
+    languages:values("language"),
+    fields:values("field"),
+    programOptions
+  };
 }
+
+export async function getProgramsForProgramIdentity(identity:string,filters:Omit<ProgramSearch,"query"|"page"|"pageSize"|"sort">={}){
+  const {all,universityBySlug}=await buildCatalogPrograms();
+  const target=canonicalProgramKey(identity);
+  return all.filter(item=>{
+    const university=universityBySlug.get(item.universitySlug);
+    return canonicalProgramKey(item.name,item.englishName,item.turkishName)===target
+      &&(!filters.city||university?.city===filters.city)
+      &&(!filters.university||item.universitySlug===filters.university)
+      &&(!filters.degree||item.degreeType===filters.degree)
+      &&(!filters.language||item.language===filters.language)
+      &&(!filters.field||item.field===filters.field);
+  });
+}
+
+export function getProgramIdentity(program:Program){return canonicalProgramKey(program.name,program.englishName,program.turkishName);}
+export function getProgramDisplayName(program:Program,locale="tr"){return programDisplayName(program,locale);}
+
 export async function getAllCatalogProgramsForForm():Promise<Program[]>{
   const universities=await getCatalogUniversities();
   const universityBySlug=new Map(universities.map(item=>[item.slug,item]));
