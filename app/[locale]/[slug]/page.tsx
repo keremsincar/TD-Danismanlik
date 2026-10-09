@@ -211,13 +211,86 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
   const fieldUniversities=[...universityMap.values()]
     .sort((a,b)=>compareTr(a.name,b.name));
 
+  const programCopy={
+    tr:{
+      title:"Üniversite Bölümleri",
+      description:"İlgilendiğiniz bölümü arayın, sıralayın ve bu bölümü sunan üniversiteleri görüntüleyin.",
+      search:"Bölüm ara",
+      placeholder:"Örn. Bilgisayar Mühendisliği",
+      sort:"Sırala",
+      apply:"Uygula",
+      clear:"Temizle",
+      found:"bölüm bulundu",
+      viewUniversities:"Üniversiteleri Gör",
+      cardDescription:"Bu bölümü sunan üniversiteleri görüntüleyin.",
+      noResults:"Aramanıza uygun bölüm bulunamadı.",
+      allPrograms:"Tüm Bölümler",
+      viewUniversity:"Üniversiteyi İncele",
+      noUniversities:"Bu bölüm için üniversite bulunamadı.",
+      selectedSuffix:"programının bulunduğu üniversiteleri inceleyin."
+    },
+    en:{
+      title:"University Programs",
+      description:"Search and sort programs, then view the universities offering them.",
+      search:"Search program",
+      placeholder:"e.g. Computer Engineering",
+      sort:"Sort",
+      apply:"Apply",
+      clear:"Clear",
+      found:"programs found",
+      viewUniversities:"View Universities",
+      cardDescription:"View universities offering this program.",
+      noResults:"No programs matched your search.",
+      allPrograms:"All Programs",
+      viewUniversity:"View University",
+      noUniversities:"No universities found for this program.",
+      selectedSuffix:"is offered by the following universities."
+    },
+    ru:{
+      title:"Университетские программы",
+      description:"Найдите нужную программу, отсортируйте список и посмотрите университеты, где она доступна.",
+      search:"Поиск программы",
+      placeholder:"Напр. Компьютерная инженерия",
+      sort:"Сортировка",
+      apply:"Применить",
+      clear:"Очистить",
+      found:"программ найдено",
+      viewUniversities:"Смотреть университеты",
+      cardDescription:"Посмотреть университеты, предлагающие эту программу.",
+      noResults:"По вашему запросу программы не найдены.",
+      allPrograms:"Все программы",
+      viewUniversity:"Смотреть университет",
+      noUniversities:"Для этой программы университеты не найдены.",
+      selectedSuffix:"доступна в следующих университетах."
+    },
+    ar:{
+      title:"التخصصات والبرامج الجامعية",
+      description:"ابحث عن البرنامج ورتّب النتائج ثم اعرض الجامعات التي تقدمه.",
+      search:"ابحث عن برنامج",
+      placeholder:"مثال: هندسة الحاسوب",
+      sort:"الترتيب",
+      apply:"تطبيق",
+      clear:"مسح",
+      found:"برنامج",
+      viewUniversities:"عرض الجامعات",
+      cardDescription:"اعرض الجامعات التي تقدم هذا البرنامج.",
+      noResults:"لم يتم العثور على برامج مطابقة.",
+      allPrograms:"جميع البرامج",
+      viewUniversity:"عرض الجامعة",
+      noUniversities:"لم يتم العثور على جامعات لهذا البرنامج.",
+      selectedSuffix:"متاح في الجامعات التالية."
+    }
+  } as const;
+
+  const pc=programCopy[(locale in programCopy?locale:"tr") as keyof typeof programCopy];
+
   const title=selectedProgram
     ? selectedProgram
-    : "Üniversite Bölümleri";
+    : pc.title;
 
   const description=selectedProgram
-    ? `${selectedProgram} programının bulunduğu üniversiteleri inceleyin.`
-    : "İlgilendiğiniz bölümü arayın, sıralayın ve bu bölümü sunan üniversiteleri görüntüleyin.";
+    ? `${selectedProgram} ${pc.selectedSuffix}`
+    : pc.description;
 
   const makePageHref=(page:number)=>{
     const params=new URLSearchParams();
@@ -248,17 +321,17 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
         <>
           <form className="program-filter-bar" method="get">
             <label>
-              <span>Bölüm ara</span>
+              <span>{pc.search}</span>
               <input
                 type="search"
                 name="q"
                 defaultValue={searchTerm}
-                placeholder="Örn. Bilgisayar Mühendisliği"
+                placeholder={pc.placeholder}
               />
             </label>
 
             <label>
-              <span>Sırala</span>
+              <span>{pc.sort}</span>
               <select name="sort" defaultValue={sortMode}>
                 <option value="asc">A → Z</option>
                 <option value="desc">Z → A</option>
@@ -266,18 +339,18 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
             </label>
 
             <button className="button button-primary" type="submit">
-              Uygula
+              {pc.apply}
             </button>
 
             {(searchTerm||sortMode==="desc")&&(
               <Link className="program-filter-clear" href={`/${locale}/bolumler`}>
-                Temizle
+                {pc.clear}
               </Link>
             )}
           </form>
 
           <div className="program-results-meta">
-            <strong>{filteredProgramNames.length}</strong> bölüm bulundu
+            <strong>{filteredProgramNames.length}</strong> {pc.found}
           </div>
 
           <div className="listing-grid program-listing-grid">
@@ -288,15 +361,15 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
                 href={`/${locale}/bolumler?program=${encodeURIComponent(program)}`}
               >
                 <h2>{program}</h2>
-                <p>Bu bölümü sunan üniversiteleri görüntüleyin.</p>
-                <b>Üniversiteleri Gör</b>
+                <p>{pc.cardDescription}</p>
+                <b>{pc.viewUniversities}</b>
               </Link>
             ))}
           </div>
 
           {!visibleProgramNames.length&&(
             <div className="empty-state">
-              Aramanıza uygun bölüm bulunamadı.
+              {pc.noResults}
             </div>
           )}
 
@@ -334,7 +407,7 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
       ) : (
         <>
           <Link className="elab-pill program-back-link" href={`/${locale}/bolumler`}>
-            ← Tüm Bölümler
+            ← {pc.allPrograms}
           </Link>
 
           <div className="listing-grid program-university-grid">
@@ -345,14 +418,14 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
               >
                 <h2>{university.name}</h2>
                 <p>{selectedProgram}</p>
-                <b>Üniversiteyi İncele</b>
+                <b>{pc.viewUniversity}</b>
               </Link>
             ))}
           </div>
 
           {!fieldUniversities.length&&(
             <div className="empty-state">
-              Bu bölüm için üniversite bulunamadı.
+              {pc.noUniversities}
             </div>
           )}
         </>
