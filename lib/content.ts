@@ -227,7 +227,7 @@ export async function searchCatalogPrograms(options:ProgramSearch={}){
   const pageCount=Math.max(1,Math.ceil(filtered.length/pageSize));
   const page=Math.min(pageCount,Math.max(1,options.page||1));
   const values=(key:"degreeType"|"language"|"field")=>[...new Set(all.map(item=>item[key]).filter(Boolean) as string[])].sort((a,b)=>key==="degreeType"?degreeRank(a)-degreeRank(b):a.localeCompare(b,"tr"));
-  return {programs:filtered.slice((page-1)*pageSize,page*pageSize),total:filtered.length,page,pageCount,universities,cities:[...new Set(universities.map(item=>item.city))].sort((a,b)=>a.localeCompare(b,"tr")),degrees:values("degreeType"),languages:values("language"),fields:values("field")};
+  return {programs:filtered.slice((page-1)*pageSize,page*pageSize),total:filtered.length,page,pageCount,universities,cities:[...new Set(universities.map(item=>item.city))].sort((a,b)=>a.localeCompare(b,"tr")),degrees:values("degreeType"),languages:values("language"),fields:values("field"),programNames:[...new Set(all.map(item=>item.name.trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"tr-TR",{sensitivity:"base"}))};
 }
 export async function getAllCatalogProgramsForForm():Promise<Program[]>{
   const first=await searchCatalogPrograms({page:1,pageSize:120,sort:"program-asc"});

@@ -135,7 +135,7 @@ export async function generateMetadata({params}:{params:Promise<{locale:string;s
   };
 }
 
-export default async function GenericPage({params,searchParams}:{params:Promise<{locale:string;slug:string}>;searchParams:Promise<{page?:string;q?:string;city?:string;type?:string;sort?:string;university?:string;degree?:string;language?:string;field?:string;programPage?:string}>}){const [{locale,slug},query]=await Promise.all([params,searchParams]);const initialPage=Math.max(1,Number.parseInt(query.page||"1",10)||1);const [settings,services,universities,images]=await Promise.all([getSettings(),getServices(),getUniversities(),getSiteImages()]);
+export default async function GenericPage({params,searchParams}:{params:Promise<{locale:string;slug:string}>;searchParams:Promise<{page?:string;q?:string;city?:string;type?:string;sort?:string;university?:string;degree?:string;language?:string;field?:string;programPage?:string;program?:string}>}){const [{locale,slug},query]=await Promise.all([params,searchParams]);const initialPage=Math.max(1,Number.parseInt(query.page||"1",10)||1);const [settings,services,universities,images]=await Promise.all([getSettings(),getServices(),getUniversities(),getSiteImages()]);
 const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():[];const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanlik-talebi")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.request}]}><main className="request-page"><section><p className="section-index">{t.request}</p><h1>{request.title1}<br/><em>{request.title2}</em></h1><p>{request.lead}</p><div className="request-points"><span>{request.point1}</span><span>{request.point2}</span><span>{request.point3}</span></div></section><ConsultationForm {...{services,universities,programs,locale}}/></main></InnerPage>;
   if(slug==="iletisim")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.contact}]}><ContactPage settings={settings} locale={locale}/></InnerPage>;
   if(slug==="tesekkurler")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:request.thanksTitle}]}><main className="thanks-page"><span>✓</span><p className="section-index">{request.thanksKicker}</p><h1>{request.thanksTitle}</h1><p>{request.thanksBody}</p><div><Link className="button button-dark" href={`/${locale}`}>{request.home}</Link>{settings.whatsapp&&<a className="button button-primary" href={`https://wa.me/${settings.whatsapp.replace(/\D/g,"")}`}>{request.whatsapp}</a>}</div></main></InnerPage>;
@@ -143,9 +143,10 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
   if(slug==="universiteler"){const catalog=await getCatalogUniversities();const filters={query:query.q||"",city:query.city||"",type:query.type||"",sort:query.sort||"name"};const source=catalogSourceCopy[(locale in catalogSourceCopy?locale:"tr") as keyof typeof catalogSourceCopy];return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.universities}]}><main className="listing-page"><header><p className="elab-kicker">{t.universities}</p><h1>{pageIntro(locale,"universiteler")[0]}</h1><p>{pageIntro(locale,"universiteler")[1]}</p></header><UniversityCatalog universities={catalog} locale={locale} initialPage={initialPage} filters={filters} programCounts={getCatalogProgramCounts()}/><p className="catalog-source">{source}</p></main></InnerPage>}
   if(slug==="tercih-robotu"){const options=await searchCatalogPrograms({pageSize:12,sort:"degree"});return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:locale==="tr"?"Tercih Robotu":"Program Matcher"}]}><PreferenceRobot locale={locale} cities={options.cities} degrees={options.degrees} languages={options.languages} fields={options.fields}/></InnerPage>}
   if(slug==="bolumler"){
-  const selectedField=query.field||"";
+  const selectedProgram=query.program||"";
+
   const catalog=await searchCatalogPrograms({
-    field:selectedField,
+    query:selectedProgram,
     page:1,
     pageSize:120,
     sort:"program-asc"
@@ -154,41 +155,46 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
   const compareTr=(a:string,b:string)=>
     a.trim().localeCompare(b.trim(),"tr-TR",{sensitivity:"base"});
 
-  const fields=[...catalog.fields].sort(compareTr);
+  const programNames=[...catalog.programNames].sort(compareTr);
+
+  const matchingPrograms=selectedProgram
+    ? catalog.programs.filter(
+        program=>program.name.trim().localeCompare(
+          selectedProgram.trim(),
+          "tr-TR",
+          {sensitivity:"base"}
+        )===0
+      )
+    : [];
 
   const universityMap=new Map<
     string,
     {name:string;slug:string;count:number}
   >();
 
-  if(selectedField){
-    for(const program of catalog.programs){
-      const key=program.universitySlug;
-      const current=universityMap.get(key);
+  for(const program of matchingPrograms){
+    const current=universityMap.get(program.universitySlug);
 
-      if(current){
-        current.count+=1;
-      }else{
-        universityMap.set(key,{
-          name:program.universityName,
-          slug:program.universitySlug,
-          count:1
-        });
-      }
+    if(current){
+      current.count+=1;
+    }else{
+      universityMap.set(program.universitySlug,{
+        name:program.universityName,
+        slug:program.universitySlug,
+        count:1
+      });
     }
   }
 
   const fieldUniversities=[...universityMap.values()]
     .sort((a,b)=>compareTr(a.name,b.name));
 
-  const title=selectedField
-    ? `${selectedField} Bölümü`
-    : locale==="tr"
-      ? "Üniversite Bölümleri"
-      : t.programs;
+  const title=selectedProgram
+    ? selectedProgram
+    : "Üniversite Bölümleri";
 
-  const description=selectedField
-    ? `${selectedField} bölümünün bulunduğu üniversiteleri inceleyin.`
+  const description=selectedProgram
+    ? `${selectedProgram} programının bulunduğu üniversiteleri inceleyin.`
     : "İlgilendiğiniz bölümü seçin ve bu bölümü sunan üniversiteleri görüntüleyin.";
 
   return <InnerPage
@@ -197,7 +203,7 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
     crumbs={[
       {label:t.home,href:`/${locale}`},
       {label:t.programs,href:`/${locale}/bolumler`},
-      ...(selectedField?[{label:selectedField}]:[])
+      ...(selectedProgram?[{label:selectedProgram}]:[])
     ]}
   >
     <main className="listing-page">
@@ -207,30 +213,23 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
         <p>{description}</p>
       </header>
 
-      {!selectedField ? (
+      {!selectedProgram ? (
         <div className="listing-grid">
-          {fields.map(field=>(
+          {programNames.map(program=>(
             <Link
-              key={field}
-              href={`/${locale}/bolumler?field=${encodeURIComponent(field)}`}
+              key={program}
+              href={`/${locale}/bolumler?program=${encodeURIComponent(program)}`}
             >
-              <h2>{field}</h2>
-              <p>
-                {locale==="tr"
-                  ?"Bu bölümü sunan üniversiteleri görüntüleyin."
-                  :"View universities offering this program."}
-              </p>
-              <b>{locale==="tr"?"Üniversiteleri Gör":"View Universities"}</b>
+              <h2>{program}</h2>
+              <p>Bu bölümü sunan üniversiteleri görüntüleyin.</p>
+              <b>Üniversiteleri Gör</b>
             </Link>
           ))}
         </div>
       ) : (
         <>
-          <Link
-            className="elab-pill"
-            href={`/${locale}/bolumler`}
-          >
-            ← {locale==="tr"?"Tüm Bölümler":"All Programs"}
+          <Link className="elab-pill" href={`/${locale}/bolumler`}>
+            ← Tüm Bölümler
           </Link>
 
           <div className="listing-grid">
@@ -240,16 +239,8 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
                 href={`/${locale}/universiteler/${university.slug}`}
               >
                 <h2>{university.name}</h2>
-                <p>
-                  {university.count>1
-                    ? `${university.count} program seçeneği`
-                    : selectedField}
-                </p>
-                <b>
-                  {locale==="tr"
-                    ?"Üniversiteyi İncele"
-                    :"View University"}
-                </b>
+                <p>{selectedProgram}</p>
+                <b>Üniversiteyi İncele</b>
               </Link>
             ))}
           </div>
@@ -264,7 +255,8 @@ const programs=slug==="danismanlik-talebi"?await getAllCatalogProgramsForForm():
     </main>
   </InnerPage>
 }
-  if(slug==="surec")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.process}]}><main className="listing-page process-listing-page"><header><p className="elab-kicker">{t.processKicker}</p><h1>{pageIntro(locale,"surec")[0]}</h1><p>{pageIntro(locale,"surec")[1]}</p></header><div className="process-showcase"><div className="process-page-grid">{[[t.meet,t.meetBody],[t.roadmap,t.roadmapBody],[t.application,t.applicationBody],[t.followup,t.followupBody]].map(([title,body],index)=><article key={title}><span>{locale==="tr"?`Aşama ${index+1}`:`0${index+1}`}</span><h2>{title}</h2><p>{body}</p></article>)}</div><aside className="process-media"><img src={images.about} alt=""/><div><strong>TD</strong><span>{settings.siteName.replace(/^TD\s+/i,"")}</span></div></aside></div><Link className="elab-pill elab-pill-blue process-page-cta" href={`/${locale}/danismanlik-talebi`}>{t.request}</Link></main></InnerPage>;
+
+if(slug==="surec")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.process}]}><main className="listing-page process-listing-page"><header><p className="elab-kicker">{t.processKicker}</p><h1>{pageIntro(locale,"surec")[0]}</h1><p>{pageIntro(locale,"surec")[1]}</p></header><div className="process-showcase"><div className="process-page-grid">{[[t.meet,t.meetBody],[t.roadmap,t.roadmapBody],[t.application,t.applicationBody],[t.followup,t.followupBody]].map(([title,body],index)=><article key={title}><span>{locale==="tr"?`Aşama ${index+1}`:`0${index+1}`}</span><h2>{title}</h2><p>{body}</p></article>)}</div><aside className="process-media"><img src={images.about} alt=""/><div><strong>TD</strong><span>{settings.siteName.replace(/^TD\s+/i,"")}</span></div></aside></div><Link className="elab-pill elab-pill-blue process-page-cta" href={`/${locale}/danismanlik-talebi`}>{t.request}</Link></main></InnerPage>;
   if(slug==="sss"){const faqs=localizeFaqs(locale,await getFaqs());return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.faq}]}><main className="listing-page faq-listing-page"><header><p className="elab-kicker">{t.faqKicker}</p><h1>{pageIntro(locale,"sss")[0]}</h1><p>{pageIntro(locale,"sss")[1]}</p></header><FaqAccordion className="faq-page-list" items={faqs} showCategory/></main></InnerPage>}
   if(slug==="yorumlar"){const reviews=await getReviews();return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.reviews}]}><main className="listing-page"><header><p className="elab-kicker">{t.reviewKicker}</p><h1>{pageIntro(locale,"yorumlar")[0]}</h1><p>{pageIntro(locale,"yorumlar")[1]}</p></header>{reviews.length?<div className="review-page-grid">{reviews.map(r=><article key={r.id}><blockquote>“{r.quote}”</blockquote><div className="review-page-person"><span aria-hidden="true">{r.author.slice(0,1)}</span><p><strong>{r.author}</strong><small>{r.context}</small></p></div></article>)}</div>:<div className="empty-state">{locale==="tr"?"Henüz yayımlanmış danışan görüşü bulunmuyor.":locale==="en"?"No client feedback has been published yet.":locale==="ru"?"Отзывы клиентов пока не опубликованы.":"لم تُنشر آراء العملاء بعد."}</div>}</main></InnerPage>}
   const page=translatedPages[locale]?.[slug]??pages[slug];if(!page)notFound();const updated=locale==="en"?"Last updated: 24 September 2026":locale==="ru"?"Обновлено: 24 сентября 2026":locale==="ar"?"آخر تحديث: 24 سبتمبر 2026":"";return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:page.title}]}><main className="legal-page"><header><p className="section-index">TD DANIŞMANLIK</p><h1>{page.title}</h1><p>{page.lead}</p></header><article>{page.body.map(p=><p key={p}>{p}</p>)}{slug!=="hakkimizda"&&<small>{updated}</small>}</article></main></InnerPage>}
