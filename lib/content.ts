@@ -31,20 +31,98 @@ export type Program = { id:number; universityId:number; universityName:string; u
 type ReferenceProgram = { id:number; universitySlug:string; universityName:string; slug:string; name:string; englishName:string; degreeType:string; field:string; language:string; duration:string; tuitionFee:string; source:string };
 const referencePrograms=referenceProgramsRaw as ReferenceProgram[];
 const normalizeProgramKey=(value:string)=>value.trim().toLocaleLowerCase("en-US").replace(/\s+/g," ");
-const turkishNameByEnglish=new Map<string,string>();
-for(const item of referencePrograms){
-  if(item.englishName?.trim()&&item.name?.trim()&&normalizeProgramKey(item.englishName)!==normalizeProgramKey(item.name)){
-    turkishNameByEnglish.set(normalizeProgramKey(item.englishName),item.name.trim());
-  }
-}
+const looksEnglishProgramName=(value:string)=>{
+  const text=` ${normalizeProgramKey(value).replace(/[^a-z0-9]+/g," ")} `;
+  return /\b(and|of|management|engineering|technology|design|psychology|architecture|business|international|computer|systems|health|tourism|trade|programming|analytics|security|development|administration|education|sports|music|theatre|nursing|nutrition|physiotherapy|logistics|banking|insurance|electric|electronic|fashion|foreign|molecular|genetics|artificial|intelligence|operations|applied|clinical|accounting|auditing)\b/.test(text);
+};
 const turkishProgramOverrides=new Map<string,string>([
   ["accounting and auditing","Muhasebe ve Denetim"],
   ["advertising and strategic brand communication","Reklamcılık ve Stratejik Marka İletişimi"],
+  ["advertising and strategic brand communication non thesis","Reklamcılık ve Stratejik Marka İletişimi"],
   ["african studies and international relations","Afrika Çalışmaları ve Uluslararası İlişkiler"],
+  ["anesthesia","Anestezi"],
+  ["applied mathematics","Uygulamalı Matematik"],
+  ["applied psychology","Uygulamalı Psikoloji"],
+  ["architecture","Mimarlık"],
+  ["artificial intelligence engineering","Yapay Zekâ Mühendisliği"],
+  ["artificial intelligence operations","Yapay Zekâ Operasyonları"],
+  ["autonomous systems technology","Otonom Sistemler Teknolojisi"],
+  ["banking and insurance","Bankacılık ve Sigortacılık"],
+  ["big data analytics","Büyük Veri Analitiği"],
+  ["business administration","İşletme"],
+  ["business management","İşletme Yönetimi"],
+  ["child development","Çocuk Gelişimi"],
+  ["clinical psychology","Klinik Psikoloji"],
+  ["cloud computing operations","Bulut Bilişim Operasyonları"],
+  ["computer engineering","Bilgisayar Mühendisliği"],
+  ["computer programming","Bilgisayar Programcılığı"],
+  ["computer technology","Bilgisayar Teknolojisi"],
+  ["construction technology","İnşaat Teknolojisi"],
+  ["corporate it systems expertise","Kurumsal Bilişim Sistemleri Uzmanlığı"],
+  ["cybersecurity","Siber Güvenlik"],
+  ["digital media management","Dijital Medya Yönetimi"],
+  ["digital transformation electronics","Dijital Dönüşüm Elektroniği"],
+  ["e commerce and marketing","E-Ticaret ve Pazarlama"],
+  ["electric","Elektrik"],
+  ["electrical and electronics engineering","Elektrik-Elektronik Mühendisliği"],
+  ["electronic technology","Elektronik Teknolojisi"],
+  ["energy systems engineering","Enerji Sistemleri Mühendisliği"],
+  ["executive mba","Yönetici MBA"],
+  ["fashion design","Moda Tasarımı"],
+  ["foreign trade","Dış Ticaret"],
+  ["game development and programming","Oyun Geliştirme ve Programlama"],
+  ["graphic design","Grafik Tasarımı"],
+  ["hair care and beauty services","Saç Bakımı ve Güzellik Hizmetleri"],
+  ["health information systems technology","Sağlık Bilgi Sistemleri Teknolojisi"],
+  ["health tourism management","Sağlık Turizmi Yönetimi"],
+  ["hospital and health institutions management","Hastane ve Sağlık Kurumları Yönetimi"],
+  ["human resources management","İnsan Kaynakları Yönetimi"],
+  ["industrial design","Endüstriyel Tasarım"],
+  ["industrial engineering","Endüstri Mühendisliği"],
+  ["information security technology","Bilgi Güvenliği Teknolojisi"],
+  ["interior architecture","İç Mimarlık"],
+  ["interior design","İç Mekân Tasarımı"],
+  ["international business management","Uluslararası İşletme Yönetimi"],
+  ["international trade and business","Uluslararası Ticaret ve İşletme"],
+  ["logistics","Lojistik"],
+  ["management information systems","Yönetim Bilişim Sistemleri"],
+  ["manufacturing execution systems operations","Üretim Yürütme Sistemleri Operasyonları"],
+  ["mechanical engineering","Makine Mühendisliği"],
+  ["medical imaging techniques","Tıbbi Görüntüleme Teknikleri"],
+  ["molecular biology and genetics","Moleküler Biyoloji ve Genetik"],
+  ["nursing","Hemşirelik"],
+  ["nutrition and dietetics","Beslenme ve Diyetetik"],
+  ["physical education and sports","Beden Eğitimi ve Spor"],
+  ["physiotherapy","Fizyoterapi"],
+  ["physiotherapy and rehabilitation","Fizyoterapi ve Rehabilitasyon"],
+  ["psychology","Psikoloji"],
+  ["railway systems management","Raylı Sistemler Yönetimi"],
+  ["robotics and artificial intelligence","Robotik ve Yapay Zekâ"],
+  ["textile and fashion design","Tekstil ve Moda Tasarımı"],
+  ["theatre","Tiyatro"],
+  ["tourism management","Turizm İşletmeciliği"],
+  ["turkish language and literature","Türk Dili ve Edebiyatı"],
+  ["turkish music","Türk Müziği"],
+  ["unmanned vehicle technology","İnsansız Araç Teknolojisi"]
 ]);
+const turkishNameByEnglish=new Map<string,string>();
+for(const item of referencePrograms){
+  const left=item.name?.trim()||"";
+  const right=item.englishName?.trim()||"";
+  if(!left||!right||normalizeProgramKey(left)===normalizeProgramKey(right))continue;
+  if(looksEnglishProgramName(right)&&!looksEnglishProgramName(left))turkishNameByEnglish.set(normalizeProgramKey(right),left);
+  else if(looksEnglishProgramName(left)&&!looksEnglishProgramName(right))turkishNameByEnglish.set(normalizeProgramKey(left),right);
+}
 function turkishProgramName(name:string,englishName?:string){
-  const key=normalizeProgramKey(englishName||name);
-  return turkishNameByEnglish.get(key)||turkishProgramOverrides.get(key)||name;
+  const nameKey=normalizeProgramKey(name);
+  const englishKey=normalizeProgramKey(englishName||"");
+  const override=turkishProgramOverrides.get(nameKey)||turkishProgramOverrides.get(englishKey);
+  if(override)return override;
+  const mapped=turkishNameByEnglish.get(nameKey)||turkishNameByEnglish.get(englishKey);
+  if(mapped)return mapped;
+  if(englishName&&looksEnglishProgramName(name)&&!looksEnglishProgramName(englishName))return englishName.trim();
+  if(!looksEnglishProgramName(name))return name.trim();
+  return name.trim();
 }
 function canonicalProgramKey(name:string,englishName?:string,turkishName?:string){
   const source=(turkishName||turkishProgramName(name,englishName)||name)
