@@ -195,6 +195,8 @@ const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanli
     ar:{title:"التخصصات والبرامج الجامعية",description:"قارن البرامج وضيّق النتائج حسب المدينة والجامعة والدرجة ولغة الدراسة.",search:"ابحث عن برنامج",placeholder:"مثال: هندسة الحاسوب",sort:"الترتيب",apply:"عرض النتائج",clear:"مسح",found:"برنامج",viewUniversities:"عرض الجامعات",noResults:"لم يتم العثور على برامج مطابقة.",allPrograms:"جميع البرامج",viewUniversity:"عرض الجامعة",noUniversities:"لم يتم العثور على جامعات مطابقة.",selectedSuffix:"متاح في هذه الجامعات.",city:"المدينة",allCities:"كل المدن",university:"الجامعة",allUniversities:"كل الجامعات",degree:"الدرجة",allDegrees:"كل الدرجات",language:"لغة الدراسة",allLanguages:"كل اللغات",field:"المجال",allFields:"كل المجالات",universityCount:"جامعات"}
   } as const;
   const pc=programCopy[(locale in programCopy?locale:"tr") as keyof typeof programCopy];
+  const degreeLabel=(value:string)=>({tr:{"Ön Lisans":"Ön Lisans","Lisans":"Lisans","Yüksek Lisans":"Yüksek Lisans","Doktora":"Doktora"},en:{"Ön Lisans":"Associate","Lisans":"Bachelor","Yüksek Lisans":"Master","Doktora":"Doctorate"},ru:{"Ön Lisans":"Колледж","Lisans":"Бакалавриат","Yüksek Lisans":"Магистратура","Doktora":"Докторантура"},ar:{"Ön Lisans":"دبلوم","Lisans":"بكالوريوس","Yüksek Lisans":"ماجستير","Doktora":"دكتوراه"}}[(locale==="en"||locale==="ru"||locale==="ar"?locale:"tr") as "tr"|"en"|"ru"|"ar"] as Record<string,string>)[value]||value;
+  const languageLabel=(value:string)=>({tr:{"Türkçe":"Türkçe","İngilizce":"İngilizce"},en:{"Türkçe":"Turkish","İngilizce":"English"},ru:{"Türkçe":"Турецкий","İngilizce":"Английский"},ar:{"Türkçe":"التركية","İngilizce":"الإنجليزية"}}[(locale==="en"||locale==="ru"||locale==="ar"?locale:"tr") as "tr"|"en"|"ru"|"ar"] as Record<string,string>)[value]||value;
 
   const selectedProgramDisplay=!selectedProgram
     ? ""
@@ -231,8 +233,8 @@ const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanli
           <div className="program-filter-secondary">
             <label><span>{pc.city}</span><select name="city" defaultValue={query.city||""}><option value="">{pc.allCities}</option>{catalog.cities.map(city=><option key={city} value={city}>{city}</option>)}</select></label>
             <label><span>{pc.university}</span><select name="university" defaultValue={query.university||""}><option value="">{pc.allUniversities}</option>{catalog.universities.map(university=><option key={university.slug} value={university.slug}>{university.name}</option>)}</select></label>
-            <label><span>{pc.degree}</span><select name="degree" defaultValue={query.degree||""}><option value="">{pc.allDegrees}</option>{catalog.degrees.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
-            <label><span>{pc.language}</span><select name="language" defaultValue={query.language||""}><option value="">{pc.allLanguages}</option>{catalog.languages.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
+            <label><span>{pc.degree}</span><select name="degree" defaultValue={query.degree||""}><option value="">{pc.allDegrees}</option>{catalog.degrees.map(value=><option key={value} value={value}>{degreeLabel(value)}</option>)}</select></label>
+            <label><span>{pc.language}</span><select name="language" defaultValue={query.language||""}><option value="">{pc.allLanguages}</option>{catalog.languages.map(value=><option key={value} value={value}>{languageLabel(value)}</option>)}</select></label>
             <label><span>{pc.field}</span><select name="field" defaultValue={query.field||""}><option value="">{pc.allFields}</option>{catalog.fields.map(value=><option key={value} value={value}>{value}</option>)}</select></label>
             {(searchTerm||sortMode==="desc"||query.city||query.university||query.degree||query.language||query.field)&&<Link className="program-filter-clear" href={`/${locale}/bolumler`}>{pc.clear}</Link>}
           </div>
@@ -242,7 +244,7 @@ const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanli
         <div className="program-listing-grid program-listing-premium">{visibleProgramNames.map((program,index)=><Link className="program-card program-card-v2" key={program.key} href={`/${locale}/bolumler?program=${encodeURIComponent(program.key)}`}>
           <div className="program-card-top"><span>{String((safeProgramPage-1)*perPage+index+1).padStart(2,"0")}</span><b>{program.universityCount} {pc.universityCount}</b></div>
           <h2>{program.display}</h2>
-          <div className="program-card-meta">{program.degrees.slice(0,2).map(value=><span key={value}>{value}</span>)}{program.languages.slice(0,2).map(value=><span key={value}>{value}</span>)}</div>
+          <div className="program-card-meta">{program.degrees.slice(0,2).map(value=><span key={value}>{degreeLabel(value)}</span>)}{program.languages.slice(0,2).map(value=><span key={value}>{languageLabel(value)}</span>)}</div>
           <div className="program-card-cta"><span>{pc.viewUniversities}</span><b aria-hidden="true">↗</b></div>
         </Link>)}</div>
         {!visibleProgramNames.length&&<div className="empty-state">{pc.noResults}</div>}
@@ -253,7 +255,7 @@ const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanli
         <div className="program-university-grid program-university-grid-v2">{fieldUniversities.map((university,index)=><Link key={university.slug} href={`/${locale}/universiteler/${university.slug}`}>
           <span className="program-university-index">{String(index+1).padStart(2,"0")}</span>
           <h2>{university.name}</h2>
-          <div>{[...university.degrees].slice(0,2).map(value=><span key={value}>{value}</span>)}{[...university.languages].slice(0,2).map(value=><span key={value}>{value}</span>)}</div>
+          <div>{[...university.degrees].slice(0,2).map(value=><span key={value}>{degreeLabel(value)}</span>)}{[...university.languages].slice(0,2).map(value=><span key={value}>{languageLabel(value)}</span>)}</div>
           <b>{pc.viewUniversity}<span aria-hidden="true">↗</span></b>
         </Link>)}</div>
         {!fieldUniversities.length&&<div className="empty-state">{pc.noUniversities}</div>}
