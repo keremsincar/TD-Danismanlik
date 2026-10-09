@@ -4,11 +4,10 @@ import Link from "@/components/NativeLink";
 import { InnerPage } from "@/components/InnerPage";
 import { ConsultationForm } from "@/components/ConsultationForm";
 import { ContactPage } from "@/components/ContactPage";
-import { ProgramFinder } from "@/components/ProgramFinder";
 import { PreferenceRobot } from "@/components/PreferenceRobot";
 import { UniversityCatalog } from "@/components/UniversityCatalog";
 import { FaqAccordion } from "@/components/FaqAccordion";
-import { getCatalogProgramCounts,getCatalogUniversities,getFaqs,getProgramsForProgramIdentity,getReviews,getServices,getSettings,getSiteImages,getUniversities,searchCatalogPrograms } from "@/lib/content";
+import { getCatalogProgramCounts,getCatalogUniversities,getFaqs,getProgramsForProgramIdentity,getReviews,getServices,getSettings,getUniversities,searchCatalogPrograms } from "@/lib/content";
 import { languageLabels,localizeFaqs,localizeService,pageIntro,requestText } from "@/lib/i18n";
 export const dynamic="force-dynamic";
 const pages:Record<string,{title:string;lead:string;body:string[]}>= {
@@ -135,7 +134,7 @@ export async function generateMetadata({params}:{params:Promise<{locale:string;s
   };
 }
 
-export default async function GenericPage({params,searchParams}:{params:Promise<{locale:string;slug:string}>;searchParams:Promise<{page?:string;q?:string;city?:string;type?:string;sort?:string;university?:string;degree?:string;language?:string;field?:string;programPage?:string;program?:string}>}){const [{locale,slug},query]=await Promise.all([params,searchParams]);const initialPage=Math.max(1,Number.parseInt(query.page||"1",10)||1);const [settings,services,universities,images]=await Promise.all([getSettings(),getServices(),getUniversities(),getSiteImages()]);
+export default async function GenericPage({params,searchParams}:{params:Promise<{locale:string;slug:string}>;searchParams:Promise<{page?:string;q?:string;city?:string;type?:string;sort?:string;university?:string;degree?:string;language?:string;field?:string;programPage?:string;program?:string}>}){const [{locale,slug},query]=await Promise.all([params,searchParams]);const initialPage=Math.max(1,Number.parseInt(query.page||"1",10)||1);const [settings,services,universities]=await Promise.all([getSettings(),getServices(),getUniversities()]);
 const t=languageLabels(locale),request=requestText(locale);if(slug==="danismanlik-talebi")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.request}]}><main className="request-page"><section><p className="section-index">{t.request}</p><h1>{request.title1}<br/><em>{request.title2}</em></h1><p>{request.lead}</p><div className="request-points"><span>{request.point1}</span><span>{request.point2}</span><span>{request.point3}</span></div></section><ConsultationForm {...{services,universities,locale}}/></main></InnerPage>;
   if(slug==="iletisim")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:t.contact}]}><ContactPage settings={settings} locale={locale}/></InnerPage>;
   if(slug==="tesekkurler")return <InnerPage settings={settings} locale={locale} crumbs={[{label:t.home,href:`/${locale}`},{label:request.thanksTitle}]}><main className="thanks-page"><span>✓</span><p className="section-index">{request.thanksKicker}</p><h1>{request.thanksTitle}</h1><p>{request.thanksBody}</p><div><Link className="button button-dark" href={`/${locale}`}>{request.home}</Link>{settings.whatsapp&&<a className="button button-primary" href={`https://wa.me/${settings.whatsapp.replace(/\D/g,"")}`}>{request.whatsapp}</a>}</div></main></InnerPage>;
