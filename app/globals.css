@@ -1801,7 +1801,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .faq-categories button:hover{border-color:#99b1bd!important;color:var(--td-blue)!important}
 .faq-categories button.is-active{background:var(--td-blue)!important;border-color:var(--td-blue)!important;color:#fff!important}
 .faq-accordion-list{display:block!important}
-.faq-page-list{border-top:1px solid var(--td-line)!important}
+.faq-page-list{max-width:none!important;width:100%!important;border-top:1px solid var(--td-line)!important}
 .faq-page-list article{border:0!important;border-bottom:1px solid var(--td-line)!important;border-radius:0!important;background:transparent!important;overflow:hidden!important}
 .faq-page-list article.is-open{background:#fff!important}
 .faq-accordion-list article>button{
