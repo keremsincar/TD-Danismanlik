@@ -88,6 +88,94 @@ export async function createAdminSession(userId:number) {
   return {token,expires};
 }
 
+async function ensureAdminLoginChallengeTable(){
+  await ensureDatabase();
+  await rawDatabase().prepare(`CREATE TABLE IF NOT EXISTS admin_login_challenges (
+    id TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    email TEXT NOT NULL,
+    code_hash TEXT NOT NULL,
+    ip TEXT NOT NULL,
+    user_agent TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+  )`).run();
+}
+
+function maskEmail(email:string){
+  const [local,domain]=email.split("@");
+  if(!domain)return email;
+  const visible=local.slice(0,Math.min(2,local.length));
+  return `${visible}${"*".repeat(Math.max(3,local.length-visible.length))}@${domain}`;
+}
+
+async function sendSecurityEmail(to:string,subject:string,html:string){
+  const runtime=env as unknown as {RESEND_API_KEY?:string};
+  if(!runtime.RESEND_API_KEY)return false;
+  const response=await fetch("https://api.resend.com/emails",{
+    method:"POST",
+    headers:{Authorization:`Bearer ${runtime.RESEND_API_KEY}`,"Content-Type":"application/json"},
+    body:JSON.stringify({from:"TD Danışmanlık <bildirim@tddanismanlik.com>",to:[to],subject,html})
+  }).catch(()=>null);
+  return Boolean(response?.ok);
+}
+
+export async function beginAdminLoginApproval(user:AdminAccount,ip:string,userAgent:string){
+  await ensureAdminLoginChallengeTable();
+  const code=String((crypto.getRandomValues(new Uint32Array(1))[0]%900000)+100000);
+  const id=randomToken(24);
+  const codeHash=await sha256(`${id}:${code}`);
+  const now=new Date();
+  const expires=new Date(now.getTime()+10*60_000);
+  await rawDatabase().batch([
+    rawDatabase().prepare("DELETE FROM admin_login_challenges WHERE user_id=? OR expires_at<=?").bind(user.id,now.toISOString()),
+    rawDatabase().prepare("INSERT INTO admin_login_challenges (id,user_id,email,code_hash,ip,user_agent,expires_at,attempts,created_at) VALUES (?,?,?,?,?,?,?,?,?)").bind(id,user.id,user.email,codeHash,ip,userAgent.slice(0,500),expires.toISOString(),0,now.toISOString())
+  ]);
+  const sent=await sendSecurityEmail(
+    user.email,
+    "TD Danışmanlık yönetici girişi doğrulama kodu",
+    `<h2>Yönetici girişi doğrulaması</h2><p>TD Danışmanlık yönetim paneline giriş yapılmak isteniyor.</p><p style="font-size:28px;font-weight:700;letter-spacing:6px">${code}</p><p>Bu kod 10 dakika geçerlidir.</p><p><b>IP:</b> ${ip.replace(/[<>&"]/g,"")}</p><p>Bu giriş size ait değilse şifrenizi değiştirin ve aktif oturumları sonlandırın.</p>`
+  );
+  if(!sent){
+    await rawDatabase().prepare("DELETE FROM admin_login_challenges WHERE id=?").bind(id).run();
+    return {error:"Güvenli giriş kodu e-posta ile gönderilemedi. E-posta servisi ayarlarını kontrol edin."} as const;
+  }
+  return {challengeId:id,maskedEmail:maskEmail(user.email)} as const;
+}
+
+export async function approveAdminLogin(challengeId:string,code:string,ip:string){
+  await ensureAdminLoginChallengeTable();
+  const now=new Date().toISOString();
+  const challenge=await rawDatabase().prepare("SELECT id,user_id AS userId,email,code_hash AS codeHash,ip,expires_at AS expiresAt,attempts,user_agent AS userAgent FROM admin_login_challenges WHERE id=?").bind(challengeId).first<{id:string;userId:number;email:string;codeHash:string;ip:string;expiresAt:string;attempts:number;userAgent:string}>();
+  if(!challenge||challenge.expiresAt<=now){
+    if(challenge)await rawDatabase().prepare("DELETE FROM admin_login_challenges WHERE id=?").bind(challengeId).run();
+    return {error:"Doğrulama isteğinin süresi doldu. Lütfen yeniden giriş yapın."} as const;
+  }
+  if(challenge.attempts>=5)return {error:"Çok fazla hatalı kod denemesi yapıldı. Lütfen yeniden giriş yapın."} as const;
+  if(challenge.ip!==ip)return {error:"Giriş doğrulaması farklı bir ağdan tamamlanamaz. Lütfen yeniden giriş yapın."} as const;
+  const actual=await sha256(`${challengeId}:${code.trim()}`);
+  let difference=actual.length===challenge.codeHash.length?0:1;
+  if(!difference)for(let i=0;i<actual.length;i++)difference|=actual.charCodeAt(i)^challenge.codeHash.charCodeAt(i);
+  if(difference!==0){
+    await rawDatabase().prepare("UPDATE admin_login_challenges SET attempts=attempts+1 WHERE id=?").bind(challengeId).run();
+    return {error:"Doğrulama kodu hatalı."} as const;
+  }
+  await rawDatabase().prepare("DELETE FROM admin_login_challenges WHERE id=?").bind(challengeId).run();
+  const user=await rawDatabase().prepare("SELECT id,email,name,role,active,created_at AS createdAt,updated_at AS updatedAt,last_login_at AS lastLoginAt FROM admin_users WHERE id=? AND active=1").bind(challenge.userId).first<AdminAccount>();
+  if(!user)return {error:"Yönetici hesabı artık aktif değil."} as const;
+  return {user,userAgent:challenge.userAgent} as const;
+}
+
+export async function sendAdminLoginNotice(user:AdminAccount,ip:string,userAgent:string){
+  const when=new Date().toLocaleString("tr-TR",{timeZone:"Europe/Istanbul"});
+  await sendSecurityEmail(
+    user.email,
+    "TD Danışmanlık yönetici paneline giriş yapıldı",
+    `<h2>Başarılı yönetici girişi</h2><p><b>Hesap:</b> ${user.email}</p><p><b>Tarih:</b> ${when}</p><p><b>IP:</b> ${ip.replace(/[<>&"]/g,"")}</p><p><b>Cihaz:</b> ${userAgent.replace(/[<>&"]/g,"").slice(0,300)}</p><p>Bu giriş size ait değilse hemen şifrenizi değiştirin ve oturumları sonlandırın.</p>`
+  );
+}
+
 export async function authenticateAdmin(email:string,password:string,requestKey:string) {
   await ensureBootstrapOwner();const d1=rawDatabase(),now=Date.now(),key=`admin-login:${requestKey}:${email}`;
   const limit=await d1.prepare("SELECT count,reset_at AS resetAt FROM rate_limits WHERE key=?").bind(key).first<{count:number;resetAt:number}>();
